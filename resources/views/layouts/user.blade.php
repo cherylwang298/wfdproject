@@ -14,6 +14,8 @@
 <body>
     @yield('content')
 
+    {{-- <h1 class="text-center text-7xl font-bold text-blue-300">Tes</h1> --}}
+
     @yield('script')
 </body>
 </html>

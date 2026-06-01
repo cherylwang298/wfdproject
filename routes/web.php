@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PropertyController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,3 +16,5 @@ Route::prefix('prototype')->group(function(){
         return view('prototyping.index');
     });
 });
+
+Route::get('/properties', [PropertyController::class, 'index'])->name('index.properties');

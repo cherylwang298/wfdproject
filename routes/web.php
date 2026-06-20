@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\AirlineController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,3 +19,6 @@ Route::prefix('prototype')->group(function(){
 });
 
 Route::get('/properties', [PropertyController::class, 'index'])->name('index.properties');
+// Route::get('/airlines', [])
+
+Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');

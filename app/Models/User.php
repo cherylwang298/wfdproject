@@ -24,4 +24,6 @@ class User extends Authenticatable
         'profile_picture',
         'password',
     ];
+
+    
 }

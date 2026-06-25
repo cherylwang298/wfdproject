@@ -11,18 +11,17 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use HasUuids, HasFactory, Notifiable;
 
-use HasUuids;
+    protected $table = 'users';
 
-protected $table = 'users';
-
-protected $fillable = [
-    'username',
-    'first_name',
-    'last_name',
-    'email',
-    'phone_number',
-    'profile_picture',
-    'password',
-];
-    }
+    protected $fillable = [
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'phone_number',
+        'profile_picture',
+        'password',
+    ];
+}

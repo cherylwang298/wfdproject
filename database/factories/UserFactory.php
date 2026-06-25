@@ -25,11 +25,14 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'id' => (string) \Illuminate\Support\Str::uuid(), // Generate UUID untuk id
+            'username' => fake()->unique()->userName(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'phone_number' => fake()->unique()->phoneNumber(), // Memenuhi kolom phone_number yang unique
+            'profile_picture' => null,
+            'password' => static::$password ??= \Illuminate\Support\Facades\Hash::make('password'),
         ];
     }
 

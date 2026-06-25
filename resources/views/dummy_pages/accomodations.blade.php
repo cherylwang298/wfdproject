@@ -42,7 +42,12 @@
 
             {{-- {{ route('property.detail',$property['id']) }}  property.detail--}}
                 <a
-                    href="{{ route('property.detail',$property['id']) }}"
+                   href="{{ route('property.detail', [
+    'id' => $property['id'],
+    'checkin' => $checkin,
+    'checkout' => $checkout,
+    'guests' => $guests,
+]) }}"
                     class="group bg-white rounded-3xl overflow-hidden shadow hover:shadow-xl transition duration-300">
 
                     {{-- Image --}}

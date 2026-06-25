@@ -146,9 +146,13 @@
                                 </a> --}}
 
                                 @if(auth()->check())
-{{-- {{ route('booking.open', $unit['id']) }} --}}
-    <a
-        href=""
+{{--  --}}
+    <a href="{{ route('booking.open', [
+    'id' => $unit['id'],
+    'checkin' => $checkin,
+    'checkout' => $checkout,
+    'guests' => $guests,
+]) }}"
         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl">
 
         Book Now

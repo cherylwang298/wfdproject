@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
@@ -64,6 +65,10 @@ Route::get('/properties/{id}', [SearchController::class, 'openPropertyDetail'])
 
 // butuh user middleware:
 
-
+Route::get('/booking/{id}', [BookingController::class, 'openBookingPage'])->name('booking.open');
+Route::post('/booking/store',
+    [BookingController::class,'storeBooking'])
+    ->name('booking.store');
+Route::get('/my-bookings', [UserController::class, 'myBookings'])->name('bookings.success');
 Route::post('/logout', [UserController::class, 'logout'])
     ->name('logout');

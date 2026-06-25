@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,10 +11,9 @@ use Illuminate\Support\Str;
 
 class Reservation extends Model
 {
-    use HasFactory;
+    use HasUuids;
 
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $table = 'reservations';
 
     protected $fillable = [
         'user_id',
@@ -21,6 +21,9 @@ class Reservation extends Model
         'check_in',
         'check_out',
         'total_price',
+        'guest_name',
+        'guest_email',
+        'guest_phone_number',
         'status',
         'payment_status',
         'promo_id',

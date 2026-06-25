@@ -38,7 +38,7 @@ public function searchAccomodations(Request $request)
     // dd($request->all());
 
     $request->validate([
-        'city' => 'required|string',
+        'city' => 'required|string',    
         'checkin' => 'required|date',
         'checkout' => 'required|date|after:checkin',
         'guests' => 'required|integer|min:1'
@@ -135,7 +135,7 @@ public function searchAccomodations(Request $request)
 
 
 
-public function openPropertyDetail($id)
+public function openPropertyDetail(Request $request, $id)
 {
     $properties = collect(
         Http::get(env('API_BASE_URL').'/properties')->json()
@@ -175,7 +175,10 @@ public function openPropertyDetail($id)
 
     return view('dummy_pages.accomodation-details', [
         'property' => $property,
-        'units' => $propertyUnits
+        'units' => $propertyUnits,
+        'checkin' => $request->query('checkin'),
+        'checkout' => $request->query('checkout'),
+        'guests' => $request->query('guests'),
     ]); 
 }
 

@@ -136,4 +136,39 @@ return view('dummy_pages.home', compact(
 ));   
 }
 
+
+public function getAllBookings(){
+    $user = Auth::user();
+    $bookings = $user->reservations()->with('property')->get();
+    return view('dummy_pages.users.my-bookings', compact('bookings'));
+}
+
+public function myBookings()
+{
+    // 1. Ambil semua data booking milik user
+    $bookings = Auth::user()->reservations()->latest()->get();
+
+    // 2. Ambil semua data unit dari API Repo
+    $response = Http::get(env('API_BASE_URL') . '/units');
+    
+    if ($response->successful()) {
+        // Ubah data API unit menjadi Collection agar mudah diolah
+        $units = collect($response->json());
+
+        // 3. Pasangkan data unit dari API ke dalam masing-masing booking berdasarkan unit_id
+        $bookings->transform(function ($booking) use ($units) {
+            // Cari data unit yang id-nya cocok dengan unit_id di booking
+            $matchedUnit = $units->firstWhere('id', $booking->unit_id);
+            
+            // Bungkus menjadi objek atau array agar bisa dibaca di Blade
+            $booking->unit_details = $matchedUnit; 
+            
+            return $booking;
+        });
+    }
+
+    return view('dummy_pages.users.my-bookings', compact('bookings'));
+}
+
+
     }

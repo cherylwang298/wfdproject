@@ -20,6 +20,9 @@ return new class extends Migration
             $table->unsignedInteger('total_price');
             $table->string('status')->default('pending');
             $table->string('payment_status')->default('unpaid');
+            $table->string('guest_name');
+            $table->string('guest_phone_number');
+            $table->string('guest_email');
             $table->uuid('promo_id')->nullable(); 
             $table->timestamps();
 

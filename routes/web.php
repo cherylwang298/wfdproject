@@ -6,6 +6,7 @@ use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FlightSearchController;
+use App\Http\Controllers\PromoController;
 use App\Http\Controllers\PropertyDetailController;
 use App\Http\Controllers\UserController;
 
@@ -34,6 +35,9 @@ Route::get('/accommodations/{id}', [PropertyDetailController::class, 'show'])->n
 // flights
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
 Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights');
+
+// deals / promos
+Route::get('/deals', [PromoController::class, 'index'])->name('deals');
 
 // admin routes
 Route::get('/admin/login', function(){

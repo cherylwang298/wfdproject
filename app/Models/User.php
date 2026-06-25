@@ -25,5 +25,23 @@ class User extends Authenticatable
         'password',
     ];
 
-    
+    public function reservations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function flightBookings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FlightBooking::class);
+    }
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function favorites(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }

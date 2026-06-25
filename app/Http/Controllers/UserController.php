@@ -119,5 +119,64 @@ return view('dummy_pages.home', compact(
    
 }
 
+    public function home2()
+    {
+        // 1. Ambil data properti dari API
+        $responseProperties = Http::get(env('API_BASE_URL') . '/properties');
 
+        // 2. Ambil data penerbangan dari API Flights
+        $flights = collect();
+        try {
+            $responseFlights = Http::get(env('API_BASE_URL') . '/flights'); // Hubungkan ke endpoint /units atau /flights Anda di API
+            if ($responseFlights->successful()) {
+                $flights = collect($responseFlights->json());
+            }
+        } catch (\Exception $e) {
+            // Tetap biarkan kosong atau isi fallback jika API Flights mati
+        }
+
+        // 3. Ambil 3 promo random dari DB lokal
+        $availPromos = Promo::all();
+        $promos = $availPromos->shuffle()->take(3)->values();
+
+        // 4. Proses data Properites jika API berhasil
+        if ($responseProperties->successful()) {
+            $properties = collect($responseProperties->json());
+            $featuredProperties = $properties->shuffle()->take(6)->values();
+        } else {
+            $featuredProperties = collect();
+        }
+
+        // 5. Ambil 4 flights secara random dari API jika data flights tersedia
+        $featuredRoutes = collect();
+        if ($flights->isNotEmpty()) {
+            // Jika data di database kurang dari 4, ambil semua yang ada agar tidak error
+            $takeCount = $flights->count() >= 4 ? 4 : $flights->count();
+            $featuredRoutes = $flights->random($takeCount)->values();
+        } else {
+            // Fallback dummy jika database penerbangan di API bener-bener kosong
+            $featuredRoutes = collect([
+                ['origin' => 'CGK', 'destination' => 'DPS', 'class' => 'economy', 'price' => 750000],
+                ['origin' => 'SUB', 'destination' => 'SIN', 'class' => 'economy', 'price' => 1200000],
+                ['origin' => 'CGK', 'destination' => 'NRT', 'class' => 'business', 'price' => 3500000],
+                ['origin' => 'DPS', 'destination' => 'SYD', 'class' => 'economy', 'price' => 2800000],
+            ]);
+        }
+
+        // Data static traveler stories
+        $testimonials = collect([
+            ['initials'=>'SJ','name'=>'Sarah Jenkins','sub'=>'Traveled to Santorini','rating'=>5,'quote'=>"Booking our honeymoon through StayGo was an absolute dream.",'color'=>'bg-primary-container text-on-primary-container'],
+            ['initials'=>'MR','name'=>'Michael Ross','sub'=>'Frequent Flyer','rating'=>5,'quote'=>"I travel for business constantly. StayGo helps me manage flights and hotels.",'color'=>'bg-tertiary-container text-on-tertiary-container'],
+            ['initials'=>'EL','name'=>'Emma Lin','sub'=>'Family Traveler','rating'=>4.5,'quote'=>"The flight price tracking feature saved us over $300 on our family trip!",'color'=>'bg-secondary-container text-on-secondary-container'],
+        ]);
+
+        return view('homepage', compact(
+            'featuredProperties',
+            'promos',
+            'featuredRoutes',
+            'testimonials'
+        ));
     }
+
+
+}

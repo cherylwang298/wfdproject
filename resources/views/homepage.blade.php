@@ -24,7 +24,7 @@
 </head>
 <body class="bg-background text-on-background antialiased">
 
-{{-- @include('partials.nav') --}}
+@include('partials.navbar')
 
 <header class="relative pt-32 pb-48 px-6 md:px-16 overflow-hidden flex flex-col items-center justify-center min-h-[860px]">
     <div class="absolute inset-0 z-0">
@@ -109,33 +109,48 @@
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="properties-grid">
-            @foreach ($hotels as $h)
-            <a href="#" class="property-card group cursor-pointer relative overflow-hidden rounded-3xl block hover:shadow-2xl transition-shadow duration-300"
-               data-type="{{ $h['type'] }}" data-price="{{ $h['price'] }}" data-rating="{{ $h['rating'] ?? 4.5 }}">
-                <div class="relative h-64 overflow-hidden bg-gray-200">
-                    <img alt="{{ $h['name'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                         src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600">
-                    <button onclick="event.preventDefault(); toggleFav(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors border border-white/30">
-                        <span class="material-symbols-outlined text-[18px] text-on-surface-variant fav-icon">favorite_border</span>
-                    </button>
-                    @if (!empty($h['badge']))
-                    <span class="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full text-xs font-semibold">{{ $h['badge'] }}</span>
-                    @endif
+            @foreach ($featuredProperties as $h)
+            <a href="hotel_detail.php?id={{ $h['id'] }}" 
+                class="property-card group cursor-pointer relative overflow-hidden rounded-3xl block hover:shadow-2xl transition-shadow duration-300"
+                data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['rating'] }}">
+                <div class="relative h-64 overflow-hidden">
+                <img alt="{{ $h['name'] }}" 
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600"
+                    onerror="this.src='https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600'">
+                
+                <button onclick="event.preventDefault(); toggleFav(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors border border-white/30">
+                    <span class="material-symbols-outlined text-[18px] text-on-surface-variant fav-icon">favorite_border</span>
+                </button>
+                
+                @if (!empty($h['badge']))
+                <span class="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">{{ $h['badge'] }}</span>
+                @endif
                 </div>
-                <div class="p-5 bg-surface-container-lowest border-t border-gray-100">
-                    <div class="flex justify-between items-start mb-1">
-                        <h3 class="text-on-surface text-[18px] font-bold leading-tight">{{ $h['name'] }}</h3>
-                        <span class="flex items-center gap-0.5 text-on-surface text-xs font-semibold shrink-0 ml-2">
-                            <span class="material-symbols-outlined text-[14px] text-secondary icon-fill">star</span>{{ $h['rating'] ?? 4.5 }}
-                        </span>
-                    </div>
-                    <p class="text-on-surface-variant text-[14px] flex items-center gap-1 mb-3">
-                        <span class="material-symbols-outlined text-[14px]">location_on</span>{{ $h['city'] ?? $h['location'] }}
+                
+                <div class="p-5 bg-surface-container-lowest">
+                <div class="flex justify-between items-start mb-1">
+                    <h3 class="font-headline-md text-on-surface text-[18px] leading-tight">{{ $h['name'] }}</h3>
+                    <span class="flex items-center gap-0.5 text-on-surface font-label-sm text-label-sm shrink-0 ml-2">
+                    <span class="material-symbols-outlined text-[14px] text-secondary icon-fill">star</span>{{ number_format($h['rating'], 1) }}
+                    </span>
+                </div>
+                
+                <p class="font-body-md text-on-surface-variant text-[14px] flex items-center gap-1 mb-3">
+                    <span class="material-symbols-outlined text-[14px]">location_on</span>{{ $h['city'] }}
+                </p>
+                
+                <div class="flex items-center justify-between">
+                    <span class="font-label-sm text-label-sm text-on-surface-variant capitalize bg-surface-container px-3 py-1 rounded-full">{{ $h['type'] }}</span>
+                    <p class="font-headline-md text-on-surface text-[18px]">
+                        @if($h['cheapest_price'] > 0)
+                            Rp {{ number_format($h['cheapest_price'], 0, ',', '.') }}
+                        @else
+                            N/A
+                        @endif
+                        <span class="font-body-md text-on-surface-variant text-[13px]">/night</span>
                     </p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-on-surface-variant capitalize bg-surface-container px-3 py-1 rounded-full">{{ $h['type'] }}</span>
-                        <p class="text-on-surface text-[18px] font-bold">Rp {{ number_format($h['price'], 0, ',', '.') }}<span class="text-on-surface-variant text-[13px] font-normal">/night</span></p>
-                    </div>
+                </div>
                 </div>
             </a>
             @endforeach
@@ -147,30 +162,83 @@
         </div>
     </section>
 
+    {{-- promos --}}
     <section class="max-w-7xl mx-auto mb-24">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-on-surface mb-2">Hot Deals for You 🔥</h2>
+            <p class="text-sm text-on-surface-variant">Save more on selected stays and exclusive promotions.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($promos as $promo)
+                @php
+                    $isPercent = ($promo['discount_type'] ?? 'percent') === 'percent';
+                    $value = $promo['discount_value'] ?? 0;
+                    $code = $promo['code'] ?? '-';
+                    $expired = isset($promo['expired_at']) ? \Carbon\Carbon::parse($promo['expired_at'])->format('d M Y') : '-';
+                @endphp
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg p-6 group hover:shadow-xl transition-all duration-300">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform"></div>
+                    <div class="relative z-10 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="text-xs font-semibold opacity-75 mb-1">Valid until {{ $expired }}</div>
+                            <h3 class="text-3xl font-black tracking-tight">
+                                {{ $value }}{{ $isPercent ? '%' : ' IDR' }} <span class="text-sm font-bold opacity-90">OFF</span>
+                            </h3>
+                            <p class="mt-2 text-lg font-bold tracking-wide uppercase">{{ $code }}</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <button onclick="navigator.clipboard.writeText(@js($code)); this.innerText='✓ Copied!'" 
+                                    class="bg-white/20 hover:bg-white/30 text-xs font-mono px-4 py-2 rounded-xl border border-white/20 transition-colors backdrop-blur-sm">
+                                {{ $code }}
+                            </button>
+                            <span class="text-xs opacity-75">Click to copy code</span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full text-center py-12 text-on-surface-variant bg-surface-container rounded-3xl">
+                    <p class="font-medium">No deals available at the moment.</p>
+                </div>
+            @endforelse
+        </div>
+    </section>
+
+    <section class="max-w-[1440px] mx-auto mb-24">
         <div class="flex justify-between items-end mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-on-surface mb-2">Popular Flights</h2>
-                <p class="text-sm text-on-surface-variant">Top destinations for your next adventure.</p>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Popular Flights</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant">Top destinations for your next adventure.</p>
             </div>
+            <a href="#" class="font-label-md text-label-md text-primary hover:text-blue-950 transition-colors hidden md:flex items-center gap-1">
+            View all flights <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
         </div>
+        
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach ($featuredRoutes as $r)
             <a href="#" class="bg-surface-container p-6 hover:bg-surface-container-high transition-all cursor-pointer group rounded-3xl hover:shadow-md hover:-translate-y-1 duration-300 block">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-xl font-bold text-on-surface">{{ $r['from'] }}</span>
-                    <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">flight_takeoff</span>
-                    <span class="text-xl font-bold text-on-surface">{{ $r['to'] }}</span>
-                </div>
-                <p class="text-sm text-on-surface-variant mb-6">{{ $r['label'] }}</p>
-                <div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
-                    <span class="text-xs text-on-surface-variant">from</span>
-                    <span class="text-sm font-bold text-primary">${{ $r['price'] }}</span>
-                </div>
+            <div class="flex items-center justify-between mb-4">
+                {{-- Menampilkan Kode Bandara Asal dan Tujuan dari API --}}
+                <span class="font-headline-md text-headline-md text-on-surface text-xl font-bold">{{ $r['origin'] }}</span>
+                <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">flight_takeoff</span>
+                <span class="font-headline-md text-headline-md text-on-surface text-xl font-bold">{{ $r['destination'] }}</span>
+            </div>
+            
+            {{-- Menampilkan Tipe Kelas Penerbangan --}}
+            <p class="text-sm text-on-surface-variant mb-6 capitalize">{{ $r['class'] ?? 'Economy Class' }}</p>
+            
+            <div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+                <span class="font-label-sm text-label-sm text-on-surface-variant text-xs">one-way from</span>
+                {{-- Menampilkan Harga Rupiah Dinamis --}}
+                <span class="font-label-md text-label-md text-primary font-bold">
+                    Rp {{ number_format($r['price'], 0, ',', '.') }}
+                </span>
+            </div>
             </a>
             @endforeach
         </div>
-    </section>
+        </section>
 </main>
 
 <script>

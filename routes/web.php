@@ -23,6 +23,7 @@ Route::prefix('prototype')->group(function(){
 });
 
 Route::get('/', [UserController::class, 'home'])->name('home');
+Route::get('/testhome', [UserController::class, 'home2'])->name('homepage');
 // Route::get('/airlines', [])
 
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');

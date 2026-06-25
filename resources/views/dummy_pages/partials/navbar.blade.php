@@ -42,7 +42,7 @@
             href="{{ route('login.form') }}"
             class="text-sm px-4 py-2 rounded-full border hover:bg-slate-50"
         >
-            Login
+            Sign In
         </a>
 
         <a

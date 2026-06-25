@@ -24,7 +24,7 @@
 </head>
 <body class="bg-background text-on-background antialiased">
 
-@include('partials.navbar')
+@include('partials.navbar', ['currentPage' => 'home'])
 
 <header class="relative pt-32 pb-48 px-6 md:px-16 overflow-hidden flex flex-col items-center justify-center min-h-[860px]">
     <div class="absolute inset-0 z-0">
@@ -110,7 +110,7 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="properties-grid">
             @foreach ($featuredProperties as $h)
-            <a href="hotel_detail.php?id={{ $h['id'] }}" 
+            <a href="{{ route('properties.detail', $h['id']) }}" 
                 class="property-card group cursor-pointer relative overflow-hidden rounded-3xl block hover:shadow-2xl transition-shadow duration-300"
                 data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['rating'] }}">
                 <div class="relative h-64 overflow-hidden">

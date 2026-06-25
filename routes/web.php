@@ -5,6 +5,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FlightSearchController;
 use App\Http\Controllers\PropertyDetailController;
 use App\Http\Controllers\UserController;
 
@@ -23,12 +24,16 @@ Route::prefix('prototype')->group(function(){
     });
 });
 
+// home
 Route::get('/', [UserController::class, 'home'])->name('home');
 Route::get('/testhome', [UserController::class, 'home2'])->name('homepage');
-Route::get('/accommodations/{id}', [PropertyDetailController::class, 'show'])->name('properties.detail');
-// Route::get('/airlines', [])
 
+// accommodations
+Route::get('/accommodations/{id}', [PropertyDetailController::class, 'show'])->name('properties.detail');
+
+// flights
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
+Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights');
 
 // admin routes
 Route::get('/admin/login', function(){

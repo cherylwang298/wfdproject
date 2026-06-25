@@ -3,7 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FlightCheckoutController;
 use App\Http\Controllers\FlightSearchController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\PropertyDetailController;
@@ -41,13 +41,27 @@ Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights'
 // deals / promos
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
 
+// --- ROUTING SYSTEM CHECKOUT TIKET PESAWAT STAYGO ---
+Route::middleware('auth')->group(function () {
+    // Menampilkan halaman checkout flights
+    Route::get('/checkout/flight', [FlightCheckoutController::class, 'showCheckout'])->name('checkout.flight');
+    
+    // Menerima submit form booking simpan database AJAX POST
+    Route::post('/checkout/flight/store', [FlightCheckoutController::class, 'storeBooking'])->name('checkout.flight.store');
+});
+
+// Contoh dummy rute penampung halaman sukses invoice tanda terima (receipt) agar tidak crash
+Route::get('/booking/receipt/{code}', function($code) {
+    return 'Halaman Sukses Booking Tiket Pesawat! Kode Booking Invoice Anda: ' . $code;
+})->name('booking.receipt');
+
 // Route::get('/airlines', [])
 
 // Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
 
 
 // ROOT
-Route::get('/', [UserController::class, 'home'])->name('home');
+Route::get('/', [UserController::class, 'home2'])->name('home');
 
 
 
@@ -68,7 +82,7 @@ Route::get('/register', function(){
     return view('dummy_pages.users.registration');
 })->name('register.form');
 Route::post('/register', [UserController::class, 'register'])->name('register.submit');
-Route::get('/login', [UserController::class, 'openLogin'])->name('login.form');
+Route::get('/login', [UserController::class, 'openLogin'])->name('login');
 Route::post('/login', [UserController::class, 'login'])
     ->name('login.submit');
 Route::get('/accomodations', [SearchController::class, 'openAccomodationPage'])->name('accomodations.open');

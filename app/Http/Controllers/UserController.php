@@ -28,11 +28,11 @@ class UserController extends Controller
 
         $request->session()->regenerate();
 
-    //      dd(
-    //     Auth::check(),
-    //     Auth::id(),
-    //     session()->all()
-    // );
+        // dd(
+        //     Auth::check(),
+        //     Auth::id(),
+        //     session()->all()
+        // );
 
         return redirect()->route('home');
     }
@@ -136,8 +136,16 @@ return view('dummy_pages.home', compact(
 ));   
 }
 
-    public function home2()
+    public function home2(Request $request)
     {
+        // dd([
+        //     'Apakah Auth mengenali User?' => Auth::check(),
+        //     'Data User saat ini'          => Auth::user(),
+        //     'Session ID'                  => session()->getId(),
+        //     'Semua Isi Session'           => session()->all(),
+        //     'Isi Cookie Session Browser'  => $request->cookie(config('session.cookie')),
+        // ]);
+
         // 1. Ambil data properti dari API
         $responseProperties = Http::get(env('API_BASE_URL') . '/properties');
 

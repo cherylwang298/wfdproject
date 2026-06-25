@@ -439,7 +439,22 @@ function showFloatingCheckout() {
 }
 
 function goToCheckout() {
-    window.location.href = `/checkout?type=flight&outbound=${selectedOutbound.id}` + (selectedInbound ? `&inbound=${selectedInbound.id}` : '');
+    // 1. Ambil jumlah pax dari state counter input di form
+    const adultsCount = document.getElementById('adultCount').innerText;
+    const childrenCount = document.getElementById('childCount').innerText;
+
+    // 2. Susun parameter URL query string
+    let url = `/checkout/flight?outbound=${selectedOutbound.id}&adults=${adultsCount}&children=${childrenCount}`;
+    
+    // 3. Jika user memilih tiket round-trip (pulang-pergi)
+    if (isRoundTrip() && selectedInbound) {
+        // Jika tiket inbound menggunakan ID virtual tiruan, kembalikan ke ID outbound sebagai fallback transaksi
+        const inboundId = selectedInbound._virtual ? selectedOutbound.id : selectedInbound.id;
+        url += `&inbound=${inboundId}`;
+    }
+
+    // 4. Redirect navigasi langsung ke halaman checkout flight murni Laravel
+    window.location.href = url;
 }
 
 document.getElementById('flightSearchForm').addEventListener('submit', function(e) {

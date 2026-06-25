@@ -35,7 +35,7 @@ class PropertyController extends Controller
     $response = Http::get(env('API_BASE_URL') . '/properties');
 
     if (!$response->successful()) {
-        return view('users.home', [
+        return view('dummy_pages.home', [
             'properties' => collect(),
             'featured' => collect(),
             'hotels' => collect(),
@@ -59,7 +59,7 @@ class PropertyController extends Controller
         ->where('type', 'villa')
         ->values();
 
-    return view('users.home', compact(
+    return view('dummy_pages.home', compact(
         'properties',
         'featured',
         'hotels',

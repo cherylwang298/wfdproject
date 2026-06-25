@@ -8,9 +8,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/check', function(){
     return view('prototyping.INDEX');
@@ -22,7 +22,7 @@ Route::prefix('prototype')->group(function(){
     });
 });
 
-Route::get('/properties', [PropertyController::class, 'index'])->name('index.properties');
+Route::get('/', [UserController::class, 'home'])->name('home');
 // Route::get('/airlines', [])
 
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
@@ -35,9 +35,9 @@ Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('admin.
 Route::get('/admin/dashboard', [AdminController::class, 'openDashboard'])->name('admin.dashboard');
 
 // user routes
-Route::get('/', function(){
-    return view('dummy_pages.home');
-})->name('home');
+// Route::get('/', function(){
+//     return view('dummy_pages.home');
+// })->name('home');
 Route::get('/register', function(){
     return view('dummy_pages.users.registration');
 })->name('register.form');

@@ -13,7 +13,7 @@
 </h1>
     
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-   @forelse($properties as $p)
+   @forelse($featured as $p)
     <div class="bg-white p-6 rounded-xl shadow">
         <h2 class="text-xl font-bold">
             {{ $p['name'] }}

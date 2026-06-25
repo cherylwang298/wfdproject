@@ -5,6 +5,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 
 
 Route::get('/', function () {
@@ -26,10 +27,24 @@ Route::get('/properties', [PropertyController::class, 'index'])->name('index.pro
 
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
 
+// admin routes
 Route::get('/admin/login', function(){
     return view('dummy_pages.admins.login');
 })->name('admin.login');
-
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('admin.login.submit');
-
 Route::get('/admin/dashboard', [AdminController::class, 'openDashboard'])->name('admin.dashboard');
+
+// user routes
+Route::get('/', function(){
+    return view('dummy_pages.home');
+})->name('home');
+Route::get('/register', function(){
+    return view('dummy_pages.users.registration');
+})->name('register.form');
+Route::post('/register', [UserController::class, 'register'])->name('register.submit');
+Route::get('/login', [UserController::class, 'openLogin'])->name('login.form');
+Route::post('/login', [UserController::class, 'login'])
+    ->name('login.submit');
+
+Route::post('/logout', [UserController::class, 'logout'])
+    ->name('logout');

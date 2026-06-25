@@ -24,8 +24,15 @@ class UserController extends Controller
     ]);
 
     if (Auth::attempt($credentials)) {
+        //    dd('LOGIN BERHASIL');
 
         $request->session()->regenerate();
+
+    //      dd(
+    //     Auth::check(),
+    //     Auth::id(),
+    //     session()->all()
+    // );
 
         return redirect()->route('home');
     }
@@ -72,9 +79,20 @@ class UserController extends Controller
     return redirect()->route('login.form');
     }
 
- public function home()
+ public function home(Request $request)
 {
+
+    // dd(Auth::check(), Auth::user());
+
+    //  dd(
+    //     session()->getId(),
+    //     $request->cookie(config('session.cookie')),
+    //     Auth::check(),
+    //     Auth::user()
+    // );
     $response = Http::get(env('API_BASE_URL') . '/properties');
+
+    $user = Auth::user();
 
     if (!$response->successful()) {
         return view('dummy_pages.home', [
@@ -82,6 +100,7 @@ class UserController extends Controller
             'featured' => collect(),
             'hotels' => collect(),
             'villas' => collect(),
+            // 'user' => $user
         ]);
     }
 
@@ -113,10 +132,8 @@ return view('dummy_pages.home', compact(
     'hotels',
     'villas',
     'promos'
-));
-
-
-   
+    // 'user'
+));   
 }
 
     public function home2()

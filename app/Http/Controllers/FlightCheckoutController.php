@@ -25,9 +25,22 @@ class FlightCheckoutController extends Controller
         $children = (int) $request->query('children', 0);
         $totalPassengers = $adults + $children;
 
-        // 1. Ambil data master flights dari API untuk kalkulasi ringkasan order
+        // 1. Ambil data master flights dari API
         $response = Http::get(env('API_BASE_URL') . '/flights');
-        $flights = $response->successful() ? collect($response->json()) : collect();
+        $rawFlights = $response->successful() ? $response->json() : [];
+
+        // 2. Ambil master data Airlines dari API untuk menerjemahkan airline_id menjadi Nama Maskapai
+        $responseAirlines = Http::get(env('API_BASE_URL') . '/airlines');
+        $airlinesMaster = $responseAirlines->successful() ? $responseAirlines->json() : [];
+        $airlineMap = collect($airlinesMaster)->pluck('name', 'id')->toArray();
+
+        // 3. Transformasikan data penerbangan agar menyertakan string nama 'airline'
+        $flights = collect($rawFlights)->map(function ($f) use ($airlineMap) {
+            $f['airline'] = $airlineMap[$f['airline_id']] ?? 'Unknown Airline'; // Tambahkan key airline secara dinamis
+            $f['from']        = $f['origin'];      // <-- TAMBAHKAN ALIAS INI
+            $f['to']          = $f['destination']; // <-- TAMBAHKAN ALIAS INI
+            return $f;
+        });
 
         $outboundFlight = $flights->firstWhere('id', $outboundId);
         $inboundFlight = $inboundId ? $flights->firstWhere('id', $inboundId) : null;
@@ -36,7 +49,7 @@ class FlightCheckoutController extends Controller
             return redirect()->route('flights')->with('error', 'Penerbangan tidak valid.');
         }
 
-        // 2. Hitung harga dalam nominal asli Rupiah
+        // 4. Hitung harga dalam nominal asli Rupiah
         $pricePerPerson = (int) $outboundFlight['price'] + ($inboundFlight ? (int) $inboundFlight['price'] : 0);
         $subtotal = $pricePerPerson * $totalPassengers;
         $taxes = round($subtotal * 0.12);

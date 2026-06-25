@@ -46,12 +46,15 @@ class FlightSearchController extends Controller
                 'to_city'        => $f['destination'],
                 'dep'            => $depTime->format('H:i'),
                 'arr'            => $arrTime->format('H:i'),
-                'departure_time' => $f['departure_time'], // <-- TAMBAHKAN BARIS INI KEMBALI
+                'departure_time' => $f['departure_time'],
                 'duration'       => "{$hours}h {$minutes}m",
                 'airline'        => $airlineName,
                 'code'           => 'FL-' . rand(100, 999),
                 'class'          => $f['class'],
-                'price'          => (int) ($f['price'] / 15000), 
+                
+                // UBAH BARIS INI: langsung ambil nilai price asli Rupiah dari API
+                'price'          => (int) $f['price'], 
+                
                 'stops'          => 0,
                 'badge'          => rand(0, 5) === 0 ? 'Cheapest' : null,
             ];

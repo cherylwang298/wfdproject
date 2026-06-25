@@ -307,7 +307,7 @@ function renderFlightCard(f, type, isSelected) {
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-right">
-                    <div class="text-xl font-extrabold text-blue-600">$${f.price}</div>
+                    <div class="text-xl font-extrabold text-blue-600">Rp ${f.price.toLocaleString('id-ID')}</div>
                     <div class="text-[10px] font-medium text-gray-400">per person</div>
                 </div>
                 <button class="px-5 py-2 rounded-full text-xs font-bold ${isSelected ? 'bg-gray-100 text-gray-700' : 'bg-blue-600 text-white hover:bg-blue-700'}">
@@ -433,7 +433,7 @@ function showFloatingCheckout() {
     const total = selectedOutbound.price + (isRoundTrip() && selectedInbound ? selectedInbound.price : 0);
     btn.innerHTML = `
         <button onclick="goToCheckout()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-6 py-4 rounded-full shadow-2xl transform active:scale-95 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined">shopping_cart</span> Checkout · $${total}
+            <span class="material-symbols-outlined">shopping_cart</span> Checkout · Rp ${total.toLocaleString('id-ID')}
         </button>
     `;
 }

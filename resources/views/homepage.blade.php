@@ -210,7 +210,7 @@
             <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Popular Flights</h2>
             <p class="font-body-md text-body-md text-on-surface-variant">Top destinations for your next adventure.</p>
             </div>
-            <a href="#" class="font-label-md text-label-md text-primary hover:text-blue-950 transition-colors hidden md:flex items-center gap-1">
+            <a href="{{ route('flights') }}" class="font-label-md text-label-md text-primary hover:text-blue-950 transition-colors hidden md:flex items-center gap-1">
             View all flights <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </a>
         </div>

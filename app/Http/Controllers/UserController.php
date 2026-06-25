@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use App\Models\Promo;
 
 class UserController extends Controller
 {
@@ -61,12 +63,61 @@ class UserController extends Controller
     }
 
     public function logout(Request $request)
-{
+    {
     Auth::logout();
 
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
     return redirect()->route('login.form');
+    }
+
+ public function home()
+{
+    $response = Http::get(env('API_BASE_URL') . '/properties');
+
+    if (!$response->successful()) {
+        return view('dummy_pages.home', [
+            'properties' => collect(),
+            'featured' => collect(),
+            'hotels' => collect(),
+            'villas' => collect(),
+        ]);
+    }
+
+    $properties = collect($response->json());
+
+    $featured = $properties
+        ->shuffle()
+        ->take(6)
+        ->values();
+
+    $hotels = $properties
+        ->where('type', 'hotel')
+        ->values();
+
+    $villas = $properties
+        ->where('type', 'villa')
+        ->values();
+
+    $availPromos = Promo::all();
+
+$promos = $availPromos
+    ->shuffle()
+    ->take(3)
+    ->values();
+
+return view('dummy_pages.home', compact(
+    'properties',
+    'featured',
+    'hotels',
+    'villas',
+    'promos'
+));
+
+
+   
 }
-}
+
+
+    }

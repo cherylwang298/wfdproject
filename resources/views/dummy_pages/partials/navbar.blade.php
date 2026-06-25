@@ -9,7 +9,7 @@
         <!-- MENU -->
         <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
             <a href="#" class="hover:text-blue-600">Home</a>
-            <a href="#" class="hover:text-blue-600">Accomodation</a>
+            <a href="#" class="hover:text-blue-600">Accomodations</a>
             <a href="#" class="hover:text-blue-600">Flights</a>
             <a href="#" class="hover:text-blue-600">Deals</a>
             <a href="#" class="hover:text-blue-600">My Bookings</a>

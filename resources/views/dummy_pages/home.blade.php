@@ -82,16 +82,20 @@
 <!-- HOT DEALS -->
 <section class="max-w-6xl mx-auto px-6 pb-20">
 
-    <div class="flex items-end justify-between mb-6">
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+
         <div>
             <span class="text-blue-600 text-xs font-bold uppercase tracking-wider">
                 Limited Offer
             </span>
-            <h2 class="text-2xl md:text-3xl font-extrabold">
+
+            <h2 class="text-3xl md:text-4xl font-extrabold mt-1">
                 Hot Deals for You 🔥
             </h2>
-            <p class="text-sm text-slate-500 mt-1">
-                Save more on selected stays and special promotions
+
+            <p class="text-sm text-slate-500 mt-2">
+                Save more on selected stays and exclusive promotions
             </p>
         </div>
 
@@ -100,37 +104,52 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- GRID -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
         @forelse($promos ?? [] as $p)
 
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-lg hover:shadow-2xl transition">
+        @php
+            $isPercent = $p['discount_type'] === 'percent';
+            $value = $p['discount_value'] ?? 0;
+            $code = $p['code'] ?? '-';
+            $expired = isset($p['expired_at']) 
+                ? \Carbon\Carbon::parse($p['expired_at'])->format('d M Y') 
+                : '-';
+        @endphp
 
-            <!-- glow circle -->
+        <!-- CARD -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1">
+
+            <!-- glow -->
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
 
             <div class="p-6 relative z-10">
 
+                <!-- EXPIRY -->
                 <div class="text-xs font-semibold opacity-80">
-                    Until {{ $p['valid_until'] ?? '-' }}
+                    Valid until {{ $expired }}
                 </div>
 
-                <h3 class="text-2xl font-extrabold mt-1">
-                    {{ $p['discount_value'] ?? 0 }}
-                    {{ ($p['discount_type'] ?? '') === 'percent' ? '%' : 'IDR' }}
+                <!-- VALUE -->
+                <h3 class="text-3xl font-extrabold mt-1">
+                    {{ $value }}
+                    {{ $isPercent ? '%' : 'IDR' }}
                     <span class="text-sm font-bold opacity-80">OFF</span>
                 </h3>
 
-                <p class="mt-2 font-semibold">
-                    {{ $p['title'] ?? 'Special Deal' }}
+                <!-- CODE TITLE -->
+                <p class="mt-2 font-semibold tracking-wide">
+                    {{ strtoupper($code) }}
                 </p>
 
-                <div class="mt-4 flex items-center justify-between">
+                <!-- ACTION -->
+                <div class="mt-5 flex items-center justify-between">
 
                     <button
-                        onclick="navigator.clipboard.writeText('{{ $p['code'] ?? '' }}'); this.innerText='Copied!'"
+                        onclick="navigator.clipboard.writeText('{{ $code }}'); this.innerText='✓ Copied!'"
                         class="bg-white/20 hover:bg-white/30 text-xs font-mono px-3 py-1.5 rounded-lg border border-white/30 transition">
-                        {{ $p['code'] ?? 'CODE' }}
+                        {{ $code }}
                     </button>
 
                     <span class="text-xs opacity-80">
@@ -144,8 +163,10 @@
 
         @empty
 
-        <div class="col-span-3 text-center text-slate-400 py-10">
-            No deals available right now
+        <!-- EMPTY STATE -->
+        <div class="col-span-full text-center py-12 text-slate-400">
+            <div class="text-lg font-semibold">No deals available</div>
+            <p class="text-sm mt-1">Please check again later</p>
         </div>
 
         @endforelse

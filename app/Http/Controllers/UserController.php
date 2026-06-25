@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use App\Models\Promo;
 
 class UserController extends Controller
 {
@@ -99,16 +100,23 @@ class UserController extends Controller
         ->where('type', 'villa')
         ->values();
 
-    // optional kalau nanti kamu pakai deals/promo section
-    $promos = collect(); // atau dari API kalau ada endpoint promo
+    $availPromos = Promo::all();
 
-    return view('dummy_pages.home', compact(
-        'properties',
-        'featured',
-        'hotels',
-        'villas',
-        'promos'
-    ));
+$promos = $availPromos
+    ->shuffle()
+    ->take(3)
+    ->values();
+
+return view('dummy_pages.home', compact(
+    'properties',
+    'featured',
+    'hotels',
+    'villas',
+    'promos'
+));
+
+
+   
 }
 
 

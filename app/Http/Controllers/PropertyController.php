@@ -66,4 +66,6 @@ class PropertyController extends Controller
         'villas'
     ));
 }
+
+
 }

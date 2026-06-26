@@ -133,7 +133,10 @@ public function myBookings()
 });
 
 
-        $flightBookings = $user->flightBookings()->with(['tickets.passenger', 'payment'])->latest()->get();
+        $flightBookings = $user->flightBookings()
+            ->with(['tickets.passenger', 'payment', 'cancel_request']) // <-- Tambahkan 'cancel_request' di sini
+            ->latest()
+            ->get();
         
         try {
             $responseFlights = Http::get(env('API_BASE_URL') . '/flights');

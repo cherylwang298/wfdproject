@@ -136,4 +136,39 @@ class BookingController extends Controller
             ->with('error', $e->getMessage());
     }
 }
+
+    /**
+     * Menangani permohonan pembatalan tiket pesawat dari user (Akomodasi / Flights)
+     */
+    public function requestFlightCancel(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:1000'
+        ]);
+
+        // PROTEKSI BACKEND: Cek apakah booking ini sudah punya request cancel yang 'pending' atau 'approved'
+        $existingRequest = \App\Models\CancelRequest::where('flight_booking_id', $id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($existingRequest) {
+            return back()->with('error', 'Anda sudah mengirimkan permohonan pembatalan untuk penerbangan ini.');
+        }
+
+        DB::beginTransaction();
+        try {
+            \App\Models\CancelRequest::create([
+                'flight_booking_id' => $id,
+                'user_id'           => auth()->id(),
+                'reason'            => $request->reason,
+                'status'            => 'pending'
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'Permohonan pembatalan penerbangan Anda berhasil dikirim dan menunggu persetujuan admin.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal mengirim permohonan pembatalan: ' . $e->getMessage());
+        }
+    }
 }

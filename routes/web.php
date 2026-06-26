@@ -38,6 +38,7 @@ Route::get('/accommodations/{id}', [PropertyDetailController::class, 'showProper
 // flights
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
 Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights');
+// request pembatalan penerbangan ke admin
 
 // deals / promos
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
@@ -62,6 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
     Route::post('/review/{propertyId}', [UserController::class, 'addReview'])->name('review.store');
 
+    // cancel flight
+    Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });

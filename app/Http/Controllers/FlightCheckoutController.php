@@ -78,7 +78,8 @@ class FlightCheckoutController extends Controller
             'passengers' => 'required|array',
             'passengers.*.name' => 'required|string',
             'passengers.*.phone' => 'required|string',
-            'payment_method' => 'required|in:card,bank'
+            'payment_method' => 'required', // Menerima: Bank Transfer, E-Wallet, atau Credit Card
+            'promo_id' => 'nullable'         // Menerima input id promo jika kupon sukses di-apply
         ]);
 
         // Mulai database transaction lokal
@@ -89,8 +90,16 @@ class FlightCheckoutController extends Controller
             $booking = FlightBooking::create([
                 'user_id' => Auth::id() ?? null,
                 'booking_code' => 'STAYGO-' . strtoupper(Str::random(8)),
-                'payment_status' => 'unpaid' // Bisa langsung di-set 'Paid' jika simulasi pembayaran instan sukses
+                'payment_status' => 'Paid',
+                'promo_id' => $request->promo_id // <-- PASTIKAN KOLOM INI ADA DI MIGRASI/MODEL FLIGHT BOOKINGS
             ]);
+
+            if ($request->filled('promo_id')) {
+                $promo = \App\Models\Promo::find($request->promo_id);
+                if ($promo && $promo->quota > 0) {
+                    $promo->decrement('quota');
+                }
+            }
 
             $totalAmount = 0;
             $ticketPayloads = []; // Menampung data untuk dikirim ke API nanti
@@ -149,17 +158,21 @@ class FlightCheckoutController extends Controller
                 }
             }
 
+            $grandTotalFinal = (int) $request->input('total_price');
+
             // 3. Tambahkan biaya pajak & fees 12%
-            $finalTax = round($totalAmount * 0.12);
-            $grandTotalFinal = $totalAmount + $finalTax;
+            if (!$grandTotalFinal || $grandTotalFinal <= 0) {
+                $finalTax = round($totalAmount * 0.12);
+                $grandTotalFinal = $totalAmount + $finalTax;
+            }
 
             // 4. Catat riwayat log ke tabel payments lokal
             Payment::create([
                 'flight_booking_id' => $booking->id,
                 'reservation_id' => null,
-                'method' => $request->payment_method,
+                'method' => $request->payment_method, // Menyimpan string metode baru secara seragam
                 'amount' => $grandTotalFinal,
-                'status' => 'Paid' // Di-set Paid agar sinkron dengan status tiket issued
+                'status' => 'Paid'
             ]);
 
             /*

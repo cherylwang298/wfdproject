@@ -161,7 +161,7 @@
 
                                         {{-- UBAH JADI BUTTON SELECT SINGLE --}}
                                         <button type="button" 
-                                                onclick="selectUnit('{{ $unit['id'] }}')" 
+                                                onclick="selectUnit('{{ $unit['id'] }}', '{{ $unit['capacity'] }}')" 
                                                 id="select-btn-{{ $unit['id'] }}"
                                                 class="select-unit-btn bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm">
                                             Select
@@ -262,6 +262,9 @@
 </main>
 
 <script>
+let count = 1;
+let currentMaxCapacity = 10;
+
 // Logika Favorit Client-side LocalStorage
 function toggleFav(btn, hotelId) {
     let favs = JSON.parse(localStorage.getItem('staygo_favs') || '[]');
@@ -273,12 +276,11 @@ function toggleFav(btn, hotelId) {
         favs.push(hotelId.toString());
     }
     localStorage.setItem('staygo_favs', JSON.stringify(favs));
-    location.reload(); // Refresh untuk menyinkronkan status ikon top & bottom
+    location.reload();
 }
 
 // 1. Fungsi eksklusif untuk memilih salah satu unit saja
-function selectUnit(unitId) {
-    // Reset semua tombol & border card unit lain kembali ke sedia kala
+function selectUnit(unitId, capacity) {
     document.querySelectorAll('.select-unit-btn').forEach(btn => {
         btn.className = "select-unit-btn bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm";
         btn.innerText = "Select";
@@ -287,7 +289,6 @@ function selectUnit(unitId) {
         card.classList.remove('border-blue-600', 'ring-2', 'ring-blue-600/20', 'bg-blue-50/20');
     });
 
-    // Aktifkan visual terpilih pada unit card dan tombol yang diklik
     const activeBtn = document.getElementById(`select-btn-${unitId}`);
     activeBtn.className = "select-unit-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm";
     activeBtn.innerText = "Selected ✓";
@@ -295,17 +296,39 @@ function selectUnit(unitId) {
     const activeCard = document.getElementById(`unit-card-${unitId}`);
     activeCard.classList.add('border-blue-600', 'ring-2', 'ring-blue-600/20', 'bg-blue-50/20');
 
-    // Simpan ID unit terpilih ke dalam hidden input form panel kanan
     document.getElementById('selected_unit_id').value = unitId;
+
+    currentMaxCapacity = parseInt(capacity) || 10;
+    
+    const countSpan = document.getElementById('guestCount');
+    const guestInput = document.getElementById('guestInput');
+
+    if (count > currentMaxCapacity) {
+        count = currentMaxCapacity; 
+        countSpan.innerText = count;
+        guestInput.value = count;
+    }
+
+    checkPlusButtonState(count);
 }
 
-// 2. Fungsi validasi saat menekan tombol "Reserve Now" di panel kanan
+function checkPlusButtonState(currentCount) {
+    const plusBtn = document.getElementById('guestPlus');
+    if (currentCount >= currentMaxCapacity) {
+        plusBtn.disabled = true;
+        plusBtn.classList.add('opacity-40', 'cursor-not-allowed', 'bg-gray-100');
+    } else {
+        plusBtn.disabled = false;
+        plusBtn.classList.remove('opacity-40', 'cursor-not-allowed', 'bg-gray-100');
+    }
+}
+
+// 2. Fungsi validasi saat menekan tombol "Reserve Now"
 function handleFormSubmit(e) {
     e.preventDefault();
 
     const unitId = document.getElementById('selected_unit_id').value;
     
-    // Validasi: Pastikan user sudah memilih salah satu unit di kolom kiri
     if (!unitId) {
         alert('Please select an available unit room first before continuing your reservation.');
         return;
@@ -315,11 +338,10 @@ function handleFormSubmit(e) {
     const checkout = document.getElementById('checkout').value;
     const guests = document.getElementById('guestInput').value;
 
-    // KUNCI PENYESUAIAN: Ubah rute URL agar sama persis dengan halaman search!
     window.location.href = `/booking/${unitId}?checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
 }
 
-// 1. Fungsi AJAX untuk Toggle Favorit (Menambah / Menghapus)
+// 3. Fungsi AJAX untuk Toggle Favorit
 async function toggleFav(btn, propertyId) {
     try {
         const response = await fetch("{{ route('favorites.toggle') }}", {
@@ -329,9 +351,7 @@ async function toggleFav(btn, propertyId) {
                 "X-CSRF-TOKEN": "{{ csrf_token() }}",
                 "Accept": "application/json"
             },
-            body: JSON.stringify({
-                property_id: propertyId
-            })
+            body: JSON.stringify({ property_id: propertyId })
         });
 
         if(response.status == 401){
@@ -359,7 +379,7 @@ async function toggleFav(btn, propertyId) {
     }
 }
 
-// 2. Set status awal keaktifan ikon merah saat halaman pertama kali dibuka
+// Set status awal keaktifan ikon merah
 const isFavorite = @json($isFavorite ?? false);
 document.addEventListener("DOMContentLoaded", () => {
     if(isFavorite) {
@@ -370,6 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// Listener Inisialisasi DOM Utama
 document.addEventListener('DOMContentLoaded', function() {
     const favs = JSON.parse(localStorage.getItem('staygo_favs') || '[]');
     const hotelId = '{{ $hotel['id'] }}';
@@ -380,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Sinkronisasi Pembatasan Tanggal Check-in & Check-out
+    // Sinkronisasi Pembatasan Tanggal Check-in & Check-out (KODE BERSIH TANPA DUPLIKAT)
     const ci = document.getElementById('checkin');
     const co = document.getElementById('checkout');
     if (ci && co) {
@@ -390,24 +411,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Penghitung Counter Tamu & Sinkronisasi Hidden Input
-    let count = 1;
+    // Ambil nilai awal tamu dari Blade
+    count = parseInt(document.getElementById('guestCount').innerText) || 1;
+    
     const countSpan = document.getElementById('guestCount');
-    const guestInput = document.getElementById('guestInput'); // Ambil target hidden input
+    const guestInput = document.getElementById('guestInput');
+    const plusBtn = document.getElementById('guestPlus');
+    const minusBtn = document.getElementById('guestMinus');
 
-    document.getElementById('guestMinus').addEventListener('click', () => { 
-        if(count > 1) { 
+    // LISTENER TOMBOL MINUS
+    minusBtn.addEventListener('click', () => {
+        if (count > 1) { 
             count--; 
-            countSpan.innerText = count; 
-            guestInput.value = count; // Masukkan angka terbaru ke form
+            countSpan.innerText = count;
+            guestInput.value = count;
+
+            checkPlusButtonState(count);
         } 
     });
     
-    document.getElementById('guestPlus').addEventListener('click', () => { 
-        if(count < 10) { 
+    // LISTENER TOMBOL PLUS
+    plusBtn.addEventListener('click', () => { 
+        if (count < currentMaxCapacity) { 
             count++; 
-            countSpan.innerText = count; 
-            guestInput.value = count; // Masukkan angka terbaru ke form
+            countSpan.innerText = count;
+            guestInput.value = count;
+            
+            checkPlusButtonState(count);
         } 
     });
 });

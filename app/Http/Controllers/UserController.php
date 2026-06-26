@@ -209,7 +209,7 @@ public function myBookings()
         // 4. Proses data Properites jika API berhasil
         if ($responseProperties->successful()) {
             $properties = collect($responseProperties->json());
-            $featuredProperties = $properties->shuffle()->take(6)->values();
+            $featuredProperties = $properties->shuffle()->take(8)->values();
         } else {
             $featuredProperties = collect();
         }

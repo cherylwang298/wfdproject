@@ -114,11 +114,49 @@ public function approveCancelRequest($id)
       return view('admins.manage-users', compact('users', 'username'));
     }
 
-    public function openReserv(){
-      $admin = Auth::guard('admin')->user();
-      $username = $admin->name;
-      $reservations = Reservation::all();
-      return view('admins.reservations', compact('reservations', 'username'));
+    public function openReserv()
+{
+    $admin = Auth::guard('admin')->user();
+
+    $username = $admin->name;
+
+    $reservations = Reservation::with('user')
+        ->latest()
+        ->get();
+
+    return view('admins.reservations', compact(
+        'reservations',
+        'username'
+    ));
+}
+
+public function viewReserv($id){
+$reservation = Reservation::with('user')->findOrFail($id);
+ return response()->json($reservation);
+
+}
+
+public function editReserv(Request $request, $id)
+    {
+        $reservation = Reservation::findOrFail($id);
+
+        $request->validate([
+            'status' => 'required|string|in:pending,confirmed,completed,cancelled',
+        ]);
+
+        $reservation->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Status reservasi berhasil diperbarui.');
+    }
+
+    public function deleteReserv($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->delete();
+
+        return redirect()->back()->with('success', 'Data reservasi berhasil dihapus.');
     }
 
     public function createPromo(Request $request){

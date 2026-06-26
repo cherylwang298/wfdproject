@@ -155,27 +155,27 @@ $currentPage = 'bookings';
                                                 Bayar Sekarang
                                             </a>
                                         @else
-                                            @if(!$booking->isReviewed)
-        <button type="button"
-            onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
-            class="bg-amber-500 text-white text-sm px-4 py-2 rounded">
-            ⭐ Tulis Review
-        </button>
-    @else
-        <button
-            disabled
-            class="bg-green-100 text-green-700 text-sm px-4 py-2 rounded">
-            ✓ Review Submitted
-        </button>
-    @endif
+                                        @if(!$booking->isReviewed)
+                                                <button type="button"
+                                                    onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
+                                                    class="bg-amber-500 text-white text-sm px-4 py-2 rounded">
+                                                    ⭐ Tulis Review
+                                                </button>
+                                            @else
+                                                <button
+                                                    disabled
+                                                    class="bg-green-100 text-green-700 text-sm px-4 py-2 rounded">
+                                                    ✓ Review Submitted
+                                                </button>
+                                            @endif
 
-    <button type="button"
-        onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"
-        class="bg-blue-600 text-white text-sm px-4 py-2 rounded">
-        View Details
-    </button>
+                                            <button type="button"
+                                                onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"
+                                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded">
+                                                View Details
+                                            </button>
 
-@endif
+                                        @endif
                                         @endif
                             
                                 </div>

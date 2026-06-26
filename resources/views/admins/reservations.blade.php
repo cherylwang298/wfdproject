@@ -28,9 +28,9 @@
 
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between">
         <div>
-            <p class="text-sm font-semibold text-gray-400">Pending Approval</p>
+            <p class="text-sm font-semibold text-gray-400">Cancelled</p>
             <h3 class="text-3xl font-bold mt-2 text-amber-500">
-                {{ $reservations->where('status', 'pending')->count() }}
+                {{ $reservations->where('status', 'cancelled')->count() }}
             </h3>
         </div>
     </div>

@@ -188,7 +188,6 @@ $currentPage = 'hotel';
                 </div>
             </div>
 
-            {{-- RIGHT COLUMN: STICKY BOOKING PANEL --}}
             <div class="lg:col-span-1 lg:sticky lg:top-28">
                 <div class="bg-white border border-gray-100 p-6 rounded-2xl shadow-xl flex flex-col gap-6">
                     <div class="flex items-baseline justify-between">
@@ -216,22 +215,9 @@ $currentPage = 'hotel';
                         </div>
                     </div>
 
-                    {{-- <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-gray-400 text-[20px]">group</span>
-                            <span class="text-xs font-bold text-gray-500">Guests Limit</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button type="button" id="guestMinus" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center font-bold text-gray-700 shadow-sm transition-all">-</button>
-                            <span id="guestCount" class="w-4 text-center font-extrabold text-sm text-gray-800">{{ $guests ?? 1 }}</span>
-                            <button type="button" id="guestPlus" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center font-bold text-gray-700 shadow-sm transition-all">+</button>
-                        </div>
-                    </div> --}}
 
                     <div class="flex flex-col gap-2 pt-2">
-                        {{-- <button onclick="scrollToUnits()" class="block w-full text-center font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-4 rounded-xl shadow-md transform active:scale-95 transition-all">
-                            Select Available Unit
-                        </button> --}}
+   
                         <button onclick="toggleFav(this, '{{ $property['id'] }}')" class="flex items-center justify-center w-full border border-gray-200 text-gray-700 font-bold text-xs py-3.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
                             <span class="material-symbols-outlined text-[18px] align-middle mr-1.5 fav-icon-bottom">favorite_border</span> Save to Favourites
                         </button>
@@ -303,25 +289,6 @@ async function toggleFav(btn, propertyId) {
 }
 
 
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     const propertyId = '{{ $property['id'] }}';
-//     syncFavIcons(propertyId);
-
-//     const ci = document.getElementById('checkin');
-//     const co = document.getElementById('checkout');
-//     if (ci && co) {
-//         ci.addEventListener('change', function() {
-//             co.min = this.value;
-//             if (co.value && co.value <= this.value) co.value = '';
-//         });
-//     }
-    
-//     let count = parseInt(document.getElementById('guestCount').innerText) || 1;
-//     const countSpan = document.getElementById('guestCount');
-//     document.getElementById('guestMinus').addEventListener('click', () => { if(count > 1) { count--; countSpan.innerText = count; } });
-//     document.getElementById('guestPlus').addEventListener('click', () => { if(count < 10) { count++; countSpan.innerText = count; } });
-// });
 </script>
 
 <script>

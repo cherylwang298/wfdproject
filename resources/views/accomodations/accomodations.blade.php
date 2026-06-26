@@ -68,7 +68,7 @@ $currentPage = 'hotel';
 
                     </div>
 
-                    {{-- Content --}}
+          
                     <div class="p-5">
 
                         <div class="flex justify-between items-start">

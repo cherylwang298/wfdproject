@@ -93,19 +93,17 @@ $currentPage = 'hotel';
 
                         <div class="mt-6 flex justify-between items-end">
 
-    <div>
-        <p class="text-xs text-gray-400">
-            Starting from
-        </p>
+                        <div>
+                            <p class="text-xs text-gray-400">
+                                Starting from
+                            </p>
 
-        <p class="text-xl font-bold text-blue-600">
-            Rp {{ number_format($property['min_price'], 0, ',', '.') }}
-            <span class="text-sm font-medium text-gray-500">/night</span>
-        </p>
-    </div>
-
-    
-</div>
+                            <p class="text-xl font-bold text-blue-600">
+                                Rp {{ number_format($property['min_price'], 0, ',', '.') }}
+                                <span class="text-sm font-medium text-gray-500">/night</span>
+                            </p>
+                        </div>
+                    </div>
 
                     </div>
 

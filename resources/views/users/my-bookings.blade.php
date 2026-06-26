@@ -44,9 +44,6 @@ $currentPage = 'bookings';
             </button>
         </div>
 
-        {{-- ============================================================= --}}
-        {{-- KELOMPOK TAB 1: RIWAYAT RESERVASI AKOMODASI ASLI 100%          --}}
-        {{-- ============================================================= --}}
         <div id="section-accommodation" class="block">
             @if($bookings->isEmpty())
                 <div class="bg-white rounded-lg shadow p-6 text-center">
@@ -57,25 +54,21 @@ $currentPage = 'bookings';
                 </div>
             @else
                 <div class="grid grid-cols-1 gap-6">
+                  {{-- {{ dd($bookings->first()->isReviewed) }} --}}
                     @foreach($bookings as $booking)
-                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center">
                             <div>
                                 <div class="flex items-center gap-3 mb-2">
                                     <span class="text-sm font-semibold text-gray-500">ID: {{ substr($booking->id, 0, 8) }}...</span>
                                     
+                                    {{-- Badge Status Ringkas di Sebelah ID --}}
                                     @if($booking->cancel_request)
-                                        @if($booking->cancel_request->status === 'Pending')
-                                            <span class="px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-800">Cancel Request Sent</span>
-                                        @elseif($booking->cancel_request->status === 'approved')
-                                            <span class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-800">Cancelled</span>
-                                        @elseif($booking->cancel_request->status === 'Rejected')
-                                            <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Confirmed (Cancel Rejected)</span>
-                                        @endif
-                                    @else
-                                        @if($booking->payment && $booking->payment->status === 'Paid')
-                                            <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Confirmed</span>
-                                        @else
-                                            <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
+                                        @if(strtolower($booking->cancel_request->status) === 'pending')
+                                            <span class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded font-medium">Cancel Pending</span>
+                                        @elseif(strtolower($booking->cancel_request->status) === 'approved')
+                                            <span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded font-medium">Cancelled</span>
+                                        @elseif(strtolower($booking->cancel_request->status) === 'rejected')
+                                            <span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded font-medium">Cancel Rejected</span>
                                         @endif
                                     @endif
                                 </div>
@@ -100,6 +93,7 @@ $currentPage = 'bookings';
                                 </div>
                             </div>
 
+                            {{-- KONTANER TOMBOL AKSI SEBELAH KANAN --}}
                             <div class="mt-4 md:mt-0 text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 flex flex-col items-end gap-2">
                                 <div>
                                     <p class="text-sm text-gray-500">Total Bayar</p>
@@ -109,16 +103,56 @@ $currentPage = 'bookings';
                                 </div>
 
                                 <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                                    @if($booking->cancel_request && $booking->cancel_request->status === 'Pending')
-                                        <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
-                                            Cancel Request Sent
-                                        </button>
-                                    @elseif($booking->cancel_request && $booking->cancel_request->status === 'approved')
-                                        <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
-                                            Cancelled
-                                        </button>
+                                    @if($booking->cancel_request)
+                                        @if(strtolower($booking->cancel_request->status) === 'pending')
+                                            <button disabled class="bg-purple-100 text-purple-700 text-sm px-4 py-2 rounded cursor-not-allowed w-full md:w-auto">
+                                                Cancel Request Submitted
+                                            </button>
+                                        @elseif(strtolower($booking->cancel_request->status) === 'approved')
+                                            <button disabled class="bg-red-100 text-red-700 text-sm px-4 py-2 rounded cursor-not-allowed w-full md:w-auto">
+                                                Cancelled
+                                            </button>
+                                        @elseif(strtolower($booking->cancel_request->status) === 'rejected')
+                                            {{-- Jika request cancel ditolak, user boleh coba mengajukan cancel lagi --}}
+                                            {{-- <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto">
+                                                Cancel Again
+                                            </button> --}}
+
+                                            {{-- @if($booking->payment && $booking->payment->status === 'Paid')
+                                                <button type="button" onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()" class="bg-amber-500 text-white text-sm px-4 py-2 rounded hover:bg-amber-600 transition w-full md:w-auto font-semibold">
+                                                    ⭐ Tulis Review
+                                                </button>
+                                            @endif --}}
+
+
+                                                {{-- {{ dump($booking->id, $booking->isReviewed) }} --}}
+                    
+                                                @if(!$booking->isReviewed)
+                                                        <button
+                                                            type="button"
+                                                            onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
+                                                            class="bg-amber-500 text-white text-sm px-4 py-2 rounded hover:bg-amber-600 transition">
+                                                            ⭐ Tulis Review
+                                                        </button>
+                                                    @else
+                                                        <button
+                                                            disabled
+                                                            class="bg-green-100 text-green-700 text-sm px-4 py-2 rounded cursor-not-allowed">
+                                                            ✓ Review Submitted
+                                                        </button>
+                                                    @endif
+
+                                                     <button type="button"
+                                                onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+                                                View Details
+                                            </button>   
+
+
+                                            @endif
                                     @else
-                                        <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto text-center">
+                                        {{-- Belum pernah request cancel sama sekali --}}
+                                        <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto">
                                             Cancel
                                         </button>
                                         
@@ -127,18 +161,42 @@ $currentPage = 'bookings';
                                                 Bayar Sekarang
                                             </a>
                                         @else
-                                            {{-- BUTTON SELESAI DIGANTI JADI VIEW DETAILS --}}
-                                            <button type="button" onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()" class="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition w-full md:w-auto text-center font-semibold">
+                                        @if(
+    $booking->payment &&
+    $booking->payment->status === 'Paid' &&
+    $booking->check_out->isPast()
+)
+    @if(!$booking->isReviewed)
+        <button
+            type="button"
+            onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
+            class="bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded">
+            ⭐ Tulis Review
+        </button>
+    @else
+        <button
+            disabled
+            class="bg-green-100 text-green-700 text-sm px-4 py-2 rounded">
+            ✓ Review Submitted
+        </button>
+    @endif
+@endif
+
+                                            <button type="button"
+                                                onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
                                                 View Details
                                             </button>
+
                                         @endif
-                                    @endif
+                                        @endif
+                            
                                 </div>
                             </div>
                         </div>
 
-                        {{-- POPUP MODAL FORM PEMBATALAN PER BOOKING ID --}}
-                        <dialog id="modal-cancel-{{ $booking->id }}" class="rounded-lg shadow-2xl p-6 w-full max-w-md backdrop:bg-gray-900/50">
+                        {{-- MODAL CANCEL --}}
+                        <dialog id="modal-cancel-{{ $booking->id }}" class="fixed inset-0 m-auto rounded-lg shadow-2xl p-6 w-full max-w-md backdrop:bg-gray-900/50">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-lg font-bold text-gray-900">Alasan Pembatalan</h3>
                                 <button onclick="document.getElementById('modal-cancel-{{ $booking->id }}').close()" class="text-gray-400 hover:text-gray-600">&times;</button>
@@ -161,10 +219,49 @@ $currentPage = 'bookings';
                             </form>
                         </dialog>
 
-                        {{-- POPUP MODAL DETAIL ACCOMMODATION --}}
-                        <dialog id="modal-detail-accommodation-{{ $booking->id }}" class="rounded-xl shadow-2xl p-6 w-full max-w-lg backdrop:bg-gray-900/50 border border-gray-100">
+                        {{-- MODAL REVIEW --}}
+                        <dialog id="modal-review-{{ $booking->id }}" class="fixed inset-0 m-auto rounded-xl shadow-2xl p-6 w-full max-w-md backdrop:bg-gray-900/50 border border-gray-100">
                             <div class="flex justify-between items-center border-b pb-3 mb-4">
-                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">🏨 Accommodation Details</h3>
+                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">⭐ Tulis Review Anda</h3>
+                                <button onclick="document.getElementById('modal-review-{{ $booking->id }}').close()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                            </div>
+                            
+                            <form action="{{ route('review.store', $booking->unit_details['property_id'] ?? 0) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                @csrf
+                                <input type="hidden" name="reservation_id" value="{{ $booking->id }}">
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Rating</label>
+                                    <div class="flex items-center gap-2 rating-stars">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <input type="radio" id="star-{{ $i }}-{{ $booking->id }}" name="rating" value="{{ $i }}" class="hidden" required>
+                                            <label for="star-{{ $i }}-{{ $booking->id }}" class="cursor-pointer text-2xl text-gray-300 hover:text-amber-400 transition-colors" onclick="highlightStars('{{ $booking->id }}', {{ $i }})">&#9733;</label>
+                                        @endfor
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Komentar</label>
+                                    <textarea name="comment" rows="4" maxlength="1000" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-400 text-sm" placeholder="Ceritakan pengalaman menginap Anda..."></textarea>
+                                </div>  
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Foto (Opsional)</label>
+                                    <input type="file" name="images[]" multiple accept="image/png, image/jpeg, image/jpg" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                    <p class="text-[11px] text-gray-400 mt-1">Maksimal file 2MB berformat JPG/PNG.</p>
+                                </div>
+
+                                <div class="flex justify-end gap-2 pt-3 border-t">
+                                    <button type="button" onclick="document.getElementById('modal-review-{{ $booking->id }}').close()" class="bg-gray-100 text-gray-700 font-bold px-4 py-2 rounded-lg text-xs hover:bg-gray-200 transition">Batal</button>
+                                    <button type="submit" class="bg-amber-500 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-amber-600 transition">Kirim Review</button>
+                                </div>
+                            </form>
+                        </dialog>
+
+                        {{-- MODAL DETAIL --}}
+                        <dialog id="modal-detail-accommodation-{{ $booking->id }}" class="fixed inset-0 m-auto rounded-xl shadow-2xl p-6 w-full max-w-lg backdrop:bg-gray-900/50 border border-gray-100">
+                            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">Accommodation Details</h3>
                                 <button onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').close()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                             </div>
                             <div class="space-y-4 text-sm text-gray-700">
@@ -200,9 +297,6 @@ $currentPage = 'bookings';
             @endif
         </div>
 
-        {{-- ============================================================= --}}
-        {{-- KELOMPOK TAB 2: SEKSI PENAMPILAN DAFTAR TIKET PESAWAT BARU     --}}
-        {{-- ============================================================= --}}
         <div id="section-flights" class="hidden">
             @if($flightBookings->isEmpty())
                 <div class="bg-white rounded-lg shadow p-6 text-center">
@@ -254,15 +348,14 @@ $currentPage = 'bookings';
                                         Rp {{ number_format($flight->payment->amount ?? 0, 0, ',', '.') }}
                                     </p>
                                 </div>
-                                {{-- BUTTON E-TICKET DIGANTI JADI VIEW DETAILS --}}
                                 <button type="button" onclick="document.getElementById('modal-detail-flight-{{ $flight->id }}').showModal()" class="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition w-full md:w-auto text-center font-semibold">
                                     View Details
                                 </button>
                             </div>
                         </div>
 
-                        {{-- POPUP MODAL DETAIL FLIGHT TICKET BOOKING --}}
-                        <dialog id="modal-detail-flight-{{ $flight->id }}" class="rounded-xl shadow-2xl p-6 w-full max-w-xl backdrop:bg-gray-900/50 border border-gray-100">
+                        {{-- MODAL DETAIL FLIGHT --}}
+                        <dialog id="modal-detail-flight-{{ $flight->id }}" class="fixed inset-0 m-auto rounded-xl shadow-2xl p-6 w-full max-w-xl backdrop:bg-gray-900/50 border border-gray-100">
                             <div class="flex justify-between items-center border-b pb-3 mb-4">
                                 <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">✈️ Flight Booking Details</h3>
                                 <button onclick="document.getElementById('modal-detail-flight-{{ $flight->id }}').close()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
@@ -325,12 +418,10 @@ $currentPage = 'bookings';
     @endif
 </div>
 
-{{-- COMPONENT FLOATING TOAST POPUP NOTIFICATION --}}
 <div id="toastNotification" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900/90 backdrop-blur-md text-white text-xs font-bold px-6 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300">
     <span>Berhasil mendownload tiket!</span>
 </div>
 
-{{-- Skrip JavaScript Pemindah Tab Aktif & Toast --}}
 <script>
 function switchBookingTab(tabId) {
     const sectionAccom = document.getElementById('section-accommodation');
@@ -351,19 +442,28 @@ function switchBookingTab(tabId) {
     }
 }
 
-// Fungsi Trigger Notifikasi Download Tiket Tiruan
 function triggerSimulatedDownload(bookingCode) {
     const toast = document.getElementById('toastNotification');
-    
-    // Munculkan toast
     toast.classList.remove('opacity-0', 'pointer-events-none');
     toast.classList.add('opacity-100');
 
-    // Hilangkan otomatis setelah 3 detik
     setTimeout(() => {
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0', 'pointer-events-none');
     }, 3000);
+}
+
+function highlightStars(bookingId, rating) {
+    for (let i = 1; i <= 5; i++) {
+        const label = document.querySelector(`label[for="star-${i}-${bookingId}"]`);
+        if (i <= rating) {
+            label.classList.remove('text-gray-300');
+            label.classList.add('text-amber-400');
+        } else {
+            label.classList.remove('text-amber-400');
+            label.classList.add('text-gray-300');
+        }
+    }
 }
 </script>
 @endsection

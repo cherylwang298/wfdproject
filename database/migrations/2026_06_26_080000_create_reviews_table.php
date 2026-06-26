@@ -13,10 +13,19 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->uuid('property_id'); // Relasi ke API Properties
+            // $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            // $table->uuid('property_id'); // Relasi ke API Properties
+
+            $table->string('user_id');
+            $table->string('reservation_id');
+            $table->string('property_id');
+
             $table->unsignedTinyInteger('rating'); // 1 sampai 5
             $table->text('comment')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('reservation_id')->references('id')->on('reservations')->onDelete('cascade');
+
             $table->timestamps(); // Kolom created_at otomatis ter-handle di sini
         });
     }

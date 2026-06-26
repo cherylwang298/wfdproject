@@ -34,7 +34,7 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <a href="#" class="flex items-center gap-1.5 text-sm font-medium text-on-surface-variant hover:text-blue-600 transition-colors px-3 py-2 rounded-xl hover:bg-gray-100/50">
+            <a href="{{route('favorites')}}" class="flex items-center gap-1.5 text-sm font-medium text-on-surface-variant hover:text-blue-600 transition-colors px-3 py-2 rounded-xl hover:bg-gray-100/50">
                 <span class="material-symbols-outlined text-blue-600 text-[22px]">favorite</span>
                 <span class="hidden lg:inline">Favourites</span>
             </a>
@@ -88,11 +88,11 @@
                 {{ $link['label'] }}
             </a>
         @endforeach
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-on-surface hover:bg-gray-100 transition-colors">
+        <a href="{{route('favorites')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-on-surface hover:bg-gray-100 transition-colors">
             <span class="material-symbols-outlined text-[20px] text-blue-600">favorite</span>Favourites
         </a>
         @auth
-            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
                 <span class="material-symbols-outlined text-[20px] text-red-600">logout</span>Sign Out
             </a>
         @else

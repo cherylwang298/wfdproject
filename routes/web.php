@@ -43,6 +43,8 @@ Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights'
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
 
     Route::get('/my-bookings', [UserController::class, 'myBookings'])->name('bookings.success');
+    Route::get('/my-favorites', [UserController::class, 'renderFavorites'])->name('favorites');
+
 
 // --- ROUTING SYSTEM CHECKOUT TIKET PESAWAT STAYGO ---
 Route::middleware('auth')->group(function () {
@@ -55,6 +57,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking/{id}', [BookingController::class, 'openBookingPage'])->name('booking.open');
     Route::post('/booking/store',[BookingController::class,'storeBooking'])->name('booking.store');
     Route::post('/booking/{id}/cancel-request', [UserController::class, 'requestCancellation'])->name('booking.cancel.request');
+
+    // addToFav
+    Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
+    Route::post('/review/{propertyId}', [UserController::class, 'addReview'])->name('review.store');
+
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
@@ -87,6 +94,23 @@ Route::middleware(['isAdmin'])->prefix('admin')->group(function () {
 
 Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveCancelRequest'])->name('admin.cancel.approve');
     Route::patch('/cancel-requests/{id}/reject', [AdminController::class, 'rejectCancelRequest'])->name('admin.cancel.reject');
+ 
+    Route::get('/promos', [AdminController::class, 'openPromos'])->name('admin.promos');
+    Route::get('/users', [AdminController::class, 'openUsers'])->name('admin.users');
+    Route::get('/reservations', [AdminController::class, 'openReserv'])->name('admin.reservations');
+
+    Route::post('/promo-create', [AdminController::class, 'createPromo'])->name('admin.promo.create');
+    Route::put('/promos/update/{id}', [AdminController::class, 'editPromo'])->name('admin.promos.update');
+Route::delete('/promos/delete/{id}', [AdminController::class, 'deletePromo'])->name('admin.promos.destroy');
+    
+    Route::get('/reservations/{id}', [AdminController::class, 'viewReserv'])->name('admin.reservations.show');
+Route::post('/reservations/update/{id}', [AdminController::class, 'editReserv'])->name('admin.reservations.update');
+Route::delete('/reservations/delete/{id}', [AdminController::class, 'deleteReserv'])->name('admin.reservations.destroy');
+
+
+    Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.show');
+    Route::put('/users/update/{id}', [AdminController::class, 'editUserStatus'])->name('admin.users.update');
+    Route::delete('/users/delete/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.destroy');
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

@@ -53,7 +53,7 @@ class BookingController extends Controller
         // 7. Ambil gambar unit jika ada
         $unit['image'] = $images->where('unit_id', $id)->first();
 
-        return view('dummy_pages.users.bookings', compact(
+        return view('users.bookings', compact(
             'unit', 
             'property', 
             'checkin', 

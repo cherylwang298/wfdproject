@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,16 +10,16 @@ use Illuminate\Support\Str;
 
 class Review extends Model
 {
-    use HasFactory;
+    use HasUuids;
 
-    protected $keyType = 'string';
-    public $incrementing = false;
-
+    protected $table = 'reviews';
+   
     protected $fillable = [
         'user_id',
         'property_id', // Disimpan sebagai referensi UUID ke API Properties
         'rating',
         'comment',
+        'reservation_id'
     ];
 
     protected static function booted()

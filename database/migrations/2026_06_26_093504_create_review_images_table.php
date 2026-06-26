@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('favorites', function (Blueprint $table) {
+        Schema::create('review_images', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('accomodation_id'); // Mengarah ke properti/villa favorit di API
-            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->string('review_id');
+            $table->string('path');
+            $table->foreign('review_id')->references('id')->on('reviews')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('favorites');
+        Schema::dropIfExists('review_images');
     }
 };

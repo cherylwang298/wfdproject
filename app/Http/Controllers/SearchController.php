@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Favorite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class SearchController extends Controller
@@ -29,7 +31,7 @@ class SearchController extends Controller
         ->sort()
         ->values();
 
-    return view('dummy_pages.search-accomodations', compact('cities'));
+    return view('accomodations.search-accomodations', compact('cities'));
 }
 
 public function searchAccomodations(Request $request)
@@ -112,7 +114,7 @@ public function searchAccomodations(Request $request)
 
     });
 
-    $availableProperties = $availableProperties->map(function ($property) use ($images) {
+    $availableProperties = $availableProperties->map(function ($property) use ($images, $units) {
 
     $image = $images
         ->where('property_id', $property['id'])
@@ -120,13 +122,19 @@ public function searchAccomodations(Request $request)
 
     $property['image'] = $image;
 
+    // Cari harga unit termurah
+    $property['min_price'] = $units
+        ->where('property_id', $property['id'])
+        ->min('price');
+
     return $property;
 });
+// });
 
 
 
     return view(
-        'dummy_pages.accomodations',
+        'accomodations.accomodations',
         [
             'properties' => $availableProperties,
             'checkin' => $request->checkin,
@@ -176,12 +184,16 @@ public function openPropertyDetail(Request $request, $id)
             return $unit;
         });
 
-    return view('dummy_pages.accomodation-details', [
+        $isFavorite = Favorite::where('user_id', Auth::id())
+        ->where('property_id', $property['id'])->exists();
+
+    return view('accomodations.accomodation-details', [
         'property' => $property,
         'units' => $propertyUnits,
         'checkin' => $request->query('checkin'),
         'checkout' => $request->query('checkout'),
         'guests' => $request->query('guests'),
+        'isFavorite' => $isFavorite
     ]); 
 }
 

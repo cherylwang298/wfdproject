@@ -6,8 +6,7 @@
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between items-start">
         <div>
             <p class="text-sm font-semibold text-gray-400">Total Bookings</p>
-            <h3 class="text-3xl font-bold text-gray-900 mt-2">1,245</h3>
-            <p class="text-xs text-green-500 mt-2 font-medium">↗ +12% <span class="text-gray-400">from last month</span></p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">{{$totalBookings}}</h3>
         </div>
         <div class="p-3 bg-blue-500 text-white rounded-2xl shadow-md shadow-blue-200">
             📅

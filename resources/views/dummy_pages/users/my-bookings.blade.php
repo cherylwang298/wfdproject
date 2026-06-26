@@ -1,6 +1,10 @@
 @extends('layouts.user') 
 
-@include('dummy_pages.partials.navbar')
+@php
+$currentPage = 'bookings';
+@endphp
+
+@include('partials.navbar')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">

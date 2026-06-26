@@ -15,6 +15,9 @@ class User extends Authenticatable
 
     protected $table = 'users';
 
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'username',
         'first_name',
@@ -23,6 +26,11 @@ class User extends Authenticatable
         'phone_number',
         'profile_picture',
         'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     public function reservations(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -139,6 +139,22 @@
                 <span id="stepLabel" class="ml-2 text-sm font-semibold text-gray-600">Select departure flight</span>
             </div>
 
+            {{-- KUNCI BARU: BARIS FILTER SORTING PENERBANGAN --}}
+            <div id="sortBarSection" class="hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Flight Options Available</p>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label for="flightSortSelector" class="text-xs font-bold text-gray-400 uppercase tracking-wider shrink-0">Sort By:</label>
+                    <select id="flightSortSelector" onchange="applyFlightSorting(this.value)" class="bg-white border border-gray-200 text-sm font-bold text-gray-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full sm:w-48 shadow-sm">
+                        <option value="default">Recommended</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="duration_asc">Shortest Duration ⚡</option>
+                    </select>
+                </div>
+            </div>
+
             <div id="flightResults" class="flex flex-col gap-4">
                 <div class="text-center py-16 text-gray-500 bg-white border border-dashed border-gray-200 rounded-2xl">
                     <span class="material-symbols-outlined text-5xl block mb-4 text-gray-400">flight_search</span>
@@ -318,6 +334,49 @@ function renderFlightCard(f, type, isSelected) {
     `;
 }
 
+// Variabel bantuan global untuk mencatat metode sort pilihan user saat ini
+let currentSortMethod = 'default';
+
+// Fungsi pemicu saat user mengganti pilihan di dropdown Sort By
+function applyFlightSorting(sortValue) {
+    currentSortMethod = sortValue;
+    
+    // Urutkan array Outbound
+    sortFlightArray(currentOutboundFlights);
+    // Urutkan array Inbound (jika round trip)
+    sortFlightArray(currentInboundFlights);
+    
+    // Render ulang datanya ke layar secara real-time
+    renderOutboundSection();
+    if (isRoundTrip() && selectedOutbound) {
+        const container = document.getElementById('inboundResults');
+        container.innerHTML = currentInboundFlights.map(f => renderFlightCard(f, 'inbound', selectedInbound && selectedInbound.id === f.id)).join('');
+        attachSelectHandlers();
+    }
+}
+
+// Fungsi internal untuk mengolah sorting array
+function sortFlightArray(arr) {
+    if (!arr || arr.length === 0) return;
+
+    if (currentSortMethod === 'price_asc') {
+        arr.sort((a, b) => a.price - b.price);
+    } else if (currentSortMethod === 'price_desc') {
+        arr.sort((a, b) => b.price - a.price);
+    } else if (currentSortMethod === 'duration_asc') {
+        // Mengubah string durasi seperti "2h 30m" menjadi total menit agar bisa dibandingkan
+        const toMinutes = str => {
+            const h = str.match(/(\d+)h/);
+            const m = str.match(/(\d+)m/);
+            return (h ? parseInt(h[1]) * 60 : 0) + (m ? parseInt(m[1]) : 0);
+        };
+        arr.sort((a, b) => toMinutes(a.duration) - toMinutes(b.duration));
+    } else {
+        // Default / Recommended: Kembalikan urutan berdasarkan ID asli dari database API
+        arr.sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    }
+}
+
 function doSearch() {
     const origin = originSelect.value;
     const dest = destSelect.value;
@@ -331,6 +390,10 @@ function doSearch() {
     selectedOutbound = null;
     selectedInbound = null;
     hasSearched = true;
+
+    document.getElementById('sortBarSection').classList.remove('hidden');
+    document.getElementById('flightSortSelector').value = 'default';
+    currentSortMethod = 'default';
 
     // Remove proceed button jika ada sisa pencarian sebelumnya
     const pb = document.getElementById('proceedToCheckout');

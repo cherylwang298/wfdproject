@@ -189,6 +189,9 @@ input[type="date"] {
 
 </header>
 
+@include('partials.footer')
+
+
 @endsection
 
 @section('script')
@@ -260,5 +263,12 @@ checkin.addEventListener('change', function(){
         checkout.value = "";
     }
 });
+
+
 </script>
+
+
+
+
 @endsection 
+

@@ -99,9 +99,10 @@ public function approveCancelRequest($id)
     }
 
     public function openPromos(){
-  $admin = Auth::guard('admin')->user();
+      $admin = Auth::guard('admin')->user();
       $username = $admin->name;
       $promos = Promo::all();
+      
       return view('admins.promos', compact('promos', 'username'));
     }
 

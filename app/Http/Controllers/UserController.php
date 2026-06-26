@@ -71,7 +71,7 @@ class UserController extends Controller
         ]);
 
         return redirect()
-            ->route('login.form')
+            ->route('login')
             ->with('success', 'Registrasi berhasil, silakan login.');
     }
 

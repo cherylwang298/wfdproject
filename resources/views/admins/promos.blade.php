@@ -2,6 +2,10 @@
 
 @section('content')
 
+@php
+    $promos = $promos ?? collect();
+@endphp
+
 {{-- HEADER --}}
 <div class="flex justify-between items-center mb-8">
     <div>
@@ -276,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <button type="button" onclick="closeEditPromoModal()" class="text-2xl text-gray-400 hover:text-gray-700">&times;</button>
         </div>
 
-        <form id="editPromoForm" action="{{route('admin.promos.update', $promo->id)}}" method="POST">
+        <form id="editPromoForm" action="" method="POST">
             @csrf
             @method('PUT')
             <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">

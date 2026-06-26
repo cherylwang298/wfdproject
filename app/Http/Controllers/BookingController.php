@@ -87,8 +87,6 @@ class BookingController extends Controller
 
     DB::beginTransaction();
 
- 
-
     try {
    
         $reservation = Reservation::create([

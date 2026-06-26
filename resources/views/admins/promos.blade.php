@@ -10,7 +10,7 @@
 <div class="flex justify-between items-center mb-8">
     <div>
         <h2 class="text-3xl font-bold text-gray-900">Promo Management</h2>
-        <p class="text-gray-400 mt-1">Create and manage promotional discounts.</p>
+
     </div>
 
     <button

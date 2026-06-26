@@ -39,41 +39,45 @@
         <h1 class="text-on-surface max-w-4xl drop-shadow-sm mb-6 text-4xl md:text-6xl font-extrabold tracking-tight">Your Journey, Beautifully Simplified</h1>
         <p class="text-body-lg text-on-surface-variant max-w-2xl mb-12 text-lg">Discover curated stays, effortless flights, and unforgettable experiences — all in one seamless platform.</p>
         
-        <form id="homeSearchForm" method="GET" action="#" class="glass-card w-full max-w-5xl rounded-2xl p-2 flex flex-col md:flex-row items-center gap-2 relative z-20 shadow-xl">
-            <div class="flex-1 flex items-center h-16 px-6 rounded-xl hover:bg-white/50 transition-colors w-full relative">
-                <span class="material-symbols-outlined text-outline mr-3">location_on</span>
-                <div class="flex flex-col text-left flex-1">
-                    <label class="text-xs font-semibold text-on-surface">Location</label>
-                    <input name="location" id="homeLocation" class="bg-transparent border-none p-0 text-sm text-on-surface-variant placeholder-outline-variant w-full outline-none focus:ring-0" placeholder="Where to?" type="text">
-                </div>
-                <div class="hidden md:block absolute right-0 top-4 bottom-4 w-px bg-outline-variant/30"></div>
-            </div>
-            <div class="flex-1 flex items-center h-16 px-6 rounded-xl hover:bg-white/50 transition-colors w-full relative">
-                <span class="material-symbols-outlined text-outline mr-3">calendar_month</span>
-                <div class="flex flex-col text-left flex-1">
-                    <label class="text-xs font-semibold text-on-surface">Check-in</label>
-                    <input type="date" name="checkin" id="homeCheckin" class="bg-transparent border-none p-0 text-sm text-on-surface-variant w-full outline-none focus:ring-0">
-                </div>
-                <div class="hidden md:block absolute right-0 top-4 bottom-4 w-px bg-outline-variant/30"></div>
-            </div>
-            <div class="flex-1 flex items-center h-16 px-6 rounded-xl hover:bg-white/50 transition-colors w-full relative">
-                <span class="material-symbols-outlined text-outline mr-3">calendar_month</span>
-                <div class="flex flex-col text-left flex-1">
-                    <label class="text-xs font-semibold text-on-surface">Check-out</label>
-                    <input type="date" name="checkout" id="homeCheckout" class="bg-transparent border-none p-0 text-sm text-on-surface-variant w-full outline-none focus:ring-0">
-                </div>
-            </div>
-            <div class="flex-1 flex items-center h-16 px-6 rounded-xl hover:bg-white/50 transition-colors w-full">
-                <span class="material-symbols-outlined text-outline mr-3">group</span>
-                <div class="flex flex-col text-left flex-1">
-                    <label class="text-xs font-semibold text-on-surface">Guests</label>
-                    <input type="number" name="guests" id="homeGuests" class="bg-transparent border-none p-0 text-sm text-on-surface-variant w-full outline-none focus:ring-0" min="1" value="2">
-                </div>
-            </div>
-            <button type="submit" class="h-16 w-full md:w-16 flex items-center justify-center bg-gradient-to-r from-primary to-secondary-container rounded-xl text-on-primary hover:scale-105 transition-transform duration-300 shadow-lg shrink-0 mt-2 md:mt-0">
-                <span class="material-symbols-outlined font-semibold">search</span>
-            </button>
-        </form>
+        <div class="max-w-5xl mx-auto mt-12">
+
+    <a href="{{ route('accomodations.open') }}"
+       class="group bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center px-3 py-3 border border-gray-100">
+
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-blue-50 text-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="w-6 h-6"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-5-5m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+
+            </svg>
+        </div>
+
+        <div class="flex-1 px-6">
+
+            <p class="text-lg font-medium text-gray-700 group-hover:text-blue-600 transition">
+                Book your dream stay
+            </p>
+
+            <p class="text-sm text-gray-400">
+                Hotels • Villas •  Resorts
+            </p>
+
+        </div>
+
+        <div class="hidden md:block bg-blue-600 text-white px-6 py-4 rounded-full font-semibold group-hover:bg-blue-700 transition">
+            Search
+        </div>
+
+    </a>
+
+</div>
     </div>
 </header>
 

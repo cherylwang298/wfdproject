@@ -267,7 +267,9 @@ $currentPage = 'bookings';
                             <div class="space-y-4 text-sm text-gray-700">
                                 <div class="bg-gray-50 p-4 rounded-xl">
                                     <h4 class="font-bold text-gray-800 mb-1">Unit Name</h4>
+                                    
                                     <p class="text-base font-semibold text-blue-600">{{ $booking->unit_details['name'] ?? 'Unit #' . $booking->unit_id }}</p>
+                                    <p>{{ $booking->property_details['name'] ?? '-' }}</p>
                                     <p class="text-xs text-gray-400 mt-2">Reservation ID: {{ $booking->id }}</p>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 border-b pb-3">

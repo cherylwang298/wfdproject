@@ -3,12 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FlightCheckoutController;
 use App\Http\Controllers\FlightSearchController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoController;
-use App\Http\Controllers\PropertyDetailController;
-use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyDetailController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -63,10 +64,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
     Route::post('/review/{propertyId}', [UserController::class, 'addReview'])->name('review.store');
 
-    // cancel flight
-    Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
     Route::post('/promo/apply',[PromoController::class,'apply'])
     ->name('promo.apply');
+    // cancel flight
+    Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
+
+       Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile.index');
+
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
@@ -112,6 +120,8 @@ Route::delete('/promos/delete/{id}', [AdminController::class, 'deletePromo'])->n
 Route::post('/reservations/update/{id}', [AdminController::class, 'editReserv'])->name('admin.reservations.update');
 Route::delete('/reservations/delete/{id}', [AdminController::class, 'deleteReserv'])->name('admin.reservations.destroy');
 
+Route::get('/flight-bookings/{id}', [AdminController::class, 'viewBooking'])->name('admin.flight-bookings.show');
+Route::delete('/flight-bookings/delete/{id}', [AdminController::class, 'deleteBooking'])->name('admin.flight-bookings.destroy');
 
     Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.show');
     Route::put('/users/update/{id}', [AdminController::class, 'editUserStatus'])->name('admin.users.update');
@@ -132,6 +142,8 @@ Route::get('/login', [UserController::class, 'openLogin'])->name('login');
 Route::post('/login', [UserController::class, 'login'])
     ->name('login.submit');
 Route::get('/accomodations', [SearchController::class, 'openAccomodationPage'])->name('accomodations.open');
+
+// Route::get('/search-accomodations-home', [SearchController::class, 'searchAccomodations'])->name('accomodations.search.home');
 
 Route::get('/search-accomodations', [SearchController::class, 'searchAccomodations'])->name('accomodations.search');
 // Route::get('/accomodation-result', [SearchController::class, 'showAccomodationResults'])->name('accomodations.result');

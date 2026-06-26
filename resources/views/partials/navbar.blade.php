@@ -49,9 +49,13 @@
                     @endphp
                     
                     <div class="hidden sm:flex flex-col items-end">
-                        <span class="text-sm font-semibold text-gray-800 leading-tight">
-                            {{ $firstName }} {{ $lastName }}
+                        
+                        <a href="{{ route('profile.index') }}">
+                        <span class="text-sm font-semibold text-gray-800 hover:text-blue-600 leading-tight">
+                            {{-- {{ $firstName }} {{ $lastName }} --}}
+                        Profile
                         </span>
+                    </a>
                     </div>
                     
                     <form method="POST" action="{{ route('logout') }}" id="logout-form" class="hidden">
@@ -61,7 +65,13 @@
                     <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
                             title="Click to Sign Out"
                             class="relative w-10 h-10 rounded-full border-2 border-blue-100 overflow-hidden hover:border-red-500 transition-all duration-300 flex items-center justify-center bg-blue-600 text-white font-bold text-sm shadow-sm">
+                        {{-- {{ $initials ?: 'U' }} --}}
+                        @if (Auth::user()->profile_picture)
+                        
+                        <img src="{{ asset('storage/'.Auth::user()->profile_picture) }}" alt="User Profile" class="w-full h-full object-cover"> 
+                        @else
                         {{ $initials ?: 'U' }}
+                        @endif
                     </button>
                 @else
                     {{-- Tampilan jika User belum login (Guest) --}}

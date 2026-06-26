@@ -6,7 +6,7 @@
 <div class="flex justify-between items-center mb-8">
     <div>
         <h2 class="text-3xl font-bold text-gray-900">User Management</h2>
-        <p class="text-gray-400 mt-1">Manage system users, roles, and account statuses.</p>
+
     </div>
 
     {{-- {{ route('admin.users.create') }} --}}

@@ -100,12 +100,19 @@
         <p class="text-xs text-on-surface-variant mt-2" id="filter-label">Showing all properties</p>
     </section>
 
+    {{-- SECtion 2: CURATED ACCOMMODATIONS --}}
     <section class="max-w-7xl mx-auto mb-24">
+        {{-- SINKRONISASI JUDUL & PENAMBAHAN TOMBOL VIEW ALL ACCOMMODATIONS --}}
         <div class="flex justify-between items-end mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-on-surface mb-2">Curated for You</h2>
-                <p class="text-sm text-on-surface-variant">Exceptional stays with atmospheric views.</p>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Curated for You</h2>
+                <p class="text-sm text-gray-500">Exceptional stays with atmospheric views.</p>
             </div>
+            {{-- Tombol View All mengarah langsung ke halaman akomodasi --}}
+            <a href="/accommodations" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group">
+                View all accommodations 
+                <span class="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </a>
         </div>
 
         @php
@@ -123,7 +130,6 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="properties-grid">
             @foreach ($featuredProperties as $h)
-                {{-- Mengunci indeks perulangan ke deretan 8 gambar (0-7) menggunakan operator modulo (%) keamanan cadangan --}}
                 @php
                     $assignedImage = $dummyImages[$loop->index % 8];
                 @endphp
@@ -133,52 +139,52 @@
                     data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['rating'] }}">
                     
                     <div class="relative h-64 overflow-hidden">
-                        {{-- Menggunakan tautan gambar dummy terikat konstan --}}
                         <img alt="{{ $h['name'] }}" 
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                             src="{{ $assignedImage }}"
                             onerror="this.src='https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600'">
                         
                         <button onclick="event.preventDefault(); toggleFav(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors border border-white/30">
-                            <span class="material-symbols-outlined text-[18px] text-on-surface-variant fav-icon">favorite_border</span>
+                            <span class="material-symbols-outlined text-[18px] text-gray-700 fav-icon">favorite_border</span>
                         </button>
                         
                         @if (!empty($h['badge']))
-                            <span class="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">{{ $h['badge'] }}</span>
+                            {{-- PENYESUAIAN CLASS CUSTOM: text-xs font-semibold --}}
+                            <span class="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm">{{ $h['badge'] }}</span>
                         @endif
                     </div>
                     
-                    <div class="p-5 bg-surface-container-lowest">
+                    <div class="p-5 bg-white">
                         <div class="flex justify-between items-start mb-1">
-                            <h3 class="font-headline-md text-on-surface text-[18px] leading-tight">{{ $h['name'] }}</h3>
-                            <span class="flex items-center gap-0.5 text-on-surface font-label-sm text-label-sm shrink-0 ml-2">
-                                <span class="material-symbols-outlined text-[14px] text-secondary icon-fill">star</span>{{ number_format($h['rating'], 1) }}
+                            {{-- PENYESUAIAN CLASS CUSTOM: text-lg font-bold text-gray-800 --}}
+                            <h3 class="text-lg font-bold text-gray-800 leading-tight group-hover:text-blue-600 transition-colors">{{ $h['name'] }}</h3>
+                            {{-- PENYESUAIAN CLASS CUSTOM: text-xs font-bold --}}
+                            <span class="flex items-center gap-0.5 text-gray-700 text-xs font-bold shrink-0 ml-2">
+                                <span class="material-symbols-outlined text-[14px] text-yellow-500 icon-fill">star</span>{{ number_format($h['rating'], 1) }}
                             </span>
                         </div>
                         
-                        <p class="font-body-md text-on-surface-variant text-[14px] flex items-center gap-1 mb-3">
-                            <span class="material-symbols-outlined text-[14px]">location_on</span>{{ $h['city'] }}
+                        {{-- PENYESUAIAN CLASS CUSTOM: text-xs text-gray-400 --}}
+                        <p class="text-xs text-gray-400 font-medium flex items-center gap-1 mb-4">
+                            <span class="material-symbols-outlined text-[14px] text-gray-400">location_on</span>{{ $h['city'] }}
                         </p>
                         
-                        <div class="flex items-center justify-between">
-                            <span class="font-label-sm text-label-sm text-on-surface-variant capitalize bg-surface-container px-3 py-1 rounded-full">{{ $h['type'] }}</span>
-                            <p class="font-headline-md text-on-surface text-[18px]">
+                        <div class="flex items-center justify-between pt-1">
+                            {{-- PENYESUAIAN CLASS CUSTOM: text-xs font-bold bg-gray-100 --}}
+                            <span class="text-xs font-bold text-gray-500 capitalize bg-gray-100 px-3 py-1 rounded-full border border-gray-200/40">{{ $h['type'] }}</span>
+                            {{-- PENYESUAIAN CLASS CUSTOM: text-lg font-extrabold text-gray-800 --}}
+                            <p class="text-lg font-extrabold text-gray-800">
                                 @if($h['cheapest_price'] > 0)
                                     Rp {{ number_format($h['cheapest_price'], 0, ',', '.') }}
                                 @else
                                     N/A
                                 @endif
-                                <span class="font-body-md text-on-surface-variant text-[13px]">/night</span>
+                                <span class="text-xs font-medium text-gray-400">/night</span>
                             </p>
                         </div>
                     </div>
                 </a>
             @endforeach
-        </div>
-
-        <div id="no-results" class="hidden text-center py-16">
-            <span class="material-symbols-outlined text-[64px] text-outline-variant mb-4 block">search_off</span>
-            <p class="text-lg text-on-surface-variant">No properties match this filter</p>
         </div>
     </section>
 
@@ -192,7 +198,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($promos as $promo)
                 @php
-                    $isPercent = ($promo['discount_type'] ?? 'percent') === 'percent';
+                    $isPercent = ($promo['discount_type'] ?? 'percentage') === 'percentage';
                     $value = $promo['discount_value'] ?? 0;
                     $code = $promo['code'] ?? '-';
                     $expired = isset($promo['expired_at']) ? \Carbon\Carbon::parse($promo['expired_at'])->format('d M Y') : '-';
@@ -277,6 +283,26 @@ document.addEventListener('DOMContentLoaded', function () {
     
     document.getElementById('homeCheckin').value = today.toISOString().split('T')[0];
     document.getElementById('homeCheckout').value = nextWeek.toISOString().split('T')[0];
+
+    allCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            e.preventDefault(); // Tahan redirect instan link asli bawaan Blade
+
+            // 1. Ambil nilai terupdate dari elemen input form pencarian homepage
+            const checkinValue = document.getElementById('homeCheckin').value;
+            const checkoutValue = document.getElementById('homeCheckout').value;
+            const guestsValue = document.getElementById('homeGuests').value;
+
+            // 2. Ambil URL dasar (e.g., http://127.0.0.1:8000/properties/{id})
+            const baseUrl = this.getAttribute('href');
+
+            // 3. Gabungkan menjadi satu kesatuan URL Query String yang valid
+            const finalUrl = `${baseUrl}?checkin=${checkinValue}&checkout=${checkoutValue}&guests=${guestsValue}`;
+
+            // 4. Alihkan halaman user dengan URL lengkap layaknya hasil search page
+            window.location.href = finalUrl;
+        });
+    });
 });
 
 function filterProperties(type) {

@@ -33,7 +33,7 @@ Route::prefix('prototype')->group(function(){
 Route::get('/testhome', [UserController::class, 'home2'])->name('homepage');
 
 // accommodations
-Route::get('/accommodations/{id}', [PropertyDetailController::class, 'show'])->name('properties.detail');
+Route::get('/accommodations/{id}', [PropertyDetailController::class, 'showPropertyDetailDirect'])->name('properties.detail');
 
 // flights
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');

@@ -43,6 +43,8 @@ Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights'
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
 
     Route::get('/my-bookings', [UserController::class, 'myBookings'])->name('bookings.success');
+    Route::get('/my-favorites', [UserController::class, 'renderFavorites'])->name('favorites');
+
 
 // --- ROUTING SYSTEM CHECKOUT TIKET PESAWAT STAYGO ---
 Route::middleware('auth')->group(function () {

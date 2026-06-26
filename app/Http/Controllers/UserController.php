@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use App\Models\Favorite;
 
 class UserController extends Controller
 {
@@ -285,6 +286,31 @@ public function requestCancellation(Request $request, $id)
     // $booking->update(['status' => 'Pending Cancellation']);
 
     return redirect()->back()->with('success', 'Permintaan pembatalan berhasil dikirim. Menunggu konfirmasi admin.');
+}
+
+public function renderFavorites()
+{
+    // Semua property_id favorit user
+    $favoriteIds = Favorite::where('user_id', Auth::id())
+        ->pluck('property_id')
+        ->toArray();
+
+    // Ambil semua property dari API
+    $response = Http::get(env('API_BASE_URL') . '/properties');
+
+    $properties = [];
+
+    if ($response->successful()) {
+
+        $allProperties = $response->json();
+
+        // Ambil hanya yang ada di favorites
+        $properties = collect($allProperties)
+            ->whereIn('id', $favoriteIds)
+            ->values();
+    }
+
+    return view('dummy_pages.users.favorites', compact('properties'));
 }
 
 }

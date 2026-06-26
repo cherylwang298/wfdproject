@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,13 +10,13 @@ use Illuminate\Support\Str;
 
 class Favorite extends Model
 {
-    use HasFactory;
+    use HasUuids;
 
-    protected $keyType = 'string';
-    public $incrementing = false;
+    protected $table = 'favorites';
+
 
     protected $fillable = [
-        'accomodation_id', // Disimpan sebagai referensi UUID ke API Properties
+        'property_id', 
         'user_id',
     ];
 

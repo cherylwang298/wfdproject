@@ -105,4 +105,19 @@ public function approveCancelRequest($id)
       return view('admins.promos', compact('promos', 'username'));
     }
 
+    public function openUsers(){
+      $admin = Auth::guard('admin')->user();
+      $username = $admin->name;
+      $users = User::all();
+
+      return view('admins.manage-users', compact('users', 'username'));
+    }
+
+    public function openReserv(){
+      $admin = Auth::guard('admin')->user();
+      $username = $admin->name;
+      $reservations = Reservation::all();
+      return view('admins.reservations', compact('reservations', 'username'));
+    }
+
 }

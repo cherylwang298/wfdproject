@@ -33,7 +33,7 @@
         <span>📊</span> Dashboard
     </a>
     
-    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.reservations') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+    <a href="{{route('admin.reservations')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.reservations') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
         <span>📄</span> Reservations
     </a>
     
@@ -45,7 +45,7 @@
         <span>🏷️</span> Promos
     </a>
     
-    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.users') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+    <a href="{{route('admin.users')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.users') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
         <span>👥</span> Users
     </a>
 </nav>
@@ -54,7 +54,7 @@
             <div class="p-4 border-t border-gray-50 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     {{-- <img class="w-10 h-10 rounded-full border" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin"> --}}
-                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold text-gray-700">
     A
 </div>
                     <div>
@@ -80,7 +80,7 @@
                         🔔
                     </button>
                     {{-- <img class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin avatar"> --}}
-                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+                <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold text-gray-700">
     A
 </div>
                 

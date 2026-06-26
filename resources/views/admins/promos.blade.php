@@ -24,9 +24,7 @@
             <p class="text-sm font-semibold text-gray-400">Total Promos</p>
             <h3 class="text-3xl font-bold mt-2">{{ $promos->count() }}</h3>
         </div>
-        <div class="p-3 bg-blue-500 rounded-2xl text-white">
-            🎁
-        </div>
+        
     </div>
 
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between">
@@ -36,9 +34,7 @@
                 {{ $promos->where('expired_at','>',now())->count() }}
             </h3>
         </div>
-        <div class="p-3 bg-green-500 rounded-2xl text-white">
-            ✅
-        </div>
+       
     </div>
 
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between">
@@ -48,9 +44,7 @@
                 {{ $promos->where('expired_at','<',now())->count() }}
             </h3>
         </div>
-        <div class="p-3 bg-red-500 rounded-2xl text-white">
-            ⏰
-        </div>
+     
     </div>
 
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between">
@@ -60,9 +54,7 @@
                 {{ $promos->sum('quota') }}
             </h3>
         </div>
-        <div class="p-3 bg-purple-500 rounded-2xl text-white">
-            🎟️
-        </div>
+        
     </div>
 
 </div>
@@ -191,7 +183,7 @@
 {{-- {{ route('admin.promos.edit',$promo) }} --}}
                             <a href=""
                                class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-2 rounded-xl">
-                                ✏️
+                                Edit
                             </a>
 
                             {{-- {{ route('admin.promos.destroy',$promo) }} --}}
@@ -205,7 +197,7 @@
                                     onclick="return confirm('Delete promo?')"
                                     class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl">
 
-                                    🗑️
+                                    Delete
 
                                 </button>
 

@@ -20,6 +20,9 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        }
     </style>
 </head>
 <body class="bg-background text-on-background antialiased">
@@ -145,7 +148,9 @@
                             onerror="this.src='https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600'">
                         
                         <button onclick="event.preventDefault(); toggleFav(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors border border-white/30">
-                            <span class="material-symbols-outlined text-[18px] text-gray-700 fav-icon">favorite_border</span>
+                            <span class="material-symbols-outlined text-[18px] fav-icon {{ !empty($h['is_fav']) ? 'text-red-500 icon-fill' : 'text-gray-700' }}">
+                                {{ !empty($h['is_fav']) ? 'favorite' : 'favorite_border' }}
+                            </span>
                         </button>
                         
                         @if (!empty($h['badge']))
@@ -342,11 +347,45 @@ function renderCards() {
     label.textContent = `Showing ${visible.length} properties`;
 }
 
-function toggleFav(btn) {
-    const icon = btn.querySelector('.fav-icon');
-    const isFaved = icon.textContent.trim() === 'favorite';
-    icon.textContent = isFaved ? 'favorite_border' : 'favorite';
-    icon.classList.toggle('text-red-500', !isFaved);
+// Ganti fungsi toggleFav lama milikmu dengan fungsi AJAX terarah ini
+async function toggleFav(btn) {
+    // Ambil properti ID dari element card pembungkus terdekat (tag 'a')
+    const card = btn.closest('.property-card');
+    // Tarik string ID unik properti dari data attribute, atau cari manual ID-nya
+    const hrefParts = card.getAttribute('href').split('/');
+    const propertyId = hrefParts[hrefParts.length - 1].split('?')[0];
+
+    try {
+        const response = await fetch("{{ route('favorites.toggle') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                property_id: propertyId
+            })
+        });
+
+        if(response.status == 401){
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
+
+        const data = await response.json();
+        const icon = btn.querySelector('.fav-icon');
+
+        if(data.status == "added"){
+            icon.textContent = "favorite";
+            icon.classList.add("text-red-500", "icon-fill");
+        } else if(data.status == "removed"){
+            icon.textContent = "favorite_border";
+            icon.classList.remove("text-red-500", "icon-fill");
+        }
+    } catch(err){
+        console.log("Error favoriting from home:", err);
+    }
 }
 </script>
 </body>

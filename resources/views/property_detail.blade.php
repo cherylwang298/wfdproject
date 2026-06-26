@@ -20,6 +20,9 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        }
     </style>
 </head>
 <body class="bg-background text-on-background antialiased">
@@ -315,6 +318,57 @@ function handleFormSubmit(e) {
     // KUNCI PENYESUAIAN: Ubah rute URL agar sama persis dengan halaman search!
     window.location.href = `/booking/${unitId}?checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
 }
+
+// 1. Fungsi AJAX untuk Toggle Favorit (Menambah / Menghapus)
+async function toggleFav(btn, propertyId) {
+    try {
+        const response = await fetch("{{ route('favorites.toggle') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                property_id: propertyId
+            })
+        });
+
+        if(response.status == 401){
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
+
+        const data = await response.json();
+
+        if(data.status == "added"){
+            document.querySelectorAll('.fav-icon,.fav-icon-bottom').forEach(icon => {
+                icon.textContent = "favorite";
+                icon.classList.add("text-red-500", "icon-fill");
+            });
+        }
+
+        if(data.status == "removed"){
+            document.querySelectorAll('.fav-icon,.fav-icon-bottom').forEach(icon => {
+                icon.textContent = "favorite_border";
+                icon.classList.remove("text-red-500", "icon-fill");
+            });
+        }
+    } catch(err){
+        console.log("Error toggling favorite:", err);
+    }
+}
+
+// 2. Set status awal keaktifan ikon merah saat halaman pertama kali dibuka
+const isFavorite = @json($isFavorite ?? false);
+document.addEventListener("DOMContentLoaded", () => {
+    if(isFavorite) {
+        document.querySelectorAll(".fav-icon,.fav-icon-bottom").forEach(icon => {
+            icon.textContent = "favorite";
+            icon.classList.add("text-red-500", "icon-fill");
+        });
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     const favs = JSON.parse(localStorage.getItem('staygo_favs') || '[]');

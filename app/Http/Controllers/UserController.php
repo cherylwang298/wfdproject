@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     //
     public function openLogin(){
-        return view('dummy_pages.users.login');
+        return view('auth.login');
     }
  
     public function login(Request $request)
@@ -120,27 +120,41 @@ public function myBookings()
         });
 
         // 2. DATA PENERBANGAN (Dikirim terpisah)
-        $flightBookings = $user->flightBookings()->with(['tickets', 'payment'])->latest()->get();
+        $flightBookings = $user->flightBookings()->with(['tickets.passenger', 'payment'])->latest()->get();
         
+        // Ambil master rute penerbangan dari API
         try {
             $responseFlights = Http::get(env('API_BASE_URL') . '/flights');
-            $apiFlights = $responseFlights->successful() ? collect($responseFlights->json()) : collect();
+            $apiFlights = $responseFlights->successful() ? collect(Http::get(env('API_BASE_URL') . '/flights')->json()) : collect();
+            
+            // --- AMBIL MASTER DATA AIRLINES DARI API ---
+            $responseAirlines = Http::get(env('API_BASE_URL') . '/airlines');
+            $airlinesMaster = $responseAirlines->successful() ? $responseAirlines->json() : [];
+            $airlineMap = collect($airlinesMaster)->pluck('name', 'id')->toArray();
+            // ───────────────────────────────────────────
         } catch (\Exception $e) {
             $apiFlights = collect();
+            $airlineMap = [];
         }
 
-        $flightBookings->transform(function ($fb) use ($apiFlights) {
+        // Transformasikan data penerbangan agar menyertakan string nama 'airline' asli
+        $flightBookings->transform(function ($fb) use ($apiFlights, $airlineMap) {
             $firstTicket = $fb->tickets->first();
             
             if ($firstTicket && $apiFlights->isNotEmpty()) {
-                // Ganti firstWhere manual menjadi filter closure agar mengabaikan perbedaan String vs Integer
-                $fb->flight_details = $apiFlights->first(function ($flightFromApi) use ($firstTicket) {
-                    return $flightFromApi['id'] == $firstTicket->flight_id; // Menggunakan '==' (Loose Comparison)
-                });
+                // Cari detail rute dari API Flights
+                $matchedFlight = $apiFlights->firstWhere('id', $firstTicket->flight_id);
+                
+                if ($matchedFlight) {
+                    // KUNCI PERBAIKAN: Suntikkan nama asli maskapai berdasarkan airline_id ke dalam flight_details
+                    $matchedFlight['airline'] = $airlineMap[$matchedFlight['airline_id']] ?? 'Unknown Airline';
+                    $fb->flight_details = $matchedFlight;
+                } else {
+                    $fb->flight_details = null;
+                }
             } else {
                 $fb->flight_details = null;
             }
-            
             return $fb;
         });
 

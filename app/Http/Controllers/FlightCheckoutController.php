@@ -64,40 +64,40 @@ class FlightCheckoutController extends Controller
     /**
      * Menyimpan data transaksi Booking, Penumpang, dan Tiket ke Database Lokal
      */
+    /**
+     * Menyimpan data transaksi Booking, Penumpang, dan Tiket ke Database Lokal & API
+     */
     public function storeBooking(Request $request)
     {
         $request->validate([
             'outbound_id' => 'required',
-            
-            // --- SINKRONISASI VALIDASI KONTAK BARU ---
             'contact_first_name' => 'required|string|max:255',
             'contact_last_name' => 'required|string|max:255',
             'contact_email' => 'required|email',
             'contact_phone' => 'required|string',
-            // ─────────────────────────────────────────
-
             'passengers' => 'required|array',
             'passengers.*.name' => 'required|string',
             'passengers.*.phone' => 'required|string',
             'payment_method' => 'required|in:card,bank'
         ]);
 
-        // Mulai database transaction untuk menjamin data tersimpan utuh secara serempak
+        // Mulai database transaction lokal
         DB::beginTransaction();
 
         try {
-            // 1. Simpan ke tabel flight_bookings
+            // 1. Simpan ke tabel flight_bookings lokal
             $booking = FlightBooking::create([
                 'user_id' => Auth::id() ?? null,
                 'booking_code' => 'STAYGO-' . strtoupper(Str::random(8)),
-                'payment_status' => 'unpaid'
+                'payment_status' => 'unpaid' // Bisa langsung di-set 'Paid' jika simulasi pembayaran instan sukses
             ]);
 
             $totalAmount = 0;
+            $ticketPayloads = []; // Menampung data untuk dikirim ke API nanti
 
             // 2. Loop entri form input dinamis penumpang
             foreach ($request->passengers as $pData) {
-                // Simpan ke tabel passengers
+                // Simpan ke tabel passengers lokal
                 $passenger = Passenger::create([
                     'name' => $pData['name'],
                     'phone_number' => $pData['phone'],
@@ -105,28 +105,47 @@ class FlightCheckoutController extends Controller
                     'passport_number' => $pData['passport'] ?? null
                 ]);
 
-                // Simpan data Tiket Keberangkatan (Outbound Ticket)
+                // Generasi kursi acak
+                $outboundSeat = 'ECO-' . rand(10, 99) . chr(rand(65, 70));
+
+                // Simpan data Tiket Keberangkatan (Outbound Ticket) lokal
                 Ticket::create([
                     'flight_id' => $request->outbound_id,
                     'flight_booking_id' => $booking->id,
                     'passenger_id' => $passenger->id,
-                    'seat_number' => 'ECO-' . rand(10, 99) . chr(rand(65, 70)),
+                    'seat_number' => $outboundSeat,
                     'seat_type' => 'economy',
                     'price' => $request->outbound_price
                 ]);
                 $totalAmount += $request->outbound_price;
 
+                // Catat payload untuk API (Outbound)
+                $ticketPayloads[] = [
+                    'flight_id' => $request->outbound_id,
+                    'seat_number' => $outboundSeat,
+                    'seat_type' => 'economy'
+                ];
+
                 // Jika ada tiket kepulangan (Inbound Ticket)
                 if ($request->has('inbound_id') && $request->inbound_id) {
+                    $inboundSeat = 'ECO-' . rand(10, 99) . chr(rand(65, 70));
+
                     Ticket::create([
                         'flight_id' => $request->inbound_id,
                         'flight_booking_id' => $booking->id,
                         'passenger_id' => $passenger->id,
-                        'seat_number' => 'ECO-' . rand(10, 99) . chr(rand(65, 70)),
+                        'seat_number' => $inboundSeat,
                         'seat_type' => 'economy',
                         'price' => $request->inbound_price
                     ]);
                     $totalAmount += $request->inbound_price;
+
+                    // Catat payload untuk API (Inbound)
+                    $ticketPayloads[] = [
+                        'flight_id' => $request->inbound_id,
+                        'seat_number' => $inboundSeat,
+                        'seat_type' => 'economy'
+                    ];
                 }
             }
 
@@ -134,15 +153,34 @@ class FlightCheckoutController extends Controller
             $finalTax = round($totalAmount * 0.12);
             $grandTotalFinal = $totalAmount + $finalTax;
 
-            // 4. Catat riwayat log ke tabel payments
+            // 4. Catat riwayat log ke tabel payments lokal
             Payment::create([
                 'flight_booking_id' => $booking->id,
                 'reservation_id' => null,
                 'method' => $request->payment_method,
                 'amount' => $grandTotalFinal,
-                'status' => 'pending'
+                'status' => 'Paid' // Di-set Paid agar sinkron dengan status tiket issued
             ]);
 
+            /*
+            |--------------------------------------------------------------------------
+            | KIRIM DATA KE REPO API (Untuk Mengurangi Seats Left)
+            |--------------------------------------------------------------------------
+            */
+            // Sesuaikan endpoint '/tickets' dengan endpoint di Controller API Anda yang memproses pengurangan seat
+            $response = Http::post(env('API_BASE_URL') . '/tickets', [
+                'application_booking_id' => $booking->id,
+                'booking_code'           => $booking->booking_code,
+                'tickets'                => $ticketPayloads // Mengirim array berisikan flight_id yang dibeli
+            ]);
+
+            // Cek jika API mengembalikan status gagal (misal: seats berstatus penuh/validasi error)
+            if (!$response->successful()) {
+                $apiError = $response->body();
+                throw new \Exception('Gagal sinkronisasi data ke API Penerbangan. Detail: ' . $apiError);
+            }
+
+            // Jika semua proses aman, commit database transaksi lokal
             DB::commit();
 
             return response()->json([

@@ -101,7 +101,7 @@ Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveC
 
 // user routes
 Route::get('/register', function(){
-    return view('dummy_pages.users.registration');
+    return view('register');
 })->name('register.form');
 Route::post('/register', [UserController::class, 'register'])->name('register.submit');
 Route::get('/login', [UserController::class, 'openLogin'])->name('login');

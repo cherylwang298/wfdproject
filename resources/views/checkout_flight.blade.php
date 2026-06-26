@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .glass-panel {
@@ -301,9 +303,19 @@ document.getElementById("applyPromoBtn").addEventListener("click", function() {
             promoRow.classList.add("flex");
             document.getElementById("promoDiscountText").innerHTML = "- Rp " + Number(data.discount).toLocaleString('id-ID');
 
-            alert('Promo Applied! ' + data.message);
+            Swal.fire({
+                icon: 'success',
+                title: 'Promo Applied!',
+                text: data.message,
+                confirmButtonColor: '#2563eb'
+            });
         } else {
-            alert('Oops! ' + data.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: data.message,
+                confirmButtonColor: '#2563eb'
+            });
         }
     });
 });
@@ -326,13 +338,23 @@ document.getElementById('checkoutFlightForm').addEventListener('submit', functio
         if(data.success) {
             window.location.href = "/my-bookings#flights";
         } else {
-            alert('Gagal memproses transaksi: ' + data.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Transaction Failed',
+                text: data.message,
+                confirmButtonColor: '#2563eb'
+            });
             submitBtn.disabled = false;
             submitBtn.innerText = 'Confirm Purchase & Book Now';
         }
     })
     .catch(err => {
-        console.error(err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: 'Terjadi kendala jaringan internet server.',
+            confirmButtonColor: '#2563eb'
+        });
         submitBtn.disabled = false;
         submitBtn.innerText = 'Confirm Purchase & Book Now';
     });

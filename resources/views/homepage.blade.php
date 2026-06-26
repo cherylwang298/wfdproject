@@ -107,52 +107,72 @@
                 <p class="text-sm text-on-surface-variant">Exceptional stays with atmospheric views.</p>
             </div>
         </div>
+
+        @php
+            $dummyImages = [
+                'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80', // Luxury infinity pool
+                'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80', // Tropical resort view
+                'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&q=80', // Modern villa poolside
+                'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80', // Boutique hotel facade
+                'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=600&q=80', // Beachfront villa terrace
+                'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80', // High-end luxury estate
+                'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=600&q=80', // Cozy minimalist cabin/room
+                'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=600&q=80'  // Atmospheric bedroom suite
+            ];
+        @endphp
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="properties-grid">
             @foreach ($featuredProperties as $h)
-            <a href="{{ route('properties.detail', $h['id']) }}" 
-                class="property-card group cursor-pointer relative overflow-hidden rounded-3xl block hover:shadow-2xl transition-shadow duration-300"
-                data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['rating'] }}">
-                <div class="relative h-64 overflow-hidden">
-                <img alt="{{ $h['name'] }}" 
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                    src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600"
-                    onerror="this.src='https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600'">
-                
-                <button onclick="event.preventDefault(); toggleFav(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors border border-white/30">
-                    <span class="material-symbols-outlined text-[18px] text-on-surface-variant fav-icon">favorite_border</span>
-                </button>
-                
-                @if (!empty($h['badge']))
-                <span class="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">{{ $h['badge'] }}</span>
-                @endif
-                </div>
-                
-                <div class="p-5 bg-surface-container-lowest">
-                <div class="flex justify-between items-start mb-1">
-                    <h3 class="font-headline-md text-on-surface text-[18px] leading-tight">{{ $h['name'] }}</h3>
-                    <span class="flex items-center gap-0.5 text-on-surface font-label-sm text-label-sm shrink-0 ml-2">
-                    <span class="material-symbols-outlined text-[14px] text-secondary icon-fill">star</span>{{ number_format($h['rating'], 1) }}
-                    </span>
-                </div>
-                
-                <p class="font-body-md text-on-surface-variant text-[14px] flex items-center gap-1 mb-3">
-                    <span class="material-symbols-outlined text-[14px]">location_on</span>{{ $h['city'] }}
-                </p>
-                
-                <div class="flex items-center justify-between">
-                    <span class="font-label-sm text-label-sm text-on-surface-variant capitalize bg-surface-container px-3 py-1 rounded-full">{{ $h['type'] }}</span>
-                    <p class="font-headline-md text-on-surface text-[18px]">
-                        @if($h['cheapest_price'] > 0)
-                            Rp {{ number_format($h['cheapest_price'], 0, ',', '.') }}
-                        @else
-                            N/A
+                {{-- Mengunci indeks perulangan ke deretan 8 gambar (0-7) menggunakan operator modulo (%) keamanan cadangan --}}
+                @php
+                    $assignedImage = $dummyImages[$loop->index % 8];
+                @endphp
+
+                <a href="{{ route('properties.detail', $h['id']) }}" 
+                    class="property-card group cursor-pointer relative overflow-hidden rounded-3xl block hover:shadow-2xl transition-shadow duration-300"
+                    data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['rating'] }}">
+                    
+                    <div class="relative h-64 overflow-hidden">
+                        {{-- Menggunakan tautan gambar dummy terikat konstan --}}
+                        <img alt="{{ $h['name'] }}" 
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                            src="{{ $assignedImage }}"
+                            onerror="this.src='https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600'">
+                        
+                        <button onclick="event.preventDefault(); toggleFav(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors border border-white/30">
+                            <span class="material-symbols-outlined text-[18px] text-on-surface-variant fav-icon">favorite_border</span>
+                        </button>
+                        
+                        @if (!empty($h['badge']))
+                            <span class="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full font-label-sm text-label-sm">{{ $h['badge'] }}</span>
                         @endif
-                        <span class="font-body-md text-on-surface-variant text-[13px]">/night</span>
-                    </p>
-                </div>
-                </div>
-            </a>
+                    </div>
+                    
+                    <div class="p-5 bg-surface-container-lowest">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-headline-md text-on-surface text-[18px] leading-tight">{{ $h['name'] }}</h3>
+                            <span class="flex items-center gap-0.5 text-on-surface font-label-sm text-label-sm shrink-0 ml-2">
+                                <span class="material-symbols-outlined text-[14px] text-secondary icon-fill">star</span>{{ number_format($h['rating'], 1) }}
+                            </span>
+                        </div>
+                        
+                        <p class="font-body-md text-on-surface-variant text-[14px] flex items-center gap-1 mb-3">
+                            <span class="material-symbols-outlined text-[14px]">location_on</span>{{ $h['city'] }}
+                        </p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-on-surface-variant capitalize bg-surface-container px-3 py-1 rounded-full">{{ $h['type'] }}</span>
+                            <p class="font-headline-md text-on-surface text-[18px]">
+                                @if($h['cheapest_price'] > 0)
+                                    Rp {{ number_format($h['cheapest_price'], 0, ',', '.') }}
+                                @else
+                                    N/A
+                                @endif
+                                <span class="font-body-md text-on-surface-variant text-[13px]">/night</span>
+                            </p>
+                        </div>
+                    </div>
+                </a>
             @endforeach
         </div>
 

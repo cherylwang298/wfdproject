@@ -115,7 +115,7 @@
     <div class="text-center mt-5">
         <p class="text-gray-600">
             Already have an account?
-            <a href="{{ route('login.form') }}"
+            <a href="{{ route('login') }}"
                class="text-blue-600 font-semibold">
                 Login
             </a>

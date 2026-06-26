@@ -45,8 +45,45 @@
                         <span class="material-symbols-outlined text-blue-600">contact_mail</span> Contact Information
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input type="text" value="{{ Auth::user()->name ?? 'Sarah Jenkins' }}" placeholder="Full Contact Name" class="w-full h-14 bg-gray-50 border border-gray-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all" required>
-                        <input type="email" value="{{ Auth::user()->email ?? 'sarah@example.com' }}" placeholder="Email Address" class="w-full h-14 bg-gray-50 border border-gray-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all" required>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">First Name</label>
+                            <input type="text" 
+                                name="contact_first_name"
+                                value="{{ Auth::user()->first_name ?? '' }}" 
+                                placeholder="First Name" 
+                                class="w-full h-14 bg-gray-50 border border-gray-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all" 
+                                required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Last Name</label>
+                            <input type="text" 
+                                name="contact_last_name"
+                                value="{{ Auth::user()->last_name ?? '' }}" 
+                                placeholder="Last Name" 
+                                class="w-full h-14 bg-gray-50 border border-gray-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all" 
+                                required>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Email Address</label>
+                            <input type="email" 
+                                name="contact_email"
+                                value="{{ Auth::user()->email ?? '' }}" 
+                                placeholder="Email Address" 
+                                class="w-full h-14 bg-gray-50 border border-gray-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all" 
+                                required>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Phone Number</label>
+                            <input type="tel" 
+                                name="contact_phone"
+                                value="{{ Auth::user()->phone_number ?? '' }}" 
+                                placeholder="Phone Number" 
+                                class="w-full h-14 bg-gray-50 border border-gray-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-blue-600 focus:bg-white transition-all" 
+                                required>
+                        </div>
                     </div>
                 </div>
 
@@ -119,21 +156,20 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-3 text-sm font-medium border-b border-gray-100 pb-4">
-                        <div class="flex justify-between text-gray-500">
-                            <span>Tickets Cost Base</span>
-                            <span>Rp {{ number_format($subtotal * 15000, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-500">
-                            <span>Vat Service Tax & Government Fees (12%)</span>
-                            <span>Rp {{ number_format($taxes * 15000, 0, ',', '.') }}</span>
-                        </div>
+                    <div class="flex justify-between text-gray-500">
+                        <span>Tickets Cost Base</span>
+                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
-                    
+
+                    <div class="flex justify-between text-gray-500">
+                        <span>Vat Service Tax & Government Fees (12%)</span>
+                        <span>Rp {{ number_format($taxes, 0, ',', '.') }}</span>
+                    </div>
+
                     <div class="flex justify-between items-baseline">
                         <span class="text-sm font-bold text-gray-800">Grand Total Invoice</span>
                         <span class="text-2xl font-extrabold text-blue-600">
-                            Rp {{ number_format($grandTotal * 15000, 0, ',', '.') }}
+                            Rp {{ number_format($grandTotal, 0, ',', '.') }}
                         </span>
                     </div>
 

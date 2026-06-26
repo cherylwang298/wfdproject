@@ -49,9 +49,13 @@
                     @endphp
                     
                     <div class="hidden sm:flex flex-col items-end">
-                        <span class="text-sm font-semibold text-gray-800 leading-tight">
-                            {{ $firstName }} {{ $lastName }}
+                        
+                        <a href="{{ route('profile.index') }}">
+                        <span class="text-sm font-semibold text-gray-800 hover:text-blue-600 leading-tight">
+                            {{-- {{ $firstName }} {{ $lastName }} --}}
+                        Profile
                         </span>
+                    </a>
                     </div>
                     
                     <form method="POST" action="{{ route('logout') }}" id="logout-form" class="hidden">

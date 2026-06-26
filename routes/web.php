@@ -3,12 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirlineController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FlightCheckoutController;
 use App\Http\Controllers\FlightSearchController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoController;
-use App\Http\Controllers\PropertyDetailController;
-use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyDetailController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,13 @@ Route::middleware('auth')->group(function () {
     ->name('promo.apply');
     // cancel flight
     Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
+
+       Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile.index');
+
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });

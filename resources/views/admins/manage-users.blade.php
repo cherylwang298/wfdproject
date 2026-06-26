@@ -157,12 +157,12 @@
 
 
                             {{-- {{ route('admin.users.destroy', $user) }} --}}
-                            <form action="" method="POST">
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button
-                                    onclick="return confirm('Are you sure you want to delete this user?')"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">
+                                    type="button"
+                                    class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">
                                     Delete
                                 </button>
                             </form>
@@ -222,6 +222,29 @@ function closeUserModal() {
 function closeStatusModal() {
     document.getElementById('statusModal').classList.add('hidden');
 }
+</script>
+
+<script>
+document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const form = this.closest('form');
+
+        Swal.fire({
+            title: 'Delete User?',
+            text: "Data user akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
 </script>
 
 @endsection

@@ -110,6 +110,7 @@ Route::delete('/reservations/delete/{id}', [AdminController::class, 'deleteReser
 
     Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.show');
     Route::put('/users/update/{id}', [AdminController::class, 'editUserStatus'])->name('admin.users.update');
+    Route::delete('/users/delete/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.destroy');
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

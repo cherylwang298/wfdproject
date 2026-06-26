@@ -253,5 +253,14 @@ public function editReserv(Request $request, $id)
     }
 }
 
+public function deleteUser($id)
+{
+    $user = User::findOrFail($id);
+    $user->delete();
+    return redirect()->back()->with('success', 'User berhasil dihapus.');
+
+
+}
+
 
 }

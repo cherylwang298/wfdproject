@@ -166,7 +166,7 @@
                     <td class="px-6 py-5">
                         <div class="flex justify-end gap-2 items-center">
                             <button type="button" onclick="openFlightDetailModal('{{ $booking->id }}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl text-sm font-medium transition">Detail</button>
-                            <form action="{{ route('admin.bookings.destroy', $booking->id) }}" method="POST" class="inline">
+                            <form action="{{ route('admin.flight-bookings.destroy', $booking->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" onclick="return confirm('Hapus booking penerbangan ini?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">Delete</button>
@@ -250,7 +250,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- FLIGHT BOOKING AJAX ---
     window.openFlightDetailModal = function(id) {
-        fetch(`/admin/bookings/${id}`)
+        fetch(`/admin/flight-bookings/${id}`)
+        // admin.flight-bookings.show
             .then(response => response.json())
             .then(data => {
                 document.getElementById('flight_det_id').innerText = '#' + data.id;

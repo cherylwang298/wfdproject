@@ -112,6 +112,8 @@ Route::delete('/promos/delete/{id}', [AdminController::class, 'deletePromo'])->n
 Route::post('/reservations/update/{id}', [AdminController::class, 'editReserv'])->name('admin.reservations.update');
 Route::delete('/reservations/delete/{id}', [AdminController::class, 'deleteReserv'])->name('admin.reservations.destroy');
 
+Route::get('/flight-bookings/{id}', [AdminController::class, 'viewBooking'])->name('admin.flight-bookings.show');
+Route::delete('/flight-bookings/delete/{id}', [AdminController::class, 'deleteBooking'])->name('admin.flight-bookings.destroy');
 
     Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.show');
     Route::put('/users/update/{id}', [AdminController::class, 'editUserStatus'])->name('admin.users.update');

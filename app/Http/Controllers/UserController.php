@@ -148,16 +148,14 @@ public function getAllBookings(){
 
 public function myBookings()
 {
-    // 1. Cek apakah user sudah login
+    
     if (Auth::check()) {
-        // Ambil semua data booking milik user jika sudah login
         $bookings = Auth::user()->reservations()->latest()->get();
 
-        // [BARU] Ambil semua id booking milik user saat ini untuk query CancelRequest sekaligus (Eager Loading manual)
         $bookingIds = $bookings->pluck('id');
         $cancelRequests = CancelRequest::whereIn('reservation_id', $bookingIds)->get();
 
-        // 2. Ambil semua data unit dari API Repo
+   
         $apiUrl = config('app.api_base_url', env('API_BASE_URL')) . '/units';
         
         try {
@@ -167,9 +165,8 @@ public function myBookings()
             $units = collect();
         }
 
-        // 3. Gabungkan data Unit API dan data CancelRequest ke dalam masing-masing booking
+
         $bookings->transform(function ($booking) use ($units, $cancelRequests) {
-            // Pasangkan data unit
             if ($units->isNotEmpty()) {
                 $matchedUnit = $units->firstWhere('id', $booking->unit_id);
                 $booking->unit_details = $matchedUnit; 
@@ -177,17 +174,14 @@ public function myBookings()
                 $booking->unit_details = null;
             }
 
-            // [BARU] Cari apakah ada cancel request dengan reservation_id yang cocok
-            $matchedCancelRequest = $cancelRequests->firstWhere('reservation_id', $booking->id);
-            
-            // Simpan datanya ke properti booking (bisa bernilai object CancelRequest atau null jika tidak ada)
+            $matchedCancelRequest = $cancelRequests->firstWhere('reservation_id', $booking->id);            
             $booking->cancel_request = $matchedCancelRequest; 
 
             return $booking;
         });
 
     } else {
-        // Jika belum login, kirim collection kosong ke Blade
+      
         $bookings = collect();
     }
 

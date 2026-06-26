@@ -57,7 +57,7 @@ $currentPage = 'bookings';
                                 @if($booking->cancel_request)
                                     @if($booking->cancel_request->status === 'Pending')
                                         <span class="px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-800">Cancel Request Sent</span>
-                                    @elseif($booking->cancel_request->status === 'Approved')
+                                    @elseif($booking->cancel_request->status === 'approved')
                                         <span class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-800">Cancelled</span>
                                     @elseif($booking->cancel_request->status === 'Rejected')
                                         {{-- Jika admin menolak pembatalan, balikkan ke status Paid semula --}}
@@ -102,10 +102,14 @@ $currentPage = 'bookings';
 
                             <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
                                 {{-- LOGIKA TOMBOL AKSI KANAN --}}
-                                @if($booking->cancel_request)
+                                @if($booking->cancel_request && $booking->cancel_request->status === 'Pending')
                                     {{-- Jika sudah ada CancelRequest, matikan semua tombol pembatalan/pembayaran --}}
                                     <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
                                         Cancel Request Sent
+                                    </button>
+                                @elseif($booking->cancel_request && $booking->cancel_request->status === 'approved')
+                                    <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
+                                        Cancelled
                                     </button>
                                 @else
                                     {{-- Jika BELUM ada cancel request --}}

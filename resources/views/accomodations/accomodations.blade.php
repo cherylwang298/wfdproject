@@ -91,17 +91,21 @@ $currentPage = 'hotel';
                             {{ $property['description'] }}
                         </p>
 
-                        <div class="mt-6 flex justify-between items-center">
+                        <div class="mt-6 flex justify-between items-end">
 
-                            <span class="text-green-600 font-semibold">
-                                Available
-                            </span>
+    <div>
+        <p class="text-xs text-gray-400">
+            Starting from
+        </p>
 
-                            <span class="text-blue-600 font-semibold">
-                                View →
-                            </span>
+        <p class="text-xl font-bold text-blue-600">
+            Rp {{ number_format($property['min_price'], 0, ',', '.') }}
+            <span class="text-sm font-medium text-gray-500">/night</span>
+        </p>
+    </div>
 
-                        </div>
+    
+</div>
 
                     </div>
 

@@ -114,7 +114,7 @@ public function searchAccomodations(Request $request)
 
     });
 
-    $availableProperties = $availableProperties->map(function ($property) use ($images) {
+    $availableProperties = $availableProperties->map(function ($property) use ($images, $units) {
 
     $image = $images
         ->where('property_id', $property['id'])
@@ -122,8 +122,14 @@ public function searchAccomodations(Request $request)
 
     $property['image'] = $image;
 
+    // Cari harga unit termurah
+    $property['min_price'] = $units
+        ->where('property_id', $property['id'])
+        ->min('price');
+
     return $property;
 });
+// });
 
 
 

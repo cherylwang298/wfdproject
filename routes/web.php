@@ -85,11 +85,8 @@ Route::middleware(['isAdmin'])->prefix('admin')->group(function () {
     Route::get('/cancel-requests', [AdminController::class, 'openCancelRequests'])
     ->name('admin.cancel.requests');
 
-Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveCancel'])
-    ->name('admin.cancel.approve');
-
-Route::patch('/cancel-requests/{id}/reject', [AdminController::class, 'rejectCancel'])
-    ->name('admin.cancel.reject');
+Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveCancelRequest'])->name('admin.cancel.approve');
+    Route::patch('/cancel-requests/{id}/reject', [AdminController::class, 'rejectCancelRequest'])->name('admin.cancel.reject');
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

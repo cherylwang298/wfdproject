@@ -29,22 +29,26 @@
                 </div>
 
                 <nav class="px-4 space-y-1">
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold transition">
-                        <span>📊</span> Dashboard
-                    </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>📄</span> Reservations
-                    </a>
-                    <a href="{{route('admin.cancel.requests')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>❌</span> Cancel Requests
-                    </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>🏷️</span> Promos
-                    </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>👥</span> Users
-                    </a>
-                </nav>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.dashboard') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+        <span>📊</span> Dashboard
+    </a>
+    
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.reservations') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+        <span>📄</span> Reservations
+    </a>
+    
+    <a href="{{ route('admin.cancel.requests') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.cancel.requests') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+        <span>❌</span> Cancel Requests
+    </a>
+    
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.promos') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+        <span>🏷️</span> Promos
+    </a>
+    
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.users') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+        <span>👥</span> Users
+    </a>
+</nav>
             </div>
 
             <div class="p-4 border-t border-gray-50 flex items-center justify-between">

@@ -92,7 +92,7 @@
                 </p>
 
                 <p class="text-xs text-gray-400">
-                    Hotel • {{ $booking->booking_code }}
+                    Accomodation • {{ $booking->id }}
                 </p>
 
             @else

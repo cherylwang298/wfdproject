@@ -25,16 +25,26 @@ $currentPage = 'hotel';
 @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        
-        {{-- LEFT COLUMN: FORM DETAIL PEMESAN & PEMBAYARAN --}}
-        {{-- {{ route('booking.store') }} --}}
+     
         <div class="lg:col-span-2 space-y-8">
             <form id = "bookingForm" action="{{ route('booking.store') }}" method="POST" class="space-y-8">
                 @csrf
+
+                @if ($errors->any())
+<div class="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-4">
+    <ul>
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
                 <input type="hidden" name="unit_id" value="{{ $unit['id'] }}">
                 <input type="hidden" name="check_in" value="{{ $checkin }}">
                 <input type="hidden" name="check_out" value="{{ $checkout }}">
-                <input type="hidden" name="total_price" value="{{ $totalPrice }}">
+               
+                <input id="promoId" type="hidden" name="promo_id" value="{{ $promoId ?? '' }}">
 
                 {{-- DETAIL PEMESAN (EDITABLE) --}}
                 <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
@@ -89,6 +99,43 @@ $currentPage = 'hotel';
                 </div>
 
                 <div id="paymentDetails" class="mt-6"></div>
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">
+        Promo Code
+    </h2>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+        <input
+            type="text"
+            name="promo_code"
+            id="promoCode"
+            placeholder="Enter your promo code"
+            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500">
+
+        <button
+            type="button"
+            id="applyPromoBtn"
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition">
+            Apply
+        </button>
+    </div>
+
+    <p id="promoMessage" class="text-sm mt-3 text-gray-500">
+        Have a promo code? Enter it above and click <strong>Apply</strong>.
+    </p>
+</div>
+
+                     <input
+    type="hidden"
+    id="totalPriceInput"
+    name="total_price"
+    value="{{ $totalPrice }}">
+
+{{-- @php
+
+@endphp --}}
+ {{-- <input type="hidden" name="total_price" value="{{ $totalPrice }}"> --}}
 
                 {{-- TOMBOL BOOK NOW --}}
                 <button id="bookNowBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-blue-200 transition duration-200">
@@ -145,6 +192,11 @@ $currentPage = 'hotel';
                         <span class="text-gray-600 font-medium">Rp {{ number_format(($unit['price'] * $nights) * 0.11, 0, ',', '.') }}</span>
                     </div>
 
+                    <div id="promoDiscountRow" class="hidden justify-between text-green-600">
+    <span>Promo Discount</span>
+    <span id="promoDiscountText"></span>
+</div>
+
                     @php
                         $totalPriceandtx = ($unit['price'] * $nights) + (($unit['price'] * $nights) * 0.11);
                     @endphp
@@ -152,7 +204,16 @@ $currentPage = 'hotel';
 
                     <div class="flex justify-between items-center pt-4 border-t border-gray-200">
                         <span class="text-base font-bold text-gray-800">Total Price</span>
-                        <span class="text-2xl font-bold text-blue-600">Rp{{ number_format($totalPriceandtx, 2) }}</span>
+  
+
+<span
+    id="totalPriceText"
+    data-total="{{ $totalPrice }}"
+    class="text-2xl font-bold text-blue-600">
+
+    Rp{{ number_format($totalPrice,0,',','.') }}
+
+</span>
                     </div>
                 </div>
             </div>
@@ -342,6 +403,74 @@ bookingForm.addEventListener("submit", function(e){
             });
 
             bookingForm.submit();
+        }
+
+    });
+
+});
+
+
+</script>
+
+<script>
+const btn = document.getElementById("applyPromoBtn");
+
+btn.addEventListener("click", function(){
+
+    fetch("{{ route('promo.apply') }}",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRF-TOKEN":"{{ csrf_token() }}"
+        },
+
+        body:JSON.stringify({
+
+            promo_code:document.getElementById("promoCode").value,
+
+            total:document.getElementById("totalPriceText").dataset.total
+
+        })
+
+    })
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+        if(data.success){
+
+            document.getElementById("promoId").value = data.promo_id;
+
+            document.getElementById("totalPriceText").innerHTML =
+                "Rp"+Number(data.new_total).toLocaleString('id-ID');
+
+            document.getElementById("totalPriceInput").value = data.new_total;
+
+            document.getElementById("promoDiscountRow").classList.remove("hidden");
+
+document.getElementById("promoDiscountRow").classList.add("flex");
+
+document.getElementById("promoDiscountText").innerHTML =
+    "- Rp" + Number(data.discount).toLocaleString('id-ID');
+
+
+            Swal.fire({
+                icon:'success',
+                title:'Promo Applied!',
+                text:data.message
+            });
+
+        }else{
+
+            Swal.fire({
+                icon:'error',
+                title:'Oops',
+                text:data.message
+            });
+
         }
 
     });

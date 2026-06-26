@@ -65,6 +65,8 @@ Route::middleware('auth')->group(function () {
 
     // cancel flight
     Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
+    Route::post('/promo/apply',[PromoController::class,'apply'])
+    ->name('promo.apply');
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });

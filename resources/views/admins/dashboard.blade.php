@@ -15,9 +15,9 @@
 
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between items-start">
         <div>
-            <p class="text-sm font-semibold text-gray-400">Monthly Revenue</p>
-            <h3 class="text-3xl font-bold text-gray-900 mt-2">$45,230</h3>
-            <p class="text-xs text-green-500 mt-2 font-medium">↗ +8.5% <span class="text-gray-400">from last month</span></p>
+            <p class="text-sm font-semibold text-gray-400">Total Revenue</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">   Rp {{ number_format($totalRev, 0, ',', '.') }}</h3>
+            {{-- <p class="text-xs text-green-500 mt-2 font-medium">↗ +8.5% <span class="text-gray-400">from last month</span></p> --}}
         </div>
         <div class="p-3 bg-cyan-400 text-white rounded-2xl shadow-md shadow-cyan-100">
             💵
@@ -26,9 +26,9 @@
 
     <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-50 flex justify-between items-start">
         <div>
-            <p class="text-sm font-semibold text-gray-400">Active Users</p>
-            <h3 class="text-3xl font-bold text-gray-900 mt-2">892</h3>
-            <p class="text-xs text-gray-400 mt-2 font-medium">➔ Stable</p>
+            <p class="text-sm font-semibold text-gray-400">Total Users</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">{{$totalUsers}}</h3>
+            {{-- <p class="text-xs text-gray-400 mt-2 font-medium">➔ Stable</p> --}}
         </div>
         <div class="p-3 bg-gray-100 text-gray-500 rounded-2xl">
             👥

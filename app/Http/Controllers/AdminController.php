@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\CancelRequest;
+use App\Models\Payment;
+use App\Models\Promo;
 use App\Models\Reservation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +20,10 @@ class AdminController extends Controller
       $admin = Auth::guard('admin')->user();
       $username = $admin->name;
       $totalBookings = Reservation::all()->count();
+      $totalUsers = User::all()->count();
+      $totalRev = Payment::all()->sum('amount');
 
-        return view('admins.dashboard', compact('totalBookings', 'username'));
+      return view('admins.dashboard', compact('totalBookings', 'username', 'totalUsers', 'totalRev'));
     }
     
     public function AdminLogout(Request $request)
@@ -91,6 +96,13 @@ public function approveCancelRequest($id)
         $cancelRequest->update(['status' => 'rejected']);
 
         return redirect()->back()->with('success', 'Permintaan pembatalan telah ditolak.');
+    }
+
+    public function openPromos(){
+  $admin = Auth::guard('admin')->user();
+      $username = $admin->name;
+      $promos = Promo::all();
+      return view('admins.promos', compact('promos', 'username'));
     }
 
 }

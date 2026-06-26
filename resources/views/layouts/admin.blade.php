@@ -29,7 +29,7 @@
                 </div>
 
                 <nav class="px-4 space-y-1">
-    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.dashboard') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+    <a href="{{route('admin.dashboard')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.dashboard') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
         <span>📊</span> Dashboard
     </a>
     
@@ -41,7 +41,7 @@
         <span>❌</span> Cancel Requests
     </a>
     
-    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.promos') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+    <a href="{{route('admin.promos')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ Route::is('admin.promos') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
         <span>🏷️</span> Promos
     </a>
     

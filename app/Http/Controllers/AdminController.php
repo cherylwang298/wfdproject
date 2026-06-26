@@ -163,10 +163,43 @@ public function approveCancelRequest($id)
         ->latest()
         ->get();
 
+    $bookings = FlightBooking::with('user')
+        ->latest()
+        ->get();
+
     return view('admins.reservations', compact(
         'reservations',
-        'username'
+        'username',
+        'bookings'
     ));
+}
+
+public function viewBooking($id){
+$booking = FlightBooking::with('user')->findOrFail($id);
+ return response()->json($booking);
+}
+
+public function editBooking(Request $request, $id)
+    {
+        $booking = FlightBooking::findOrFail($id);
+
+        $request->validate([
+            'status' => 'required|string|in:pending,confirmed,completed,cancelled',
+        ]);
+
+        $booking->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Status reservasi berhasil diperbarui.');
+}
+
+public function deleteBooking($id)
+{
+    $booking = FlightBooking::findOrFail($id);
+    $booking->delete();
+
+    return redirect()->back()->with('success', 'Data reservasi berhasil dihapus.');
 }
 
 public function viewReserv($id){

@@ -167,9 +167,6 @@ public function myBookings()
 //     return $booking;
 
 
-
-
-
         $flightBookings = $user->flightBookings()
             ->with(['tickets.passenger', 'payment', 'cancel_request']) // <-- Tambahkan 'cancel_request' di sini
             ->latest()

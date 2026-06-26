@@ -83,8 +83,8 @@ $currentPage = 'hotel';
 
                         </div>
 
-                        <p class="text-gray-500 text-sm mt-2">
-                            📍 {{ $property['city'] }}
+                        <p class="text-gray-500 text-md font-semibold mt-2">
+                             {{ $property['city'] }}
                         </p>
 
                         <p class="text-gray-600 text-sm mt-3 line-clamp-3">

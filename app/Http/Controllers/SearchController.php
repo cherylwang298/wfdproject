@@ -45,6 +45,7 @@ public function searchAccomodations(Request $request)
     ]);
 
     $properties = collect(Http::get(env('API_BASE_URL').'/properties')->json());
+  
 
     // dd($properties->count());
 
@@ -64,6 +65,7 @@ public function searchAccomodations(Request $request)
 
     // property di kota yang dipilih
     $properties = $properties->where('city', $request->city);
+    //   dd($properties->values()->all());
 
     $images = collect(
     Http::get(env('API_BASE_URL').'/images')->json()
@@ -76,6 +78,7 @@ public function searchAccomodations(Request $request)
         $propertyUnits = $units
             ->where('property_id', $property['id'])
             ->where('capacity', '>=', $request->guests);
+        dd($propertyUnits->values()->all());
 
         foreach($propertyUnits as $unit){
 

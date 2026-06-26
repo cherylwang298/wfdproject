@@ -2,7 +2,10 @@
 
 @section('content')
 
-@include('dummy_pages.partials.navbar')
+@php
+$currentPage = 'hotel';
+@endphp
+@include('partials.navbar')
 
 <div class="max-w-7xl mx-auto px-6 pt-28 pb-20">
 
@@ -125,7 +128,7 @@
             </p>
 
             <a
-                href="{{ route('accommodations.open') }}"
+                href="{{ route('accomodations.open') }}"
                 class="inline-block mt-8 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
 
                 Search Again

@@ -62,7 +62,7 @@ Route::get('/booking/receipt/{code}', function($code) {
 
 
 // ROOT
-Route::get('/', [UserController::class, 'home2'])->name('home');
+// Route::get('/', [UserController::class, 'home2'])->name('home');
 
 
 
@@ -103,3 +103,4 @@ Route::post('/booking/store',
 Route::get('/my-bookings', [UserController::class, 'myBookings'])->name('bookings.success');
 Route::post('/logout', [UserController::class, 'logout'])
     ->name('logout');
+    

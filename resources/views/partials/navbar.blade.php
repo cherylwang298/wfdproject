@@ -3,7 +3,7 @@
     $navLinks = [
         // SINKRONISASI: Pastikan nama rute sesuai dengan penamaan ->name() di routes/web.php
         ['label' => 'Home',           'route' => 'homepage',       'icon' => 'home',         'page' => 'home'],
-        ['label' => 'Accommodations', 'route' => 'accommodations', 'icon' => 'hotel',        'page' => 'hotel'],
+        ['label' => 'Accommodations', 'route' => 'accomodations.open', 'icon' => 'hotel',        'page' => 'hotel'],
         ['label' => 'Flights',       'route' => 'flights',        'icon' => 'flight',       'page' => 'flights'],
         ['label' => 'Deals',         'route' => 'deals',          'icon' => 'local_offer',  'page' => 'promo'],
         ['label' => 'My Bookings',   'route' => 'bookings',       'icon' => 'luggage',      'page' => 'bookings'],

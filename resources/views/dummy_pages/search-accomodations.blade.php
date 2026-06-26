@@ -52,7 +52,11 @@
 
 @section('content')
 
-@include('dummy_pages.partials.navbar')
+@php
+    $currentPage = 'hotel';
+@endphp
+
+@include('partials.navbar')
 
 <header class="pt-32 pb-20 px-5 md:px-12 bg-gradient-to-b from-slate-100 to-white">
 

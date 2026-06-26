@@ -114,9 +114,9 @@ $currentPage = 'bookings';
                                             </button>
                                         @elseif(strtolower($booking->cancel_request->status) === 'rejected')
                                             {{-- Jika request cancel ditolak, user boleh coba mengajukan cancel lagi --}}
-                                            <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto">
+                                            {{-- <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto">
                                                 Cancel Again
-                                            </button>
+                                            </button> --}}
 
                                             {{-- @if($booking->payment && $booking->payment->status === 'Paid')
                                                 <button type="button" onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()" class="bg-amber-500 text-white text-sm px-4 py-2 rounded hover:bg-amber-600 transition w-full md:w-auto font-semibold">
@@ -142,6 +142,12 @@ $currentPage = 'bookings';
                                                         </button>
                                                     @endif
 
+                                                     <button type="button"
+                                                onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+                                                View Details
+                                            </button>   
+
 
                                             @endif
                                     @else
@@ -158,7 +164,7 @@ $currentPage = 'bookings';
                                         @if(!$booking->isReviewed)
                                                 <button type="button"
                                                     onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
-                                                    class="bg-amber-500 text-white text-sm px-4 py-2 rounded">
+                                                    class="bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded">
                                                     ⭐ Tulis Review
                                                 </button>
                                             @else
@@ -171,7 +177,7 @@ $currentPage = 'bookings';
 
                                             <button type="button"
                                                 onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"
-                                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded">
+                                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
                                                 View Details
                                             </button>
 
@@ -248,7 +254,7 @@ $currentPage = 'bookings';
                         {{-- MODAL DETAIL --}}
                         <dialog id="modal-detail-accommodation-{{ $booking->id }}" class="fixed inset-0 m-auto rounded-xl shadow-2xl p-6 w-full max-w-lg backdrop:bg-gray-900/50 border border-gray-100">
                             <div class="flex justify-between items-center border-b pb-3 mb-4">
-                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">🏨 Accommodation Details</h3>
+                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">Accommodation Details</h3>
                                 <button onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').close()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                             </div>
                             <div class="space-y-4 text-sm text-gray-700">

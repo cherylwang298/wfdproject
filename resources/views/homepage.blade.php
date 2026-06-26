@@ -112,7 +112,7 @@
                 <p class="text-sm text-gray-500">Exceptional stays with atmospheric views.</p>
             </div>
             {{-- Tombol View All mengarah langsung ke halaman akomodasi --}}
-            <a href="/accommodations" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group">
+            <a href="/accomodations" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group">
                 View all accommodations 
                 <span class="material-symbols-outlined text-[18px] transform group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </a>

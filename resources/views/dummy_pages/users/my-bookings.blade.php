@@ -10,23 +10,33 @@ $currentPage = 'bookings';
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold mb-6 text-gray-800">My Bookings</h1>
 
+    {{-- ALERT COMPONENT --}}
+    @if(session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
+
     @if(!auth()->check())
-        {{-- TAMPILAN JIKA USER BELUM LOGIN --}}
         <div class="bg-white rounded-lg shadow p-6 text-center max-w-md mx-auto">
             <div class="text-gray-400 mb-4">
-                {{-- Icon Gembok/Login Opsional --}}
                 <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
             </div>
-            {{-- <h2 class="text-xl font-semibold text-gray-700 mb-2">Yuk, Login Dulu!</h2> --}}
+         
             <p class="text-gray-500 mb-6">Silakan login terlebih dahulu untuk melihat riwayat reservasi Anda.</p>
             <a href="/login" class="inline-block bg-blue-600 text-white font-medium px-6 py-2 rounded hover:bg-blue-700 transition w-full">
                 Login Sekarang
             </a>
         </div>
     @else
-        {{-- TAMPILAN JIKA USER SUDAH LOGIN --}}
+
         @if($bookings->isEmpty())
             <div class="bg-white rounded-lg shadow p-6 text-center">
                 <p class="text-gray-500 mb-4">Kamu belum memiliki riwayat reservasi.</p>
@@ -43,10 +53,22 @@ $currentPage = 'bookings';
                             <div class="flex items-center gap-3 mb-2">
                                 <span class="text-sm font-semibold text-gray-500">ID: {{ substr($booking->id, 0, 8) }}...</span>
                                 
-                                @if($booking->payment && $booking->payment->status === 'Paid')
-                                    <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Confirmed</span>
+                                {{-- LOGIKA STATUS BADGE YANG BARU --}}
+                                @if($booking->cancel_request)
+                                    @if($booking->cancel_request->status === 'Pending')
+                                        <span class="px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-800">Cancel Request Sent</span>
+                                    @elseif($booking->cancel_request->status === 'Approved')
+                                        <span class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-800">Cancelled</span>
+                                    @elseif($booking->cancel_request->status === 'Rejected')
+                                        {{-- Jika admin menolak pembatalan, balikkan ke status Paid semula --}}
+                                        <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Confirmed (Cancel Rejected)</span>
+                                    @endif
                                 @else
-                                    <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
+                                    @if($booking->payment && $booking->payment->status === 'Paid')
+                                        <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Confirmed</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
+                                    @endif
                                 @endif
                             </div>
 
@@ -70,28 +92,69 @@ $currentPage = 'bookings';
                             </div>
                         </div>
 
-                        <div class="mt-4 md:mt-0 text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
-                            <p class="text-sm text-gray-500">Total Bayar</p>
-                            <p class="text-lg font-bold text-blue-600 mb-2">
-                                Rp {{ number_format($booking->payment->amount ?? 0, 0, ',', '.') }}
-                            </p>
+                        <div class="mt-4 md:mt-0 text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 flex flex-col items-end gap-2">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Bayar</p>
+                                <p class="text-lg font-bold text-blue-600 mb-2">
+                                    Rp {{ number_format($booking->payment->amount ?? 0, 0, ',', '.') }}
+                                </p>
+                            </div>
 
-                            <a href="#" onclick="return confirm('Apakah kamu yakin ingin membatalkan reservasi ini?')" class="inline-block bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto text-center">
-                                    Cancel
-                            </a>
-                            
-                            @if($booking->payment && $booking->payment->status !== 'Paid')
-                                <a href="/payment/{{ $booking->id }}" class="inline-block bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 transition w-full md:w-auto text-center">
-                                    Bayar Sekarang
-                                </a>
-                            @else
-                                <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
-                                    Selesai
-                                </button>
-                            @endif
+                            <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                                {{-- LOGIKA TOMBOL AKSI KANAN --}}
+                                @if($booking->cancel_request)
+                                    {{-- Jika sudah ada CancelRequest, matikan semua tombol pembatalan/pembayaran --}}
+                                    <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
+                                        Cancel Request Sent
+                                    </button>
+                                @else
+                                    {{-- Jika BELUM ada cancel request --}}
+                                    <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto text-center">
+                                        Cancel
+                                    </button>
+                                    
+                                    @if($booking->payment && $booking->payment->status !== 'Paid')
+                                        <a href="/payment/{{ $booking->id }}" class="inline-block bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 transition w-full md:w-auto text-center">
+                                            Bayar Sekarang
+                                        </a>
+                                    @else
+                                        <button disabled class="inline-block bg-gray-100 text-gray-400 text-sm px-4 py-2 rounded w-full md:w-auto text-center cursor-not-allowed">
+                                            Selesai
+                                        </button>
+                                    @endif
+                                @endif
+                            </div>
                         </div>
 
                     </div>
+
+                    {{-- POPUP MODAL FORM PEMBATALAN PER BOOKING ID --}}
+                    <dialog id="modal-cancel-{{ $booking->id }}" class="rounded-lg shadow-2xl p-6 w-full max-w-md backdrop:bg-gray-900/50">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-900">Alasan Pembatalan</h3>
+                            <button onclick="document.getElementById('modal-cancel-{{ $booking->id }}').close()" class="text-gray-400 hover:text-gray-600">&times;</button>
+                        </div>
+                        
+                        <form action="{{ route('booking.cancel.request', $booking->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="flight_booking_id" value="{{ $booking->flight_booking_id ?? '' }}">
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Mengapa Anda ingin membatalkan reservasi ini?</label>
+                                <textarea name="reason" rows="4" required class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-red-500 focus:outline-none placeholder-gray-400" placeholder="Tulis alasan pembatalan Anda di sini..."></textarea>
+                            </div>
+
+                            <div class="flex justify-end gap-2">
+                                <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').close()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition text-sm">
+                                    Batal
+                                </button>
+                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition text-sm font-semibold">
+                                    Kirim Permohonan
+                                </button>
+                            </div>
+                        </form>
+                    </dialog>
+
                 @endforeach
             </div>
         @endif

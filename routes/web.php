@@ -51,17 +51,12 @@ Route::middleware('auth')->group(function () {
     
     // Menerima submit form booking simpan database AJAX POST
     Route::post('/checkout/flight/store', [FlightCheckoutController::class, 'storeBooking'])->name('checkout.flight.store');
-
-
     
     Route::get('/booking/{id}', [BookingController::class, 'openBookingPage'])->name('booking.open');
-    Route::post('/booking/store',
-        [BookingController::class,'storeBooking'])
-        ->name('booking.store');
+    Route::post('/booking/store',[BookingController::class,'storeBooking'])->name('booking.store');
+    Route::post('/booking/{id}/cancel-request', [UserController::class, 'requestCancellation'])->name('booking.cancel.request');
 
-    Route::post('/logout', [UserController::class, 'logout'])
-        ->name('logout');
-
+    Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
 
 // Contoh dummy rute penampung halaman sukses invoice tanda terima (receipt) agar tidak crash

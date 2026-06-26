@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CancelRequest;
+use App\Models\Promo;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use App\Models\Promo;
 
 class UserController extends Controller
 {
@@ -152,28 +153,39 @@ public function myBookings()
         // Ambil semua data booking milik user jika sudah login
         $bookings = Auth::user()->reservations()->latest()->get();
 
+        // [BARU] Ambil semua id booking milik user saat ini untuk query CancelRequest sekaligus (Eager Loading manual)
+        $bookingIds = $bookings->pluck('id');
+        $cancelRequests = CancelRequest::whereIn('reservation_id', $bookingIds)->get();
+
         // 2. Ambil semua data unit dari API Repo
-        // Tips: Gunakan config() daripada env() langsung di dalam Controller
         $apiUrl = config('app.api_base_url', env('API_BASE_URL')) . '/units';
         
         try {
             $response = Http::get($apiUrl);
-            
-            if ($response->successful()) {
-                // Ubah data API unit menjadi Collection agar mudah diolah
-                $units = collect($response->json());
-
-                // 3. Pasangkan data unit dari API ke dalam masing-masing booking
-                $bookings->transform(function ($booking) use ($units) {
-                    $matchedUnit = $units->firstWhere('id', $booking->unit_id);
-                    $booking->unit_details = $matchedUnit; 
-                    return $booking;
-                });
-            }
+            $units = $response->successful() ? collect($response->json()) : collect();
         } catch (\Exception $e) {
-            // Antisipasi jika API server down agar web kamu tidak ikut crash
-            // $bookings tetap berjalan tanpa unit_details
+            $units = collect();
         }
+
+        // 3. Gabungkan data Unit API dan data CancelRequest ke dalam masing-masing booking
+        $bookings->transform(function ($booking) use ($units, $cancelRequests) {
+            // Pasangkan data unit
+            if ($units->isNotEmpty()) {
+                $matchedUnit = $units->firstWhere('id', $booking->unit_id);
+                $booking->unit_details = $matchedUnit; 
+            } else {
+                $booking->unit_details = null;
+            }
+
+            // [BARU] Cari apakah ada cancel request dengan reservation_id yang cocok
+            $matchedCancelRequest = $cancelRequests->firstWhere('reservation_id', $booking->id);
+            
+            // Simpan datanya ke properti booking (bisa bernilai object CancelRequest atau null jika tidak ada)
+            $booking->cancel_request = $matchedCancelRequest; 
+
+            return $booking;
+        });
+
     } else {
         // Jika belum login, kirim collection kosong ke Blade
         $bookings = collect();
@@ -250,6 +262,35 @@ public function myBookings()
             'testimonials'
         ));
     }
+    
+public function requestCancellation(Request $request, $id)
+{
+    // 1. Validasi input alasan
+    $request->validate([
+        'reason' => 'required|string|max:500',
+    ]);
 
+    // 2. Ambil data booking milik user yang sedang login untuk memastikan keamanan
+    $booking = Auth::user()->reservations()->findOrFail($id);
+
+    // 3. Cek apakah user sudah pernah mengajukan pembatalan untuk booking ini sebelumnya
+    $existingRequest = CancelRequest::where('reservation_id', $booking->id)->first();
+    if ($existingRequest) {
+        return redirect()->back()->with('error', 'Kamu sudah mengajukan pembatalan untuk reservasi ini.');
+    }
+
+    // 4. Simpan pengajuan ke table cancel_requests
+    CancelRequest::create([
+        'reservation_id'    => $booking->id,
+        'flight_booking_id' => $booking->flight_booking_id ?? null, // Sesuaikan jika ada flight_booking_id
+        'reason'            => $request->reason,
+        'status'            => 'Pending', // Status default saat pertama diajukan
+    ]);
+
+    // 5. (Opsional) Mengubah status booking lokal menjadi 'Cancellation Requested' 
+    // $booking->update(['status' => 'Pending Cancellation']);
+
+    return redirect()->back()->with('success', 'Permintaan pembatalan berhasil dikirim. Menunggu konfirmasi admin.');
+}
 
 }

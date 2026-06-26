@@ -261,29 +261,118 @@ public function requestCancellation(Request $request, $id)
     return redirect()->back()->with('success', 'Permintaan pembatalan berhasil dikirim. Menunggu konfirmasi admin.');
 }
 
+// public function renderFavorites()
+// {
+//     // Semua property_id favorit user
+//     $favoriteIds = Favorite::where('user_id', Auth::id())
+//         ->pluck('property_id')
+//         ->toArray();
+
+//     // Ambil semua property dari API
+//     $response = Http::get(env('API_BASE_URL') . '/properties');
+
+//     $properties = [];
+
+//     if ($response->successful()) {
+
+//         $allProperties = $response->json();
+
+//         // Ambil hanya yang ada di favorites
+//         $properties = collect($allProperties)
+//             ->whereIn('id', $favoriteIds)
+//             ->values();
+//     }
+
+//     return view('users.favorites', compact('properties'));
+// }
+
+
 public function renderFavorites()
 {
-    // Semua property_id favorit user
+    // 1. Ambil semua property_id favorit user saat ini
     $favoriteIds = Favorite::where('user_id', Auth::id())
         ->pluck('property_id')
         ->toArray();
 
-    // Ambil semua property dari API
-    $response = Http::get(env('API_BASE_URL') . '/properties');
+    $properties = collect();
 
-    $properties = [];
+    // 2. Ambil data properties dan data units dari API
+    try {
+        $responseProperties = Http::get(env('API_BASE_URL') . '/properties');
+        $responseUnits = Http::get(env('API_BASE_URL') . '/units');
+        
+        $apiProperties = $responseProperties->successful() ? collect($responseProperties->json()) : collect();
+        $apiUnits = $responseUnits->successful() ? collect($responseUnits->json()) : collect();
+    } catch (\Exception $e) {
+        $apiProperties = collect();
+        $apiUnits = collect();
+    }
 
-    if ($response->successful()) {
+    if ($apiProperties->isNotEmpty()) {
+        // Filter properti yang hanya di-favoritkan oleh user
+        $properties = $apiProperties->whereIn('id', $favoriteIds)->values();
 
-        $allProperties = $response->json();
+        // 3. Inject starting_price (harga unit termurah) ke setiap properti
+        $properties->transform(function ($property) use ($apiUnits) {
+            // Filter unit yang memiliki property_id yang sama dengan properti ini
+            $propertyUnits = $apiUnits->filter(function ($unit) use ($property) {
+                return $unit['property_id'] == $property['id'];
+            });
 
-        // Ambil hanya yang ada di favorites
-        $properties = collect($allProperties)
-            ->whereIn('id', $favoriteIds)
-            ->values();
+            // Ambil harga paling minimum, jika tidak ada unit set default ke 0
+            $minPrice = $propertyUnits->isNotEmpty() ? $propertyUnits->min('price') : 0;
+
+            // Masukkan attribute baru 'starting_price' ke dalam array properti
+            $property['starting_price'] = $minPrice;
+            
+            return $property;
+        });
     }
 
     return view('users.favorites', compact('properties'));
 }
+
+
+public function addToFav(Request $request)
+    {
+        // Pastikan user sudah login
+        if (!Auth::check()) {
+            return response()->json([
+                'status' => 'unauthorized', 
+                'message' => 'Silakan login terlebih dahulu.'
+            ], 401);
+        }
+
+        $request->validate([
+            'property_id' => 'required|string',
+        ]);
+
+        $userId = Auth::id();
+        $propertyId = $request->property_id;
+
+        // Cari tahu apakah item sudah difavoritkan sebelumnya
+        $favorite = Favorite::where('user_id', $userId)
+                            ->where('property_id', $propertyId)
+                            ->first();
+
+        if ($favorite) {
+            // Jika sudah ada, hapus dari database (unfavorite)
+            $favorite->delete();
+            return response()->json([
+                'status' => 'removed',
+                'message' => 'Dihapus dari daftar favorit.'
+            ]);
+        } else {
+            // Jika belum ada, tambahkan ke database (favorite)
+            Favorite::create([
+                'user_id' => $userId,
+                'property_id' => $propertyId,
+            ]);
+            return response()->json([
+                'status' => 'added',
+                'message' => 'Berhasil disimpan ke daftar favorit.'
+            ]);
+        }
+    }
 
 }

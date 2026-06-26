@@ -58,6 +58,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/booking/store',[BookingController::class,'storeBooking'])->name('booking.store');
     Route::post('/booking/{id}/cancel-request', [UserController::class, 'requestCancellation'])->name('booking.cancel.request');
 
+    // addToFav
+    Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
+
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
 

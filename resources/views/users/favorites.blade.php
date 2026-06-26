@@ -140,7 +140,7 @@ $currentPage = 'favorites';
                                 </div>
 
                                 <a
-                                    href="{{ route('accommodation.detail', $property['id']) }}"
+                                    href="{{ route('property.detail', $property['id']) }}"
                                     class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded-xl transition">
 
                                     View Details

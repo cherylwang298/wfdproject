@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Favorite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class SearchController extends Controller
@@ -176,12 +178,16 @@ public function openPropertyDetail(Request $request, $id)
             return $unit;
         });
 
+        $isFavorite = Favorite::where('user_id', Auth::id())
+        ->where('property_id', $property['id'])->exists();
+
     return view('accomodations.accomodation-details', [
         'property' => $property,
         'units' => $propertyUnits,
         'checkin' => $request->query('checkin'),
         'checkout' => $request->query('checkout'),
         'guests' => $request->query('guests'),
+        'isFavorite' => $isFavorite
     ]); 
 }
 

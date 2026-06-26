@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
-use App\Models\Reservation;
 use App\Models\Payment;
+use App\Models\Reservation;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
 {
@@ -36,7 +37,8 @@ class BookingController extends Controller
         $nights = $nights > 0 ? $nights : 1; // Minimal 1 malam jika input keliru
 
         // 5. Hitung total harga
-        $totalPrice = $unit['price'] * $nights;
+        $accomPrice = $unit['price'] * $nights;
+        $totalPrice = $accomPrice + ($accomPrice * 0.11);
 
         // 6. Ambil data user login
         $user = auth()->user();
@@ -77,13 +79,18 @@ class BookingController extends Controller
         'email' => 'required|email',
         'phone' => 'required',
 
-        'payment_method' => 'required'
+        'payment_method' => 'required',
+        'promo_id' => 'nullable'
     ]);
+
+
 
     DB::beginTransaction();
 
-    try {
+ 
 
+    try {
+   
         $reservation = Reservation::create([
             'user_id' => auth()->id(),
             'unit_id' => $request->unit_id,
@@ -95,8 +102,10 @@ class BookingController extends Controller
             'guest_phone_number' => $request->phone,
             'status' => 'Confirmed',
             'payment_status' => 'Paid',
-            'promo_id' => null,
+            'promo_id' => $request->promo_id,
         ]);
+
+      
 
 
         Payment::create([

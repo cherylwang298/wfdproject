@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
     Route::post('/review/{propertyId}', [UserController::class, 'addReview'])->name('review.store');
 
+    Route::post('/promo/apply',[PromoController::class,'apply'])
+    ->name('promo.apply');
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });

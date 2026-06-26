@@ -227,7 +227,7 @@ $currentPage = 'bookings';
                                 </div>
 
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">
-                                    {{ $flight->flight_details['airline'] ?? 'Flight Booking' }}
+                                    {{ $flight->flight_details['airline'] ?? 'Flight Route Expired (Out of API Dataset)' }}
                                     <span class="text-xs font-normal text-gray-400">({{ $flight->tickets->count() }} Penumpang)</span>
                                 </h2>
 
@@ -235,7 +235,7 @@ $currentPage = 'bookings';
                                     @if($flight->flight_details)
                                         <div>
                                             <span class="font-medium text-gray-400">Rute:</span> 
-                                            <span class="font-bold text-gray-800">{{ $flight->flight_details['origin'] }} → {{ $flight->flight_details['destination'] }}</span>
+                                            <span class="font-bold text-gray-800">{{ $flight->flight_details['origin'] ?? 'N/A' }} → {{ $flight->flight_details['destination'] ?? 'N/A' }}</span>
                                         </div>
                                         <div>
                                             <span class="font-medium text-gray-400">Keberangkatan:</span> 

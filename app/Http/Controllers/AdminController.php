@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CancelRequest;
 
 class AdminController extends Controller
 {
@@ -32,6 +33,14 @@ class AdminController extends Controller
 
     // 4. Lempar kembali ke halaman login admin
     return redirect()->route('admin.login')->with('success', 'Anda berhasil logout.');
+}
+
+public function openCancelRequests(){
+  $cancels = CancelRequest::all();
+    $admin = Auth::guard('admin')->user();
+      $username = $admin->name;
+
+  return view('dummy_pages.admins.cancel-requests', compact('cancels', 'username'));
 }
 
 

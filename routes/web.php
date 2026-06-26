@@ -82,6 +82,14 @@ Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('admin.
 Route::middleware(['isAdmin'])->prefix('admin')->group(function () {
     // Halaman Utama Dashboard Admin
     Route::get('/dashboard', [AdminController::class, 'openDashboard'])->name('admin.dashboard');
+    Route::get('/cancel-requests', [AdminController::class, 'openCancelRequests'])
+    ->name('admin.cancel.requests');
+
+Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveCancel'])
+    ->name('admin.cancel.approve');
+
+Route::patch('/cancel-requests/{id}/reject', [AdminController::class, 'rejectCancel'])
+    ->name('admin.cancel.reject');
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

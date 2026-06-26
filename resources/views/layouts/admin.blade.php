@@ -35,7 +35,7 @@
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
                         <span>📄</span> Reservations
                     </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
+                    <a href="{{route('admin.cancel.requests')}}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
                         <span>❌</span> Cancel Requests
                     </a>
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
@@ -75,7 +75,11 @@
                     <button class="p-2.5 bg-white rounded-full shadow-sm text-gray-500 hover:text-gray-700 border border-gray-100">
                         🔔
                     </button>
-                    <img class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin avatar">
+                    {{-- <img class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin avatar"> --}}
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+    A
+</div>
+                
                 </div>
             </header>
 

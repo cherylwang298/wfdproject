@@ -14,7 +14,7 @@ class UserController extends Controller
 {
     //
     public function openLogin(){
-        return view('dummy_pages.users.login');
+        return view('auth.login');
     }
  
     public function login(Request $request)

@@ -54,13 +54,15 @@ class PromoController extends Controller
     public function apply(Request $request)
 {
     $promo = Promo::where('code',$request->promo_code)->first();
-
+  
     if(!$promo){
         return response()->json([
             'success'=>false,
             'message'=>'Promo code not found.'
         ]);
     }
+
+      $quotaNow =$promo->quota;
 
     if($promo->expired_at < now()){
         return response()->json([
@@ -78,6 +80,11 @@ class PromoController extends Controller
     }
 
     $discount = min($discount,$total);
+    $newQuota = $quotaNow - 1;
+
+    $promo->update([
+        'quota'=>$newQuota
+    ]);
 
     return response()->json([
         'success'=>true,

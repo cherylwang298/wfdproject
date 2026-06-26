@@ -185,7 +185,6 @@
 @include('partials.footer')
 
 <script>
-    // Penanganan tab metode pembayaran kartu kredit vs transfer bank
     function togglePaymentTab(type) {
         document.getElementById('paymentMethodInput').value = type;
         
@@ -207,7 +206,6 @@
         }
     }
 
-    // Mengirimkan form checkout via AJAX Fetch POST ke Controller
     document.getElementById('checkoutFlightForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -225,8 +223,8 @@
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                // Berhasil, arahkan langsung ke halaman struk invoice tanda terima
-                window.location.href = data.redirect_url;
+                // --- KODE DIUBAH: Mengalihkan langsung ke halaman My Bookings dan mengunci tab Flights ---
+                window.location.href = "/my-bookings#flights";
             } else {
                 alert('Gagal memproses transaksi: ' + data.message);
                 submitBtn.disabled = false;

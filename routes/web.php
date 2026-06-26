@@ -42,6 +42,8 @@ Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights'
 // deals / promos
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
 
+    Route::get('/my-bookings', [UserController::class, 'myBookings'])->name('bookings.success');
+
 // --- ROUTING SYSTEM CHECKOUT TIKET PESAWAT STAYGO ---
 Route::middleware('auth')->group(function () {
     // Menampilkan halaman checkout flights
@@ -49,6 +51,17 @@ Route::middleware('auth')->group(function () {
     
     // Menerima submit form booking simpan database AJAX POST
     Route::post('/checkout/flight/store', [FlightCheckoutController::class, 'storeBooking'])->name('checkout.flight.store');
+
+
+    
+    Route::get('/booking/{id}', [BookingController::class, 'openBookingPage'])->name('booking.open');
+    Route::post('/booking/store',
+        [BookingController::class,'storeBooking'])
+        ->name('booking.store');
+
+    Route::post('/logout', [UserController::class, 'logout'])
+        ->name('logout');
+
 });
 
 // Contoh dummy rute penampung halaman sukses invoice tanda terima (receipt) agar tidak crash
@@ -96,11 +109,3 @@ Route::get('/properties/{id}', [SearchController::class, 'openPropertyDetail'])
 
 // butuh user middleware:
 
-Route::get('/booking/{id}', [BookingController::class, 'openBookingPage'])->name('booking.open');
-Route::post('/booking/store',
-    [BookingController::class,'storeBooking'])
-    ->name('booking.store');
-Route::get('/my-bookings', [UserController::class, 'myBookings'])->name('bookings.success');
-Route::post('/logout', [UserController::class, 'logout'])
-    ->name('logout');
-    

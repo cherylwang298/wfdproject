@@ -76,7 +76,7 @@ class UserController extends Controller
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    return redirect()->route('login.form');
+    return redirect()->route('login');
     }
 
  public function home(Request $request)
@@ -143,34 +143,44 @@ public function getAllBookings(){
     return view('dummy_pages.users.my-bookings', compact('bookings'));
 }
 
+
+
 public function myBookings()
 {
-    // 1. Ambil semua data booking milik user
-    $bookings = Auth::user()->reservations()->latest()->get();
+    // 1. Cek apakah user sudah login
+    if (Auth::check()) {
+        // Ambil semua data booking milik user jika sudah login
+        $bookings = Auth::user()->reservations()->latest()->get();
 
-    // 2. Ambil semua data unit dari API Repo
-    $response = Http::get(env('API_BASE_URL') . '/units');
-    
-    if ($response->successful()) {
-        // Ubah data API unit menjadi Collection agar mudah diolah
-        $units = collect($response->json());
+        // 2. Ambil semua data unit dari API Repo
+        // Tips: Gunakan config() daripada env() langsung di dalam Controller
+        $apiUrl = config('app.api_base_url', env('API_BASE_URL')) . '/units';
+        
+        try {
+            $response = Http::get($apiUrl);
+            
+            if ($response->successful()) {
+                // Ubah data API unit menjadi Collection agar mudah diolah
+                $units = collect($response->json());
 
-        // 3. Pasangkan data unit dari API ke dalam masing-masing booking berdasarkan unit_id
-        $bookings->transform(function ($booking) use ($units) {
-            // Cari data unit yang id-nya cocok dengan unit_id di booking
-            $matchedUnit = $units->firstWhere('id', $booking->unit_id);
-            
-            // Bungkus menjadi objek atau array agar bisa dibaca di Blade
-            $booking->unit_details = $matchedUnit; 
-            
-            return $booking;
-        });
+                // 3. Pasangkan data unit dari API ke dalam masing-masing booking
+                $bookings->transform(function ($booking) use ($units) {
+                    $matchedUnit = $units->firstWhere('id', $booking->unit_id);
+                    $booking->unit_details = $matchedUnit; 
+                    return $booking;
+                });
+            }
+        } catch (\Exception $e) {
+            // Antisipasi jika API server down agar web kamu tidak ikut crash
+            // $bookings tetap berjalan tanpa unit_details
+        }
+    } else {
+        // Jika belum login, kirim collection kosong ke Blade
+        $bookings = collect();
     }
 
     return view('dummy_pages.users.my-bookings', compact('bookings'));
 }
-
-
 
 
 

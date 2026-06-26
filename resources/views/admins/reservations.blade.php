@@ -146,37 +146,66 @@
     </div>
 </div>
 
-{{-- SCRIPT JAVASCRIPT CONTROL MODAL --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const detailModal = document.getElementById('detailModal');
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editReservForm');
 
-    // --- LOGIC DETAIL RESERVATION (AJAX Fetch) ---
-    window.openDetailModal = function(id) {
-        fetch(`/admin/reservations/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('det_code').innerText = data.booking_code;
-                document.getElementById('det_guest').innerText = data.user ? data.user.name : data.guest_name;
-                document.getElementById('det_contact').innerText = data.user ? data.user.email : data.guest_phone_number;
-                document.getElementById('det_date').innerText = data.reservation_date;
-                document.getElementById('det_time').innerText = data.reservation_time + ' WIB';
-                document.getElementById('det_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.total_price);
-                document.getElementById('det_status').innerText = data.status.toUpperCase();
 
-                detailModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            });
-    }
+window.openDetailModal = function(id) {
+    fetch(`/admin/reservations/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('det_code').innerText = '#' + (data.id || '');
+            let guestName = 'Guest';
+            if (data.user && data.user.name) {
+                guestName = data.user.name;
+            } else if (data.guest_name) {
+                guestName = data.guest_name;
+            }
+            document.getElementById('det_guest').innerText = guestName;
+            
+            let contactInfo = '-';
+            if (data.user && data.user.email) {
+                contactInfo = data.user.email;
+            } else if (data.guest_phone_number) {
+                contactInfo = data.guest_phone_number;
+            }
+            document.getElementById('det_contact').innerText = contactInfo;
+            
+          
+            if (data.check_in) {
+                let dateOnly = data.check_in.split(' ')[0]; 
+                
+                // Format agar tampilan lebih rapi (YYYY-MM-DD menjadi DD MMMM YYYY secara lokal)
+                let formattedDate = new Date(dateOnly).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                document.getElementById('det_date').innerText = formattedDate;
+            } else {
+                document.getElementById('det_date').innerText = '-';
+            }
+            
+          
+            document.getElementById('det_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.total_price || 0);
+            document.getElementById('det_status').innerText = (data.status || '').toUpperCase();
 
+            detailModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        })
+        .catch(error => {
+            console.error("Error mengambil detail reservasi:", error);
+        });
+}
     window.closeDetailModal = function() {
         detailModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
 
-    // --- LOGIC EDIT STATUS ---
     window.openEditModal = function(button) {
         const id = button.getAttribute('data-id');
         const code = button.getAttribute('data-code');
@@ -200,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
 @endsection
 
 @push('modals')
-{{-- ================= MODAL DETAIL RESERVASI ================= --}}
+
 <div id="detailModal" class="hidden fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
     <div class="bg-white rounded-[28px] w-full max-w-md shadow-2xl overflow-hidden">
         <div class="flex justify-between items-center p-6 border-b">
@@ -208,42 +237,39 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" onclick="closeDetailModal()" class="text-2xl text-gray-400 hover:text-gray-700">&times;</button>
         </div>
         <div class="p-6 space-y-4 text-sm">
-            <div class="flex justify-between border-b pb-2">
-                <span class="text-gray-400">Booking Code</span>
-                <span id="det_code" class="font-bold text-blue-600"></span>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <span class="text-gray-400">Guest Name</span>
-                <span id="det_guest" class="font-semibold text-gray-900"></span>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <span class="text-gray-400">Contact Info</span>
-                <span id="det_contact" class="text-gray-700"></span>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <span class="text-gray-400">Date</span>
-                <span id="det_date" class="text-gray-700"></span>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <span class="text-gray-400">Time</span>
-                <span id="det_time" class="text-gray-700"></span>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <span class="text-gray-400">Total Price</span>
-                <span id="det_price" class="font-bold text-gray-900"></span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-gray-400">Current Status</span>
-                <span id="det_status" class="font-bold text-blue-600 uppercase"></span>
-            </div>
-        </div>
+    <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-400">Reservation ID</span>
+        <span id="det_code" class="font-bold text-blue-600"></span>
+    </div>
+    <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-400">Guest Name</span>
+        <span id="det_guest" class="font-semibold text-gray-900"></span>
+    </div>
+    <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-400">Contact Info</span>
+        <span id="det_contact" class="text-gray-700"></span>
+    </div>
+    <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-400">Check-In Date</span>
+        <span id="det_date" class="text-gray-700"></span>
+    </div>
+  
+    <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-400">Total Price</span>
+        <span id="det_price" class="font-bold text-gray-900"></span>
+    </div>
+    <div class="flex justify-between">
+        <span class="text-gray-400">Current Status</span>
+        <span id="det_status" class="font-bold text-blue-600 uppercase"></span>
+    </div>
+</div>
         <div class="bg-gray-50 px-6 py-4 flex justify-end border-t">
             <button type="button" onclick="closeDetailModal()" class="px-5 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 font-semibold text-sm">Close</button>
         </div>
     </div>
 </div>
 
-{{-- ================= MODAL EDIT STATUS RESERVASI ================= --}}
+
 <div id="editModal" class="hidden fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
     <div class="bg-white rounded-[28px] w-full max-w-sm shadow-2xl overflow-hidden">
         <div class="flex justify-between items-center p-6 border-b">

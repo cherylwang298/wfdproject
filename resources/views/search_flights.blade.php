@@ -401,9 +401,8 @@ function handleFlightSelect(flightId, flightType) {
     if (flightType === 'outbound') {
         selectedOutbound = currentOutboundFlights.find(f => f.id == flightId);
         if (isRoundTrip()) {
-            document.getElementById('outboundSummaryText').textContent = `${selectedOutbound.airline} · ${selectedOutbound.from} → ${selectedOutbound.to} · $${selectedOutbound.price}`;
+            document.getElementById('outboundSummaryText').textContent = `${selectedOutbound.airline} · ${selectedOutbound.from} → ${selectedOutbound.to} · Rp ${selectedOutbound.price.toLocaleString('id-ID')}`;
             document.getElementById('selectedOutboundSummary').classList.remove('hidden');
-            renderOutboundSection();
             
             // Render Inbound Results
             const container = document.getElementById('inboundResults');

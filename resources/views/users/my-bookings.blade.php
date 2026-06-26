@@ -267,7 +267,9 @@ $currentPage = 'bookings';
                             <div class="space-y-4 text-sm text-gray-700">
                                 <div class="bg-gray-50 p-4 rounded-xl">
                                     <h4 class="font-bold text-gray-800 mb-1">Unit Name</h4>
+                                    
                                     <p class="text-base font-semibold text-blue-600">{{ $booking->unit_details['name'] ?? 'Unit #' . $booking->unit_id }}</p>
+                                    <p>{{ $booking->property_details['name'] ?? '-' }}</p>
                                     <p class="text-xs text-gray-400 mt-2">Reservation ID: {{ $booking->id }}</p>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 border-b pb-3">
@@ -308,15 +310,29 @@ $currentPage = 'bookings';
             @else
                 <div class="grid grid-cols-1 gap-6">
                     @foreach($flightBookings as $flight)
-                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center">
-                            <div>
+                        {{-- KONTANER UTAMA CARD: MENGGUNAKAN FLEX SINKRON SEJAJAR --}}
+                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            
+                            {{-- BLOK SISI KIRI: INFORMASI DETIL PENERBANGAN --}}
+                            <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
                                     <span class="text-sm font-mono font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded">{{ $flight->booking_code }}</span>
                                     
-                                    @if(($flight->payment->status ?? 'pending') === 'Paid')
-                                        <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Issued ✓</span>
+                                    {{-- TAMPILKAN UPDATE STATUS PEMBATALAN PESAWAT --}}
+                                    @if($flight->cancel_request)
+                                        @if(strtolower($flight->cancel_request->status) === 'pending')
+                                            <span class="px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-700">Cancel Pending</span>
+                                        @elseif(strtolower($flight->cancel_request->status) === 'approved')
+                                            <span class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-700">Cancelled</span>
+                                        @elseif(strtolower($flight->cancel_request->status) === 'rejected')
+                                            <span class="px-2 py-1 text-xs font-bold rounded bg-orange-100 text-orange-700">Cancel Rejected</span>
+                                        @endif
                                     @else
-                                        <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
+                                        @if(($flight->payment->status ?? 'pending') === 'Paid')
+                                            <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Issued ✓</span>
+                                        @else
+                                            <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
+                                        @endif
                                     @endif
                                 </div>
 
@@ -341,16 +357,41 @@ $currentPage = 'bookings';
                                 </div>
                             </div>
 
-                            <div class="mt-4 md:mt-0 text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 flex flex-col items-end gap-2">
+                            {{-- BLOK SISI KANAN: TOTAL BAYAR & TOMBOL AKSI INTERAKTIF --}}
+                            <div class="text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 flex flex-col items-start md:items-end gap-2 shrink-0">
                                 <div>
                                     <p class="text-sm text-gray-500">Total Bayar</p>
                                     <p class="text-lg font-bold text-purple-600 mb-2">
                                         Rp {{ number_format($flight->payment->amount ?? 0, 0, ',', '.') }}
                                     </p>
                                 </div>
-                                <button type="button" onclick="document.getElementById('modal-detail-flight-{{ $flight->id }}').showModal()" class="inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition w-full md:w-auto text-center font-semibold">
-                                    View Details
-                                </button>
+                                
+                                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                                    {{-- FITUR CANCEL UNTUK FLIGHT BOOKINGS --}}
+                                    @if($flight->cancel_request)
+                                        @if(strtolower($flight->cancel_request->status) === 'pending')
+                                            <button disabled class="bg-purple-100 text-purple-700 text-xs px-4 py-2 rounded cursor-not-allowed font-semibold w-full md:w-auto">
+                                                Cancel Pending Approval
+                                            </button>
+                                        @elseif(strtolower($flight->cancel_request->status) === 'approved')
+                                            <button disabled class="bg-red-100 text-red-700 text-xs px-4 py-2 rounded cursor-not-allowed font-semibold w-full md:w-auto">
+                                                Cancelled
+                                            </button>
+                                        @elseif(strtolower($flight->cancel_request->status) === 'rejected')
+                                            <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').showModal()" class="bg-red-500 text-white text-xs px-4 py-2 rounded hover:bg-red-600 transition font-semibold w-full md:w-auto">
+                                                Cancel Again
+                                            </button>
+                                        @endif
+                                    @else
+                                        <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').showModal()" class="bg-red-500 text-white text-xs px-4 py-2 rounded hover:bg-red-600 transition font-semibold w-full md:w-auto">
+                                            Cancel Flight
+                                        </button>
+                                    @endif
+
+                                    <button type="button" onclick="document.getElementById('modal-detail-flight-{{ $flight->id }}').showModal()" class="inline-block bg-blue-600 text-white text-xs px-4 py-2 rounded hover:bg-blue-700 transition w-full md:w-auto text-center font-semibold">
+                                        View Details
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -410,6 +451,29 @@ $currentPage = 'bookings';
                                     Close
                                 </button>
                             </div>
+                        </dialog>
+
+                        {{-- MODAL CANCEL FLIGHT --}}
+                        <dialog id="modal-cancel-flight-{{ $flight->id }}" class="fixed inset-0 m-auto rounded-lg shadow-2xl p-6 w-full max-w-md backdrop:bg-gray-900/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-900">Alasan Pembatalan Penerbangan</h3>
+                                <button onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').close()" class="text-gray-400 hover:text-gray-600">&times;</button>
+                            </div>
+                            <form id="form-cancel-flight-element-{{ $flight->id }}" action="{{ route('flight.cancel.request', $flight->id) }}" method="POST">
+                                @csrf
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Mengapa Anda ingin membatalkan pesanan tiket pesawat ini?</label>
+                                    <textarea name="reason" rows="4" required class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-red-500 focus:outline-none placeholder-gray-400" placeholder="Tulis alasan pembatalan tiket di sini..."></textarea>
+                                </div>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').close()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition text-sm">
+                                        Batal
+                                    </button>
+                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition text-sm font-semibold">
+                                        Kirim Permohonan Cancel
+                                    </button>
+                                </div>
+                            </form>
                         </dialog>
                     @endforeach
                 </div>

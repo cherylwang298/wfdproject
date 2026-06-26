@@ -107,20 +107,36 @@ public function myBookings()
         $cancelRequests = CancelRequest::whereIn('reservation_id', $bookingIds)->get();
 
         try {
-            $response = Http::get(env('API_BASE_URL') . '/units');
-            $units = $response->successful() ? collect($response->json()) : collect();
-        } catch (\Exception $e) {
-            $units = collect();
-        }
+    $unitsResponse = Http::get(env('API_BASE_URL') . '/units');
+    $propertiesResponse = Http::get(env('API_BASE_URL') . '/properties');
+
+    $units = $unitsResponse->successful()
+        ? collect($unitsResponse->json())
+        : collect();
+
+    $properties = $propertiesResponse->successful()
+        ? collect($propertiesResponse->json())
+        : collect();
+
+} catch (\Exception $e) {
+    $units = collect();
+    $properties = collect();
+}
 
         $reviewedReservations = Review::whereIn('reservation_id', $bookingIds)
         ->pluck('reservation_id')
         ->toArray();
         
 
-        $bookings->transform(function ($booking) use ($units, $cancelRequests) {
+    $bookings->transform(function ($booking) use ($units, $properties, $cancelRequests) {
 
-    $booking->unit_details = $units->firstWhere('id', $booking->unit_id);
+    $unit = $units->firstWhere('id', $booking->unit_id);
+
+    $booking->unit_details = $unit;
+
+    $booking->property_details = $unit
+        ? $properties->firstWhere('id', $unit['property_id'])
+        : null;
 
     $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id);
 
@@ -129,11 +145,35 @@ public function myBookings()
         $booking->id
     )->exists();
 
-    return $booking;
-});
+
+   return $booking;
+    });
+
+    // dd($units->first(), $properties->first());
+//     $bookings->transform(function ($booking) use ($units, $properties, $cancelRequests) {
+//     $unit = $units->firstWhere('id', (string) $booking->unit_id);
+//     $booking->unit_details = $unit;
+
+    
+//     if ($unit && isset($unit['property_id'])) {
+//         $booking->property_details = $properties->firstWhere('id', (string) $unit['property_id']);
+//     } else {
+//         $booking->property_details = null;
+//     }
+
+//     $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id);
+//     $booking->isReviewed = Review::where('reservation_id', $booking->id)->exists();
+
+//     return $booking;
 
 
-        $flightBookings = $user->flightBookings()->with(['tickets.passenger', 'payment'])->latest()->get();
+
+
+
+        $flightBookings = $user->flightBookings()
+            ->with(['tickets.passenger', 'payment', 'cancel_request']) // <-- Tambahkan 'cancel_request' di sini
+            ->latest()
+            ->get();
         
         try {
             $responseFlights = Http::get(env('API_BASE_URL') . '/flights');
@@ -175,6 +215,7 @@ public function myBookings()
 
 
 
+
     public function home2(Request $request)
     {
         // dd([
@@ -206,7 +247,7 @@ public function myBookings()
         // 4. Proses data Properites jika API berhasil
         if ($responseProperties->successful()) {
             $properties = collect($responseProperties->json());
-            $featuredProperties = $properties->shuffle()->take(6)->values();
+            $featuredProperties = $properties->shuffle()->take(8)->values();
         } else {
             $featuredProperties = collect();
         }

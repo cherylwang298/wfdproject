@@ -33,11 +33,12 @@ Route::prefix('prototype')->group(function(){
 Route::get('/testhome', [UserController::class, 'home2'])->name('homepage');
 
 // accommodations
-Route::get('/accommodations/{id}', [PropertyDetailController::class, 'show'])->name('properties.detail');
+Route::get('/accommodations/{id}', [PropertyDetailController::class, 'showPropertyDetailDirect'])->name('properties.detail');
 
 // flights
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
 Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights');
+// request pembatalan penerbangan ke admin
 
 // deals / promos
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
@@ -64,6 +65,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/promo/apply',[PromoController::class,'apply'])
     ->name('promo.apply');
+    // cancel flight
+    Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });

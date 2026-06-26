@@ -148,44 +148,72 @@ public function getAllBookings(){
 
 public function myBookings()
 {
-    
     if (Auth::check()) {
-        $bookings = Auth::user()->reservations()->latest()->get();
+        $user = Auth::user();
 
+        // 1. DATA AKOMODASI ASLI (Jangan di-transform gabungan)
+        $bookings = $user->reservations()->latest()->get();
         $bookingIds = $bookings->pluck('id');
         $cancelRequests = CancelRequest::whereIn('reservation_id', $bookingIds)->get();
 
-   
-        $apiUrl = config('app.api_base_url', env('API_BASE_URL')) . '/units';
-        
         try {
-            $response = Http::get($apiUrl);
+            $response = Http::get(env('API_BASE_URL') . '/units');
             $units = $response->successful() ? collect($response->json()) : collect();
         } catch (\Exception $e) {
             $units = collect();
         }
 
-
         $bookings->transform(function ($booking) use ($units, $cancelRequests) {
             if ($units->isNotEmpty()) {
-                $matchedUnit = $units->firstWhere('id', $booking->unit_id);
-                $booking->unit_details = $matchedUnit; 
+                $booking->unit_details = $units->firstWhere('id', $booking->unit_id); 
             } else {
                 $booking->unit_details = null;
             }
-
-            $matchedCancelRequest = $cancelRequests->firstWhere('reservation_id', $booking->id);            
-            $booking->cancel_request = $matchedCancelRequest; 
-
+            $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id); 
             return $booking;
         });
 
+        // 2. DATA PENERBANGAN (Dikirim terpisah)
+        $flightBookings = $user->flightBookings()->with(['tickets', 'payment'])->latest()->get();
+        
+        try {
+            $responseFlights = Http::get(env('API_BASE_URL') . '/flights');
+            $apiFlights = $responseFlights->successful() ? collect($responseFlights->json()) : collect();
+        } catch (\Exception $e) {
+            $apiFlights = collect();
+        }
+
+        $flightBookings->transform(function ($fb) use ($apiFlights) {
+            $firstTicket = $fb->tickets->first();
+            
+            if ($firstTicket && $apiFlights->isNotEmpty()) {
+                // Ganti firstWhere manual menjadi filter closure agar mengabaikan perbedaan String vs Integer
+                $fb->flight_details = $apiFlights->first(function ($flightFromApi) use ($firstTicket) {
+                    return $flightFromApi['id'] == $firstTicket->flight_id; // Menggunakan '==' (Loose Comparison)
+                });
+            } else {
+                $fb->flight_details = null;
+            }
+            
+            return $fb;
+        });
+
+        // dd([
+        //     'Jumlah Flight Bookings' => $flightBookings->count(),
+        //     'Sample Booking Code'    => $flightBookings->first()?->booking_code,
+        //     'Apakah Punya Tiket?'    => $flightBookings->first()?->tickets->isNotEmpty(),
+        //     'ID Flight dari Tiket'   => $flightBookings->first()?->tickets->first()?->flight_id,
+        //     'Semua ID dari API'      => $apiFlights->pluck('id')->toArray(),
+        //     'Isi Detail Penerbangan' => $flightBookings->first()?->flight_details,
+        // ]);
+
     } else {
-      
         $bookings = collect();
+        $flightBookings = collect();
     }
 
-    return view('dummy_pages.users.my-bookings', compact('bookings'));
+    // Kirim kedua variabel ke satu halaman view Blade
+    return view('dummy_pages.users.my-bookings', compact('bookings', 'flightBookings'));
 }
 
 

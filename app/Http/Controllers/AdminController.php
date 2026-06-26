@@ -18,7 +18,7 @@ class AdminController extends Controller
       $username = $admin->name;
       $totalBookings = Reservation::all()->count();
 
-        return view('dummy_pages.admins.dashboard', compact('totalBookings', 'username'));
+        return view('admins.dashboard', compact('totalBookings', 'username'));
     }
     
     public function AdminLogout(Request $request)
@@ -41,7 +41,7 @@ public function openCancelRequests(){
     $admin = Auth::guard('admin')->user();
       $username = $admin->name;
 
-  return view('dummy_pages.admins.cancel-requests', compact('cancels', 'username'));
+  return view('admins.cancel-requests', compact('cancels', 'username'));
 }
 
 public function approveCancelRequest($id)

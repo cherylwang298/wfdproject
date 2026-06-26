@@ -60,6 +60,8 @@ Route::middleware('auth')->group(function () {
 
     // addToFav
     Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
+    Route::post('/review/{propertyId}', [UserController::class, 'addReview'])->name('review.store');
+
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });

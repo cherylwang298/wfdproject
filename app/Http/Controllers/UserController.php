@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\CancelRequest;
+use App\Models\Favorite;
 use App\Models\Promo;
+use App\Models\Reservation;
+use App\Models\Review;
+use App\Models\ReviewImages;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use App\Models\Favorite;
 
 class UserController extends Controller
 {
@@ -109,15 +113,36 @@ public function myBookings()
             $units = collect();
         }
 
+        $reviewedReservations = Review::whereIn('reservation_id', $bookingIds)
+        ->pluck('reservation_id')
+        ->toArray();
+        
+
+        // dd($reviewedReservations);
+
+        // $bookings->transform(function ($booking) use ($units, $cancelRequests) {
+        //     if ($units->isNotEmpty()) {
+        //         $booking->unit_details = $units->firstWhere('id', $booking->unit_id); 
+        //     } else {
+        //         $booking->unit_details = null;
+        //     }
+        //     $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id); 
+        //     return $booking;
+        // });
+
         $bookings->transform(function ($booking) use ($units, $cancelRequests) {
-            if ($units->isNotEmpty()) {
-                $booking->unit_details = $units->firstWhere('id', $booking->unit_id); 
-            } else {
-                $booking->unit_details = null;
-            }
-            $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id); 
-            return $booking;
-        });
+
+    $booking->unit_details = $units->firstWhere('id', $booking->unit_id);
+
+    $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id);
+
+    $booking->isReviewed = Review::where(
+        'reservation_id',
+        $booking->id
+    )->exists();
+
+    return $booking;
+});
 
         // 2. DATA PENERBANGAN (Dikirim terpisah)
         $flightBookings = $user->flightBookings()->with(['tickets.passenger', 'payment'])->latest()->get();
@@ -388,5 +413,76 @@ public function addToFav(Request $request)
             ]);
         }
     }
+
+    public function addReview($propertyId, Request $request)
+{
+    $request->validate([
+        'reservation_id' => 'required|exists:reservations,id',
+        'rating' => 'required|integer|min:1|max:5',
+        'comment' => 'required|string|max:1000',
+        'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+    ]);
+
+    $reservation = Reservation::where('id', $request->reservation_id)
+    ->where('user_id', Auth::id())
+    ->firstOrFail();
+
+$unitId = $reservation->unit_id;
+
+$response = Http::get(env('API_BASE_URL') . '/units/' . $unitId);
+
+if (!$response->successful()) {
+    return back()->with('error', 'Unable to retrieve unit information.');
+}
+
+$unit = $response->json();
+
+$propertyIdFromApi = $unit['property_id'];
+
+if ($propertyIdFromApi != $propertyId) {
+    return back()->with('error', 'Invalid reservation.');
+}
+
+    // Sudah pernah review?
+    if (Review::where('reservation_id', $reservation->id)->exists()) {
+        return back()->with('error', 'You have already reviewed this booking.');
+    }
+
+    DB::beginTransaction();
+
+    try {
+
+        $review = Review::create([
+            'reservation_id' => $reservation->id,
+            'user_id' => Auth::id(),
+            'property_id' => $propertyId,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        if ($request->hasFile('images')) {
+
+            foreach ($request->file('images') as $image) {
+
+                $path = $image->store('review-images', 'public');
+
+                ReviewImages::create([
+                    'review_id' => $review->id,
+                    'path' => $path
+                ]);
+            }
+        }
+
+        DB::commit();
+
+        return back()->with('success', 'Review submitted successfully.');
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->with('error', $e->getMessage());
+    }
+}
 
 }

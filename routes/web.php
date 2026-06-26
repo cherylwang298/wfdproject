@@ -100,7 +100,9 @@ Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveC
     Route::get('/reservations', [AdminController::class, 'openReserv'])->name('admin.reservations');
 
     Route::post('/promo-create', [AdminController::class, 'createPromo'])->name('admin.promo.create');
-
+    Route::put('/promos/update/{id}', [AdminController::class, 'editPromo'])->name('admin.promos.update');
+Route::delete('/promos/delete/{id}', [AdminController::class, 'deletePromo'])->name('admin.promos.destroy');
+    
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

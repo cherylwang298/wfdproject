@@ -143,4 +143,35 @@ public function approveCancelRequest($id)
 
     }
 
+    public function editPromo(Request $request, $id)
+    {
+  
+        $promo = Promo::findOrFail($id);
+        $request->validate([
+            'code' => 'required|string|unique:promos,code,' . $promo->id, // Abaikan pengecekan unik untuk ID ini sendiri
+            'discount_type' => 'required|string|in:percentage,fixed',
+            'discount_value' => 'required|numeric|min:0',
+            'min_purchase' => 'required|numeric|min:0',
+            'quota' => 'required|numeric|min:0',
+            'expired_at' => 'required|date',
+        ]);
+
+        $promo->update([
+            'code' => $request->code,
+            'discount_type' => $request->discount_type,
+            'discount_value' => $request->discount_value,
+            'min_purchase' => $request->min_purchase,
+            'quota' => $request->quota,
+            'expired_at' => $request->expired_at,
+        ]);
+        return redirect()->back()->with('success', 'Promo berhasil diperbarui.');
+    }
+
+    public function deletePromo($id)
+    {
+        $promo = Promo::findOrFail($id);
+        $promo->delete();
+        return redirect()->back()->with('success', 'Promo berhasil dihapus.');
+    }
+
 }

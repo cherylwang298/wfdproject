@@ -13,7 +13,7 @@ class AuthController extends Controller
     //
 
 
-    public function AdminLogin(Request $request)
+   public function AdminLogin(Request $request)
 {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
@@ -22,23 +22,16 @@ class AuthController extends Controller
 
     $admin = Admin::where('email', $credentials['email'])->first();
 
-    if (!$admin) {
+    if (!$admin || !Hash::check($credentials['password'], $admin->password)) {
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ]);
     }
 
-    if (!Hash::check($credentials['password'], $admin->password)) {
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ]);
-    }
+    Auth::guard('admin')->login($admin);
 
-    // session store
-    session([
-        'admin_id' => $admin->id,
-        'admin_name' => $admin->name,
-    ]);
+  
+    $request->session()->regenerate();
 
     return redirect()->route('admin.dashboard');
 }

@@ -33,13 +33,10 @@
                         <span>📊</span> Dashboard
                     </a>
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>📄</span> Bookings
+                        <span>📄</span> Reservations
                     </a>
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>✈️</span> Flights
-                    </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
-                        <span>🏢</span> Properties
+                        <span>❌</span> Cancel Requests
                     </a>
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition font-medium">
                         <span>🏷️</span> Promos
@@ -52,13 +49,20 @@
 
             <div class="p-4 border-t border-gray-50 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img class="w-10 h-10 rounded-full border" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin">
+                    {{-- <img class="w-10 h-10 rounded-full border" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Admin"> --}}
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+    A
+</div>
                     <div>
-                        <p class="text-sm font-semibold text-gray-700">Alex Jones</p>
+                        <p class="text-sm font-semibold text-gray-700">{{$username}}</p>
                         <p class="text-xs text-gray-400">Administrator</p>
                     </div>
                 </div>
-                <a href="/logout" class="text-red-400 hover:text-red-600 text-sm">➔</a>
+               
+                <form action="{{ route('admin.logout') }}" method="POST">
+    @csrf
+    <button type="submit"><a class="text-red-400 hover:text-red-600 text-sm">➔</a></button>
+</form>
             </div>
         </div>
 

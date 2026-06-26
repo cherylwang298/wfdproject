@@ -75,12 +75,15 @@ Route::get('/', [UserController::class, 'home2'])->name('home');
 
 
 // admin routes->admin middleware only
-Route::get('/admin/login', function(){
-    return view('dummy_pages.admins.login');
-})->name('admin.login');
+Route::get('/admin/login', function(){return view('dummy_pages.admins.login');})->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('admin.login.submit');
-Route::get('/admin/dashboard', [AdminController::class, 'openDashboard'])->name('admin.dashboard');
+// Route::get('/admin/dashboard', [AdminController::class, 'openDashboard'])->name('admin.dashboard');
 
+Route::middleware(['isAdmin'])->prefix('admin')->group(function () {
+    // Halaman Utama Dashboard Admin
+    Route::get('/dashboard', [AdminController::class, 'openDashboard'])->name('admin.dashboard');
+    Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
+});
 // user routes
 // Route::get('/', function(){
 //     return view('dummy_pages.home');

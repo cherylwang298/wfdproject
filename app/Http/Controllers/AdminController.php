@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -23,11 +24,45 @@ class AdminController extends Controller
       $totalBookings = Reservation::all()->count() + FlightBooking::all()->count();
       $totalUsers = User::all()->count();
       $totalRev = Payment::all()->sum('amount');
-      $Bookings = Reservation::all()->take(5)->reverse();
+      
       $RecentTrans = Payment::all()->take(5)->reverse();
 
+      $hotelBookings = Reservation::with('user')
+    ->latest()
+    ->get()
+    ->map(function ($booking) {
+        $booking->booking_type = 'hotel';
+        return $booking;
+    });
 
-      return view('admins.dashboard', compact('totalBookings', 'username', 'totalUsers', 'totalRev', 'Bookings', 'RecentTrans'));
+$flightBookings = FlightBooking::with('user')
+    ->latest()
+    ->get()
+    ->map(function ($booking) {
+        $booking->booking_type = 'flight';
+        return $booking;
+    });
+
+$Bookings = $hotelBookings
+    ->concat($flightBookings)
+    ->sortByDesc('created_at')
+    ->take(5);
+
+
+    $chartLabels = [];
+$chartData = [];
+
+for ($i = 6; $i >= 0; $i--) {
+
+    $date = Carbon::now()->subDays($i);
+
+    $chartLabels[] = $date->format('D'); // Mon, Tue, Wed...
+
+    $chartData[] = Payment::whereDate('created_at', $date)
+        ->sum('amount');
+}
+
+      return view('admins.dashboard', compact('totalBookings', 'username', 'totalUsers', 'totalRev', 'Bookings', 'RecentTrans', 'chartLabels', 'chartData'));
     }
     
     public function AdminLogout(Request $request)

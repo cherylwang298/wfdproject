@@ -84,87 +84,40 @@ class BookingController extends Controller
 
     try {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Reservation (Main Repo)
-        |--------------------------------------------------------------------------
-        */
-
         $reservation = Reservation::create([
-
             'user_id' => auth()->id(),
-
             'unit_id' => $request->unit_id,
-
             'check_in' => $request->check_in,
-
             'check_out' => $request->check_out,
-
             'total_price' => $request->total_price,
-
              'guest_name' => $request->name,
-
             'guest_email' => $request->email,
-
             'guest_phone_number' => $request->phone,
-
             'status' => 'Confirmed',
-
             'payment_status' => 'Paid',
-
             'promo_id' => null,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Payment (Main Repo)
-        |--------------------------------------------------------------------------
-        */
 
         Payment::create([
-
             'reservation_id' => $reservation->id,
-
             'method' => $request->payment_method,
-
             'amount' => $reservation->total_price,
-
             'status' => 'Paid',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Reservation (API Repo)
-        |--------------------------------------------------------------------------
-        */
-
-        // $response = Http::post(
-        //     env('API_BASE_URL').'/reservations',
-        //     [
-
-        //         'unit_id' => $reservation->unit_id,
-
-        //         'check_in' => $reservation->check_in,
-
-        //         'check_out' => $reservation->check_out,
-
-        //         'application_reservation_id' => $reservation->id,
-
-        //     ]
-        // );
+     
 
         $response = Http::post(env('API_BASE_URL').'/reservations', [
     'unit_id'    => $reservation->unit_id,
-    'check_in'   => $reservation->check_in->format('Y-m-d'),  // Dipaksa jadi format '2026-06-26'
-    'check_out'  => $reservation->check_out->format('Y-m-d'), // Dipaksa jadi format '2026-06-27'
+    'check_in'   => $reservation->check_in->format('Y-m-d'),  
+    'check_out'  => $reservation->check_out->format('Y-m-d'), 
     'application_reservation_id' => $reservation->id,
 ]);
 
        if (!$response->successful()) {
-    // Mengambil response body dari API (apakah error validasi atau error database)
     $apiError = $response->body();
     
-    // Melempar error asli dari API agar muncul di halaman web kamu
     throw new \Exception('Gagal di API Repo. Detail: ' . $apiError);
 }
 

@@ -213,4 +213,45 @@ public function editReserv(Request $request, $id)
         return redirect()->back()->with('success', 'Promo berhasil dihapus.');
     }
 
+    public function viewUser($id){
+      $user = User::findOrFail($id);
+      return view('admin.users', compact('user'));
+    }
+
+    // public function editUserStatus($id, Request $request){
+
+    // $user = User::findOrFail($id);
+    // $request -> validate([
+    //   'status' => 'required|string|in:active,suspended',
+    // ]);
+
+    // $user->update([
+    //     'status' => $request->status,
+    // ]);
+
+    // return redirect()->back()->with('success', 'Status user berhasil diperbarui.');
+    // }
+
+    public function editUserStatus($id, Request $request)
+{
+    try {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:active,suspended',
+        ]);
+
+        $user->update([
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->back()->with('success', 'Status user berhasil diperbarui.');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return redirect()->back()->withErrors($e->validator)->withInput();
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal memperbarui status user.');
+    }
+}
+
+
 }

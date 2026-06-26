@@ -147,7 +147,10 @@
                     </td>
 
                     <td class="px-6 py-5">
-                        <span class="font-semibold text-gray-900 block">{{ $booking->user->name ?? 'Unknown User' }}</span>
+                        @php
+                        $full_name = $booking->user->first_name . ' ' . $booking->user->last_name;
+                        @endphp
+                        <span class="font-semibold text-gray-900 block">{{ $full_name?? 'Unknown User' }}</span>
                         <span class="text-xs text-gray-400 block">{{ $booking->user->email ?? '-' }}</span>
                     </td>
 
@@ -250,13 +253,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- FLIGHT BOOKING AJAX ---
     window.openFlightDetailModal = function(id) {
+
+
+
+
         fetch(`/admin/flight-bookings/${id}`)
         // admin.flight-bookings.show
             .then(response => response.json())
             .then(data => {
+
+                        const fullName = data.user
+    ? `${data.user.first_name ?? ''} ${data.user.last_name ?? ''}`.trim()
+    : 'Unknown User';
+
                 document.getElementById('flight_det_id').innerText = '#' + data.id;
                 document.getElementById('flight_det_code').innerText = data.booking_code;
-                document.getElementById('flight_det_customer').innerText = data.user ? data.user.name : 'Unknown';
+                document.getElementById('flight_det_customer').innerText = fullName;
                 document.getElementById('flight_det_email').innerText = data.user ? data.user.email : '-';
                 document.getElementById('flight_det_payment').innerText = (data.payment_status || '').toUpperCase();
 

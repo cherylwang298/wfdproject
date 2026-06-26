@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CancelRequest;
+use App\Models\FlightBooking;
 use App\Models\Payment;
 use App\Models\Promo;
 use App\Models\Reservation;
@@ -19,11 +20,14 @@ class AdminController extends Controller
 
       $admin = Auth::guard('admin')->user();
       $username = $admin->name;
-      $totalBookings = Reservation::all()->count();
+      $totalBookings = Reservation::all()->count() + FlightBooking::all()->count();
       $totalUsers = User::all()->count();
       $totalRev = Payment::all()->sum('amount');
+      $Bookings = Reservation::all()->take(5)->reverse();
+      $RecentTrans = Payment::all()->take(5)->reverse();
 
-      return view('admins.dashboard', compact('totalBookings', 'username', 'totalUsers', 'totalRev'));
+
+      return view('admins.dashboard', compact('totalBookings', 'username', 'totalUsers', 'totalRev', 'Bookings', 'RecentTrans'));
     }
     
     public function AdminLogout(Request $request)

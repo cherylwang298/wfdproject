@@ -29,7 +29,7 @@ class SearchController extends Controller
         ->sort()
         ->values();
 
-    return view('dummy_pages.search-accomodations', compact('cities'));
+    return view('accomodations.search-accomodations', compact('cities'));
 }
 
 public function searchAccomodations(Request $request)
@@ -126,7 +126,7 @@ public function searchAccomodations(Request $request)
 
 
     return view(
-        'dummy_pages.accomodations',
+        'accomodations.accomodations',
         [
             'properties' => $availableProperties,
             'checkin' => $request->checkin,
@@ -176,7 +176,7 @@ public function openPropertyDetail(Request $request, $id)
             return $unit;
         });
 
-    return view('dummy_pages.accomodation-details', [
+    return view('accomodations.accomodation-details', [
         'property' => $property,
         'units' => $propertyUnits,
         'checkin' => $request->query('checkin'),

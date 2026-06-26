@@ -81,68 +81,13 @@ class UserController extends Controller
     return redirect()->route('login');
     }
 
- public function home(Request $request)
-{
 
-    // dd(Auth::check(), Auth::user());
-
-    //  dd(
-    //     session()->getId(),
-    //     $request->cookie(config('session.cookie')),
-    //     Auth::check(),
-    //     Auth::user()
-    // );
-    $response = Http::get(env('API_BASE_URL') . '/properties');
-
-    $user = Auth::user();
-
-    if (!$response->successful()) {
-        return view('dummy_pages.home', [
-            'properties' => collect(),
-            'featured' => collect(),
-            'hotels' => collect(),
-            'villas' => collect(),
-            // 'user' => $user
-        ]);
-    }
-
-    $properties = collect($response->json());
-
-    $featured = $properties
-        ->shuffle()
-        ->take(6)
-        ->values();
-
-    $hotels = $properties
-        ->where('type', 'hotel')
-        ->values();
-
-    $villas = $properties
-        ->where('type', 'villa')
-        ->values();
-
-    $availPromos = Promo::all();
-
-$promos = $availPromos
-    ->shuffle()
-    ->take(3)
-    ->values();
-
-return view('dummy_pages.home', compact(
-    'properties',
-    'featured',
-    'hotels',
-    'villas',
-    'promos'
-    // 'user'
-));   
-}
 
 
 public function getAllBookings(){
     $user = Auth::user();
     $bookings = $user->reservations()->with('property')->get();
-    return view('dummy_pages.users.my-bookings', compact('bookings'));
+    return view('users.my-bookings', compact('bookings'));
 }
 
 
@@ -214,7 +159,7 @@ public function myBookings()
     }
 
     // Kirim kedua variabel ke satu halaman view Blade
-    return view('dummy_pages.users.my-bookings', compact('bookings', 'flightBookings'));
+    return view('users.my-bookings', compact('bookings', 'flightBookings'));
 }
 
 
@@ -338,7 +283,7 @@ public function renderFavorites()
             ->values();
     }
 
-    return view('dummy_pages.users.favorites', compact('properties'));
+    return view('users.favorites', compact('properties'));
 }
 
 }

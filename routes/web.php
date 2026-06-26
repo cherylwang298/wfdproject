@@ -143,6 +143,8 @@ Route::post('/login', [UserController::class, 'login'])
     ->name('login.submit');
 Route::get('/accomodations', [SearchController::class, 'openAccomodationPage'])->name('accomodations.open');
 
+// Route::get('/search-accomodations-home', [SearchController::class, 'searchAccomodations'])->name('accomodations.search.home');
+
 Route::get('/search-accomodations', [SearchController::class, 'searchAccomodations'])->name('accomodations.search');
 // Route::get('/accomodation-result', [SearchController::class, 'showAccomodationResults'])->name('accomodations.result');
 Route::get('/properties/{id}', [SearchController::class, 'openPropertyDetail'])

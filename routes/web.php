@@ -99,6 +99,8 @@ Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveC
     Route::get('/users', [AdminController::class, 'openUsers'])->name('admin.users');
     Route::get('/reservations', [AdminController::class, 'openReserv'])->name('admin.reservations');
 
+    Route::post('/promo-create', [AdminController::class, 'createPromo'])->name('admin.promo.create');
+
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

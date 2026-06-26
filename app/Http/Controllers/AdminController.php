@@ -120,4 +120,27 @@ public function approveCancelRequest($id)
       return view('admins.reservations', compact('reservations', 'username'));
     }
 
+    public function createPromo(Request $request){
+    $request->validate([
+        'code' => 'required|string',
+        'discount_type' => 'required|string',
+        'discount_value' => 'required|numeric',
+        'min_purchase' => 'required|numeric',
+        'quota' => 'required|numeric',
+        'expired_at' => 'required|date',
+    ]);
+
+    $promo = Promo::create([
+        'code' => $request->code,
+        'discount_type' => $request->discount_type,
+        'discount_value' => $request->discount_value,
+        'min_purchase' => $request->min_purchase,
+        'quota' => $request->quota,
+        'expired_at' => $request->expired_at,
+    ]);
+
+    return redirect()->back()->with('success', 'Promo berhasil ditambahkan.');
+
+    }
+
 }

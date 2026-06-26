@@ -10,10 +10,12 @@
     </div>
 
     {{-- {{ route('admin.promos.create') }} --}}
-    <a href=""
-        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-2xl font-semibold shadow">
-        + Create Promo
-    </a>
+   <button
+    type="button"
+    onclick="openPromoModal()"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-2xl font-semibold shadow transition">
+    + Create Promo
+</button>
 </div>
 
 {{-- SUMMARY --}}
@@ -231,4 +233,175 @@
 
 </div>
 
+
+
+{{-- SCRIPT JAVASCRIPT --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const modal = document.getElementById('createPromoModal');
+    const modalBox = document.getElementById('modalBox');
+
+    window.openPromoModal = function () {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.closePromoModal = function () {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    modal.addEventListener('click', function (e) {
+        if (!modalBox.contains(e.target)) {
+            closePromoModal();
+        }
+    });
+
+});
+</script>
 @endsection
+
+@push('modals')
+
+<div 
+    id="createPromoModal" 
+    class="hidden fixed top-0 left-0 right-0 bottom-0 w-screen h-screen z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">   
+    {{-- Modal Box --}}
+    <div id="modalBox" class="bg-white rounded-[28px] w-full max-w-xl shadow-2xl overflow-hidden transform transition-all">
+
+        {{-- Header --}}
+        <div class="flex justify-between items-center p-6 border-b">
+            <div>
+                <h3 class="text-2xl font-bold text-gray-900">
+                    Create Promo
+                </h3>
+                <p class="text-sm text-gray-400 mt-1">
+                    Fill the promo information below.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onclick="closePromoModal()"
+                class="text-2xl text-gray-400 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+
+        {{-- Form --}}
+        <form action="{{route('admin.promo.create')}}" method="POST">
+
+            @csrf
+
+            <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+
+                <div>
+                    <label class="block mb-2 text-sm font-semibold">
+                        Promo Code
+                    </label>
+
+                    <input
+                        type="text"
+                        name="code"
+                        class="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                        placeholder="WELCOME10">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div>
+                        <label class="block mb-2 text-sm font-semibold">
+                            Discount Type
+                        </label>
+
+                        <select
+                            name="discount_type"
+                            class="w-full border rounded-xl px-4 py-3">
+
+                            <option value="percentage">
+                                Percentage
+                            </option>
+
+                            <option value="fixed">
+                                Fixed Amount
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-sm font-semibold">
+                            Discount Value
+                        </label>
+
+                        <input
+                            type="number"
+                            name="discount_value"
+                            class="w-full border rounded-xl px-4 py-3">
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div>
+                        <label class="block mb-2 text-sm font-semibold">
+                            Minimum Purchase
+                        </label>
+
+                        <input
+                            type="number"
+                            name="min_purchase"
+                            class="w-full border rounded-xl px-4 py-3">
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-sm font-semibold">
+                            Quota
+                        </label>
+
+                        <input
+                            type="number"
+                            name="quota"
+                            class="w-full border rounded-xl px-4 py-3">
+                    </div>
+
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-semibold">
+                        Expired At
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        name="expired_at"
+                        class="w-full border rounded-xl px-4 py-3">
+                </div>
+
+            </div>
+
+            {{-- Footer --}}
+            <div class="border-t px-6 py-4 flex justify-end gap-3 bg-gray-50">
+
+                <button
+                    type="button"
+                    onclick="closePromoModal()"
+                    class="px-5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                    Save Promo
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+@endpush

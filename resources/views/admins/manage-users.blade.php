@@ -114,13 +114,13 @@
 
                     {{-- Status Terverifikasi/Aktif --}}
                     <td class="px-6 py-5">
-                        @if($user->email_verified_at)
+                        @if($user->status == 'active')
                             <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold">
-                                Verified
+                                Active
                             </span>
                         @else
                             <span class="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-bold">
-                                Unverified
+                                Suspended
                             </span>
                         @endif
                     </td>

@@ -141,13 +141,18 @@ $currentPage = 'hotel';
                     </div>
                     
                     <div class="flex justify-between text-sm text-gray-600">
-                        <span>Service Fee</span>
-                        <span class="text-green-600 font-medium">Free</span>
+                        <span>Tax and Service Fee (11%):</span>
+                        <span class="text-gray-600 font-medium">Rp {{ number_format(($unit['price'] * $nights) * 0.11, 0, ',', '.') }}</span>
                     </div>
+
+                    @php
+                        $totalPriceandtx = ($unit['price'] * $nights) + (($unit['price'] * $nights) * 0.11);
+                    @endphp
+
 
                     <div class="flex justify-between items-center pt-4 border-t border-gray-200">
                         <span class="text-base font-bold text-gray-800">Total Price</span>
-                        <span class="text-2xl font-bold text-blue-600">Rp{{ number_format($totalPrice, 2) }}</span>
+                        <span class="text-2xl font-bold text-blue-600">Rp{{ number_format($totalPriceandtx, 2) }}</span>
                     </div>
                 </div>
             </div>

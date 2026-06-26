@@ -161,19 +161,26 @@ $currentPage = 'bookings';
                                                 Bayar Sekarang
                                             </a>
                                         @else
-                                        @if(!$booking->isReviewed)
-                                                <button type="button"
-                                                    onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
-                                                    class="bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded">
-                                                    ⭐ Tulis Review
-                                                </button>
-                                            @else
-                                                <button
-                                                    disabled
-                                                    class="bg-green-100 text-green-700 text-sm px-4 py-2 rounded">
-                                                    ✓ Review Submitted
-                                                </button>
-                                            @endif
+                                        @if(
+    $booking->payment &&
+    $booking->payment->status === 'Paid' &&
+    $booking->check_out->isPast()
+)
+    @if(!$booking->isReviewed)
+        <button
+            type="button"
+            onclick="document.getElementById('modal-review-{{ $booking->id }}').showModal()"
+            class="bg-amber-500 hover:bg-amber-600 text-white text-sm px-4 py-2 rounded">
+            ⭐ Tulis Review
+        </button>
+    @else
+        <button
+            disabled
+            class="bg-green-100 text-green-700 text-sm px-4 py-2 rounded">
+            ✓ Review Submitted
+        </button>
+    @endif
+@endif
 
                                             <button type="button"
                                                 onclick="document.getElementById('modal-detail-accommodation-{{ $booking->id }}').showModal()"

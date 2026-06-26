@@ -101,7 +101,6 @@ public function myBookings()
     if (Auth::check()) {
         $user = Auth::user();
 
-        // 1. DATA AKOMODASI ASLI (Jangan di-transform gabungan)
         $bookings = $user->reservations()->latest()->get();
         $bookingIds = $bookings->pluck('id');
         $cancelRequests = CancelRequest::whereIn('reservation_id', $bookingIds)->get();
@@ -118,18 +117,6 @@ public function myBookings()
         ->toArray();
         
 
-        // dd($reviewedReservations);
-
-        // $bookings->transform(function ($booking) use ($units, $cancelRequests) {
-        //     if ($units->isNotEmpty()) {
-        //         $booking->unit_details = $units->firstWhere('id', $booking->unit_id); 
-        //     } else {
-        //         $booking->unit_details = null;
-        //     }
-        //     $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id); 
-        //     return $booking;
-        // });
-
         $bookings->transform(function ($booking) use ($units, $cancelRequests) {
 
     $booking->unit_details = $units->firstWhere('id', $booking->unit_id);
@@ -144,34 +131,28 @@ public function myBookings()
     return $booking;
 });
 
-        // 2. DATA PENERBANGAN (Dikirim terpisah)
+
         $flightBookings = $user->flightBookings()->with(['tickets.passenger', 'payment'])->latest()->get();
         
-        // Ambil master rute penerbangan dari API
         try {
             $responseFlights = Http::get(env('API_BASE_URL') . '/flights');
             $apiFlights = $responseFlights->successful() ? collect(Http::get(env('API_BASE_URL') . '/flights')->json()) : collect();
             
-            // --- AMBIL MASTER DATA AIRLINES DARI API ---
             $responseAirlines = Http::get(env('API_BASE_URL') . '/airlines');
             $airlinesMaster = $responseAirlines->successful() ? $responseAirlines->json() : [];
             $airlineMap = collect($airlinesMaster)->pluck('name', 'id')->toArray();
-            // ───────────────────────────────────────────
         } catch (\Exception $e) {
             $apiFlights = collect();
             $airlineMap = [];
         }
 
-        // Transformasikan data penerbangan agar menyertakan string nama 'airline' asli
         $flightBookings->transform(function ($fb) use ($apiFlights, $airlineMap) {
             $firstTicket = $fb->tickets->first();
             
             if ($firstTicket && $apiFlights->isNotEmpty()) {
-                // Cari detail rute dari API Flights
                 $matchedFlight = $apiFlights->firstWhere('id', $firstTicket->flight_id);
                 
                 if ($matchedFlight) {
-                    // KUNCI PERBAIKAN: Suntikkan nama asli maskapai berdasarkan airline_id ke dalam flight_details
                     $matchedFlight['airline'] = $airlineMap[$matchedFlight['airline_id']] ?? 'Unknown Airline';
                     $fb->flight_details = $matchedFlight;
                 } else {
@@ -183,21 +164,11 @@ public function myBookings()
             return $fb;
         });
 
-        // dd([
-        //     'Jumlah Flight Bookings' => $flightBookings->count(),
-        //     'Sample Booking Code'    => $flightBookings->first()?->booking_code,
-        //     'Apakah Punya Tiket?'    => $flightBookings->first()?->tickets->isNotEmpty(),
-        //     'ID Flight dari Tiket'   => $flightBookings->first()?->tickets->first()?->flight_id,
-        //     'Semua ID dari API'      => $apiFlights->pluck('id')->toArray(),
-        //     'Isi Detail Penerbangan' => $flightBookings->first()?->flight_details,
-        // ]);
-
     } else {
         $bookings = collect();
         $flightBookings = collect();
     }
 
-    // Kirim kedua variabel ke satu halaman view Blade
     return view('users.my-bookings', compact('bookings', 'flightBookings'));
 }
 

@@ -68,6 +68,14 @@ class FlightCheckoutController extends Controller
     {
         $request->validate([
             'outbound_id' => 'required',
+            
+            // --- SINKRONISASI VALIDASI KONTAK BARU ---
+            'contact_first_name' => 'required|string|max:255',
+            'contact_last_name' => 'required|string|max:255',
+            'contact_email' => 'required|email',
+            'contact_phone' => 'required|string',
+            // ─────────────────────────────────────────
+
             'passengers' => 'required|array',
             'passengers.*.name' => 'required|string',
             'passengers.*.phone' => 'required|string',
@@ -80,7 +88,7 @@ class FlightCheckoutController extends Controller
         try {
             // 1. Simpan ke tabel flight_bookings
             $booking = FlightBooking::create([
-                'user_id' => Auth::id() ?? null, // Mengikat ke ID User jika login
+                'user_id' => Auth::id() ?? null,
                 'booking_code' => 'STAYGO-' . strtoupper(Str::random(8)),
                 'payment_status' => 'unpaid'
             ]);
@@ -102,7 +110,7 @@ class FlightCheckoutController extends Controller
                     'flight_id' => $request->outbound_id,
                     'flight_booking_id' => $booking->id,
                     'passenger_id' => $passenger->id,
-                    'seat_number' => 'ECO-' . rand(10, 99) . chr(rand(65, 70)), // Generasi kursi acak
+                    'seat_number' => 'ECO-' . rand(10, 99) . chr(rand(65, 70)),
                     'seat_type' => 'economy',
                     'price' => $request->outbound_price
                 ]);
@@ -137,7 +145,6 @@ class FlightCheckoutController extends Controller
 
             DB::commit();
 
-            // Redirect ke halaman receipt sukses membawa parameter invoice booking code Anda
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('booking.receipt', ['code' => $booking->booking_code])

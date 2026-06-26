@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
-use App\Models\Reservation;
 use App\Models\Payment;
+use App\Models\Reservation;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
 {
@@ -36,7 +37,8 @@ class BookingController extends Controller
         $nights = $nights > 0 ? $nights : 1; // Minimal 1 malam jika input keliru
 
         // 5. Hitung total harga
-        $totalPrice = $unit['price'] * $nights;
+        $accomPrice = $unit['price'] * $nights;
+        $totalPrice = $accomPrice + ($accomPrice * 0.11);
 
         // 6. Ambil data user login
         $user = auth()->user();
@@ -77,94 +79,54 @@ class BookingController extends Controller
         'email' => 'required|email',
         'phone' => 'required',
 
-        'payment_method' => 'required'
+        'payment_method' => 'required',
+        'promo_id' => 'nullable'
     ]);
+
+
 
     DB::beginTransaction();
 
+ 
+
     try {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Reservation (Main Repo)
-        |--------------------------------------------------------------------------
-        */
-
+   
         $reservation = Reservation::create([
-
             'user_id' => auth()->id(),
-
             'unit_id' => $request->unit_id,
-
             'check_in' => $request->check_in,
-
             'check_out' => $request->check_out,
-
             'total_price' => $request->total_price,
-
              'guest_name' => $request->name,
-
             'guest_email' => $request->email,
-
             'guest_phone_number' => $request->phone,
-
             'status' => 'Confirmed',
-
             'payment_status' => 'Paid',
-
-            'promo_id' => null,
+            'promo_id' => $request->promo_id,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Payment (Main Repo)
-        |--------------------------------------------------------------------------
-        */
+      
+
 
         Payment::create([
-
             'reservation_id' => $reservation->id,
-
             'method' => $request->payment_method,
-
             'amount' => $reservation->total_price,
-
             'status' => 'Paid',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Reservation (API Repo)
-        |--------------------------------------------------------------------------
-        */
-
-        // $response = Http::post(
-        //     env('API_BASE_URL').'/reservations',
-        //     [
-
-        //         'unit_id' => $reservation->unit_id,
-
-        //         'check_in' => $reservation->check_in,
-
-        //         'check_out' => $reservation->check_out,
-
-        //         'application_reservation_id' => $reservation->id,
-
-        //     ]
-        // );
+     
 
         $response = Http::post(env('API_BASE_URL').'/reservations', [
     'unit_id'    => $reservation->unit_id,
-    'check_in'   => $reservation->check_in->format('Y-m-d'),  // Dipaksa jadi format '2026-06-26'
-    'check_out'  => $reservation->check_out->format('Y-m-d'), // Dipaksa jadi format '2026-06-27'
+    'check_in'   => $reservation->check_in->format('Y-m-d'),  
+    'check_out'  => $reservation->check_out->format('Y-m-d'), 
     'application_reservation_id' => $reservation->id,
 ]);
 
        if (!$response->successful()) {
-    // Mengambil response body dari API (apakah error validasi atau error database)
     $apiError = $response->body();
     
-    // Melempar error asli dari API agar muncul di halaman web kamu
     throw new \Exception('Gagal di API Repo. Detail: ' . $apiError);
 }
 
@@ -183,4 +145,39 @@ class BookingController extends Controller
             ->with('error', $e->getMessage());
     }
 }
+
+    /**
+     * Menangani permohonan pembatalan tiket pesawat dari user (Akomodasi / Flights)
+     */
+    public function requestFlightCancel(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:1000'
+        ]);
+
+        // PROTEKSI BACKEND: Cek apakah booking ini sudah punya request cancel yang 'pending' atau 'approved'
+        $existingRequest = \App\Models\CancelRequest::where('flight_booking_id', $id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($existingRequest) {
+            return back()->with('error', 'Anda sudah mengirimkan permohonan pembatalan untuk penerbangan ini.');
+        }
+
+        DB::beginTransaction();
+        try {
+            \App\Models\CancelRequest::create([
+                'flight_booking_id' => $id,
+                'user_id'           => auth()->id(),
+                'reason'            => $request->reason,
+                'status'            => 'pending'
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'Permohonan pembatalan penerbangan Anda berhasil dikirim dan menunggu persetujuan admin.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal mengirim permohonan pembatalan: ' . $e->getMessage());
+        }
+    }
 }

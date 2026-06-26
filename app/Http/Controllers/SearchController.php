@@ -73,6 +73,12 @@ public function searchAccomodations(Request $request)
     Http::get(env('API_BASE_URL').'/images')->json()
 );
 
+    $typeFilter = $request->query('type_filter', 'all');
+    if ($typeFilter !== 'all') {
+        // Filter properti berdasarkan tipe ('hotel' atau 'villa') sesuai string API kamu
+        $properties = $properties->where('type', $typeFilter);
+    }
+
     $availableProperties = $properties->filter(function($property)
         use ($units, $reservations, $request)
     {
@@ -114,7 +120,7 @@ public function searchAccomodations(Request $request)
 
     });
 
-    $availableProperties = $availableProperties->map(function ($property) use ($images) {
+    $availableProperties = $availableProperties->map(function ($property) use ($images, $units) {
 
     $image = $images
         ->where('property_id', $property['id'])
@@ -122,20 +128,35 @@ public function searchAccomodations(Request $request)
 
     $property['image'] = $image;
 
+    // Cari harga unit termurah
+    $property['min_price'] = $units
+        ->where('property_id', $property['id'])
+        ->min('price');
+
     return $property;
 });
+// });
 
 
+    $sort = $request->query('sort', 'default');
+    if ($sort === 'price_asc') {
+        $availableProperties = $availableProperties->sortBy('min_price');
+    } elseif ($sort === 'price_desc') {
+        $availableProperties = $availableProperties->sortByDesc('min_price');
+    } elseif ($sort === 'rating_desc') {
+        $availableProperties = $availableProperties->sortByDesc('rating');
+    }
 
-    return view(
-        'accomodations.accomodations',
-        [
-            'properties' => $availableProperties,
-            'checkin' => $request->checkin,
-            'checkout' => $request->checkout,
-            'guests' => $request->guests,
-        ]
-    );
+    // Ambil data list kota untuk menyuplai dropdown pencarian bar yang baru
+    $cities = collect(Http::get(env('API_BASE_URL').'/properties')->json())->pluck('city')->unique()->sort()->values();
+
+    return view('accomodations.accomodations', [
+        'properties' => $availableProperties->values(),
+        'cities' => $cities, // Mengirim data kota kembali ke search bar
+        'checkin' => $request->checkin,
+        'checkout' => $request->checkout,
+        'guests' => $request->guests,
+    ]);
 }
 
 

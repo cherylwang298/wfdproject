@@ -45,4 +45,10 @@ class FlightBooking extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function cancel_request()
+    {
+        // Pastikan nama kolom foreign key di tabel cancel_requests kamu adalah 'flight_booking_id'
+        return $this->hasOne(CancelRequest::class, 'flight_booking_id');
+    }
 }

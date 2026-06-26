@@ -33,11 +33,12 @@ Route::prefix('prototype')->group(function(){
 Route::get('/testhome', [UserController::class, 'home2'])->name('homepage');
 
 // accommodations
-Route::get('/accommodations/{id}', [PropertyDetailController::class, 'show'])->name('properties.detail');
+Route::get('/accommodations/{id}', [PropertyDetailController::class, 'showPropertyDetailDirect'])->name('properties.detail');
 
 // flights
 Route::get('/airlines', [AirlineController::class, 'index'])->name('index.airlines');
 Route::get('/flights', [FlightSearchController::class, 'index'])->name('flights');
+// request pembatalan penerbangan ke admin
 
 // deals / promos
 Route::get('/deals', [PromoController::class, 'index'])->name('deals');
@@ -60,6 +61,12 @@ Route::middleware('auth')->group(function () {
 
     // addToFav
     Route::post('/favorites/toggle', [UserController::class, 'addToFav'])->name('favorites.toggle');
+    Route::post('/review/{propertyId}', [UserController::class, 'addReview'])->name('review.store');
+
+    // cancel flight
+    Route::post('/flight-bookings/{id}/cancel', [\App\Http\Controllers\BookingController::class, 'requestFlightCancel'])->name('flight.cancel.request');
+    Route::post('/promo/apply',[PromoController::class,'apply'])
+    ->name('promo.apply');
 
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
@@ -92,6 +99,23 @@ Route::middleware(['isAdmin'])->prefix('admin')->group(function () {
 
 Route::patch('/cancel-requests/{id}/approve', [AdminController::class, 'approveCancelRequest'])->name('admin.cancel.approve');
     Route::patch('/cancel-requests/{id}/reject', [AdminController::class, 'rejectCancelRequest'])->name('admin.cancel.reject');
+ 
+    Route::get('/promos', [AdminController::class, 'openPromos'])->name('admin.promos');
+    Route::get('/users', [AdminController::class, 'openUsers'])->name('admin.users');
+    Route::get('/reservations', [AdminController::class, 'openReserv'])->name('admin.reservations');
+
+    Route::post('/promo-create', [AdminController::class, 'createPromo'])->name('admin.promo.create');
+    Route::put('/promos/update/{id}', [AdminController::class, 'editPromo'])->name('admin.promos.update');
+Route::delete('/promos/delete/{id}', [AdminController::class, 'deletePromo'])->name('admin.promos.destroy');
+    
+    Route::get('/reservations/{id}', [AdminController::class, 'viewReserv'])->name('admin.reservations.show');
+Route::post('/reservations/update/{id}', [AdminController::class, 'editReserv'])->name('admin.reservations.update');
+Route::delete('/reservations/delete/{id}', [AdminController::class, 'deleteReserv'])->name('admin.reservations.destroy');
+
+
+    Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.show');
+    Route::put('/users/update/{id}', [AdminController::class, 'editUserStatus'])->name('admin.users.update');
+    Route::delete('/users/delete/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.destroy');
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 });
 // user routes

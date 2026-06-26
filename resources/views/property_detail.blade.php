@@ -20,6 +20,9 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        }
     </style>
 </head>
 <body class="bg-background text-on-background antialiased">
@@ -116,6 +119,67 @@
                 </div>
             </div>
 
+            {{-- SISIPKAN DAFTAR UNIT KAMAR DI SINI --}}
+            <div class="mt-10">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Available Units</h2>
+
+                @if(isset($units) && $units->count())
+                    <div class="space-y-4">
+                        @foreach($units as $unit)
+                            {{-- Tambahkan ID unik pada container unit untuk efek visual selection via JS --}}
+                            <div id="unit-card-{{ $unit['id'] }}" class="unit-card bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row overflow-hidden transition-all hover:shadow-md">
+                                
+                                {{-- UNIT IMAGE --}}
+                                <div class="w-full md:w-60 h-44 md:h-auto bg-gray-100 shrink-0 relative">
+                                    @if($unit['image'])
+                                        <img src="{{ asset('storage/'.$unit['image']['path']) }}" class="w-full h-full object-cover md:absolute md:inset-0">
+                                    @else
+                                        <div class="w-full h-full md:absolute md:inset-0 flex items-center justify-center text-gray-400 text-xs bg-gray-100">
+                                            No Image Available
+                                        </div>
+                                    @endif
+                                </div>
+
+                                {{-- UNIT DETAILS --}}
+                                <div class="flex-1 p-5 md:p-6 flex flex-col justify-between gap-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900 mb-1">{{ $unit['name'] }}</h3>
+                                        <div class="flex items-center gap-1 text-xs font-semibold text-gray-600 bg-gray-50 px-2.5 py-1 rounded-md w-max border border-gray-100">
+                                            <span class="material-symbols-outlined text-sm text-gray-500">group</span> Capacity: {{ $unit['capacity'] }} Guests
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-3 pt-4 border-t border-gray-50">
+                                        <div>
+                                            <span class="text-xl font-extrabold text-blue-600 block">
+                                                Rp {{ number_format($unit['price'], 0, ',', '.') }}
+                                            </span>
+                                            <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400 block -mt-1">
+                                                per night
+                                            </span>
+                                        </div>
+
+                                        {{-- UBAH JADI BUTTON SELECT SINGLE --}}
+                                        <button type="button" 
+                                                onclick="selectUnit('{{ $unit['id'] }}', '{{ $unit['capacity'] }}')" 
+                                                id="select-btn-{{ $unit['id'] }}"
+                                                class="select-unit-btn bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm">
+                                            Select
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="bg-white rounded-2xl p-10 text-center border border-dashed border-gray-200">
+                        <span class="material-symbols-outlined text-4xl text-gray-300 block mb-2">bed</span>
+                        <h3 class="text-base font-bold text-gray-800">No Units Available</h3>
+                    </div>
+                @endif
+            </div>
+
             <div>
                 <h2 class="text-2xl font-bold text-on-surface mb-4">Location</h2>
                 <div class="w-full h-56 bg-gray-50 border border-gray-200/60 rounded-2xl overflow-hidden flex items-center justify-center relative">
@@ -145,37 +209,52 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col">
-                        <span class="text-xs font-bold text-gray-500 mb-1">Check-in</span>
-                        <input type="date" id="checkin" min="{{ date('Y-m-d') }}" class="bg-transparent border-none p-0 text-sm font-semibold text-gray-800 focus:ring-0 outline-none w-full">
-                    </div>
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col">
-                        <span class="text-xs font-bold text-gray-500 mb-1">Check-out</span>
-                        <input type="date" id="checkout" min="{{ date('Y-m-d', strtotime('+1 day')) }}" class="bg-transparent border-none p-0 text-sm font-semibold text-gray-800 focus:ring-0 outline-none w-full">
-                    </div>
-                </div>
+                {{-- Ubah form action menggunakan ID kosong karena jalurnya akan diatur dinamis lewat JavaScript submit --}}
+                <form id="bookingPanelForm" action="#" method="GET" onsubmit="handleFormSubmit(event)" class="flex flex-col gap-6 m-0 p-0">
+                    
+                    {{-- KUNCI UTAMA: Input tersembunyi untuk mencatat ID Unit pilihan user --}}
+                    <input type="hidden" id="selected_unit_id" name="unit_id" value="">
 
-                <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-gray-400 text-[20px]">group</span>
-                        <span class="text-xs font-bold text-gray-500">Guests</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col">
+                            <span class="text-[10px] font-extrabold text-gray-400 uppercase mb-1">Check-in</span>
+                            <input type="date" id="checkin" name="checkin" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}" class="bg-transparent border-none p-0 text-xs md:text-sm font-bold text-gray-800 focus:ring-0 outline-none w-full" required>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex flex-col">
+                            <span class="text-[10px] font-extrabold text-gray-400 uppercase mb-1">Check-out</span>
+                            <input type="date" id="checkout" name="checkout" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ date('Y-m-d', strtotime('+1 day')) }}" class="bg-transparent border-none p-0 text-xs md:text-sm font-bold text-gray-800 focus:ring-0 outline-none w-full" required>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <button type="button" id="guestMinus" class="w-8 h-8 rounded-full bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center text-md font-bold text-gray-700 shadow-sm">-</button>
-                        <span id="guestCount" class="w-4 text-center font-bold text-sm text-gray-800">1</span>
-                        <button type="button" id="guestPlus" class="w-8 h-8 rounded-full bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center text-md font-bold text-gray-700 shadow-sm">+</button>
-                    </div>
-                </div>
 
-                <div class="flex flex-col gap-2 pt-2">
-                    <a href="#" class="block w-full text-center font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-4 rounded-xl shadow-md transform active:scale-95 transition-all">
-                        Reserve Now
-                    </a>
-                    <button onclick="toggleFav(this, '{{ $hotel['id'] }}')" class="flex items-center justify-center w-full border-2 border-blue-600 text-blue-600 font-bold text-sm py-4 rounded-xl hover:bg-blue-50 transition-colors">
-                        <span class="material-symbols-outlined text-[18px] align-middle mr-1 fav-icon-bottom">favorite_border</span>Save to Favourites
-                    </button>
-                </div>
+                    <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gray-400 text-[20px]">group</span>
+                            <span class="text-xs font-bold text-gray-500">Guests</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button type="button" id="guestMinus" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center font-bold text-gray-700 shadow-sm transition-all select-none">-</button>
+                            <span id="guestCount" class="w-4 text-center font-extrabold text-sm text-gray-800 select-none">1</span>
+                            <button type="button" id="guestPlus" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center font-bold text-gray-700 shadow-sm transition-all select-none">+</button>
+                            <input type="hidden" id="guestInput" name="guests" value="1">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-2">
+                        @if(auth()->check())
+                            <button type="submit" class="block w-full text-center font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-4 rounded-xl shadow-md transform active:scale-95 transition-all">
+                                Reserve Now
+                            </button>
+                        @else
+                            <a href="{{ route('login') }}" class="block w-full text-center font-bold text-sm text-white bg-gray-950 hover:bg-gray-800 py-4 rounded-xl shadow-md transition-all">
+                                Login to Reserve
+                            </a>
+                        @endif
+                        
+                        <button type="button" onclick="toggleFav(this, '{{ $hotel['id'] }}')" class="flex items-center justify-center w-full border border-gray-200 text-gray-700 font-bold text-xs py-3.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-[18px] align-middle mr-1.5 fav-icon-bottom">favorite_border</span> Save to Favourites
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -183,6 +262,9 @@
 </main>
 
 <script>
+let count = 1;
+let currentMaxCapacity = 10;
+
 // Logika Favorit Client-side LocalStorage
 function toggleFav(btn, hotelId) {
     let favs = JSON.parse(localStorage.getItem('staygo_favs') || '[]');
@@ -194,9 +276,121 @@ function toggleFav(btn, hotelId) {
         favs.push(hotelId.toString());
     }
     localStorage.setItem('staygo_favs', JSON.stringify(favs));
-    location.reload(); // Refresh untuk menyinkronkan status ikon top & bottom
+    location.reload();
 }
 
+// 1. Fungsi eksklusif untuk memilih salah satu unit saja
+function selectUnit(unitId, capacity) {
+    document.querySelectorAll('.select-unit-btn').forEach(btn => {
+        btn.className = "select-unit-btn bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm";
+        btn.innerText = "Select";
+    });
+    document.querySelectorAll('.unit-card').forEach(card => {
+        card.classList.remove('border-blue-600', 'ring-2', 'ring-blue-600/20', 'bg-blue-50/20');
+    });
+
+    const activeBtn = document.getElementById(`select-btn-${unitId}`);
+    activeBtn.className = "select-unit-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm";
+    activeBtn.innerText = "Selected ✓";
+
+    const activeCard = document.getElementById(`unit-card-${unitId}`);
+    activeCard.classList.add('border-blue-600', 'ring-2', 'ring-blue-600/20', 'bg-blue-50/20');
+
+    document.getElementById('selected_unit_id').value = unitId;
+
+    currentMaxCapacity = parseInt(capacity) || 10;
+    
+    const countSpan = document.getElementById('guestCount');
+    const guestInput = document.getElementById('guestInput');
+
+    if (count > currentMaxCapacity) {
+        count = currentMaxCapacity; 
+        countSpan.innerText = count;
+        guestInput.value = count;
+    }
+
+    checkPlusButtonState(count);
+}
+
+function checkPlusButtonState(currentCount) {
+    const plusBtn = document.getElementById('guestPlus');
+    if (currentCount >= currentMaxCapacity) {
+        plusBtn.disabled = true;
+        plusBtn.classList.add('opacity-40', 'cursor-not-allowed', 'bg-gray-100');
+    } else {
+        plusBtn.disabled = false;
+        plusBtn.classList.remove('opacity-40', 'cursor-not-allowed', 'bg-gray-100');
+    }
+}
+
+// 2. Fungsi validasi saat menekan tombol "Reserve Now"
+function handleFormSubmit(e) {
+    e.preventDefault();
+
+    const unitId = document.getElementById('selected_unit_id').value;
+    
+    if (!unitId) {
+        alert('Please select an available unit room first before continuing your reservation.');
+        return;
+    }
+
+    const checkin = document.getElementById('checkin').value;
+    const checkout = document.getElementById('checkout').value;
+    const guests = document.getElementById('guestInput').value;
+
+    window.location.href = `/booking/${unitId}?checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
+}
+
+// 3. Fungsi AJAX untuk Toggle Favorit
+async function toggleFav(btn, propertyId) {
+    try {
+        const response = await fetch("{{ route('favorites.toggle') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ property_id: propertyId })
+        });
+
+        if(response.status == 401){
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
+
+        const data = await response.json();
+
+        if(data.status == "added"){
+            document.querySelectorAll('.fav-icon,.fav-icon-bottom').forEach(icon => {
+                icon.textContent = "favorite";
+                icon.classList.add("text-red-500", "icon-fill");
+            });
+        }
+
+        if(data.status == "removed"){
+            document.querySelectorAll('.fav-icon,.fav-icon-bottom').forEach(icon => {
+                icon.textContent = "favorite_border";
+                icon.classList.remove("text-red-500", "icon-fill");
+            });
+        }
+    } catch(err){
+        console.log("Error toggling favorite:", err);
+    }
+}
+
+// Set status awal keaktifan ikon merah
+const isFavorite = @json($isFavorite ?? false);
+document.addEventListener("DOMContentLoaded", () => {
+    if(isFavorite) {
+        document.querySelectorAll(".fav-icon,.fav-icon-bottom").forEach(icon => {
+            icon.textContent = "favorite";
+            icon.classList.add("text-red-500", "icon-fill");
+        });
+    }
+});
+
+// Listener Inisialisasi DOM Utama
 document.addEventListener('DOMContentLoaded', function() {
     const favs = JSON.parse(localStorage.getItem('staygo_favs') || '[]');
     const hotelId = '{{ $hotel['id'] }}';
@@ -207,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Sinkronisasi Pembatasan Tanggal Check-in & Check-out
+    // Sinkronisasi Pembatasan Tanggal Check-in & Check-out (KODE BERSIH TANPA DUPLIKAT)
     const ci = document.getElementById('checkin');
     const co = document.getElementById('checkout');
     if (ci && co) {
@@ -217,11 +411,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Penghitung Counter Tamu
-    let count = 1;
+    // Ambil nilai awal tamu dari Blade
+    count = parseInt(document.getElementById('guestCount').innerText) || 1;
+    
     const countSpan = document.getElementById('guestCount');
-    document.getElementById('guestMinus').addEventListener('click', () => { if(count > 1) { count--; countSpan.innerText = count; } });
-    document.getElementById('guestPlus').addEventListener('click', () => { if(count < 10) { count++; countSpan.innerText = count; } });
+    const guestInput = document.getElementById('guestInput');
+    const plusBtn = document.getElementById('guestPlus');
+    const minusBtn = document.getElementById('guestMinus');
+
+    // LISTENER TOMBOL MINUS
+    minusBtn.addEventListener('click', () => {
+        if (count > 1) { 
+            count--; 
+            countSpan.innerText = count;
+            guestInput.value = count;
+
+            checkPlusButtonState(count);
+        } 
+    });
+    
+    // LISTENER TOMBOL PLUS
+    plusBtn.addEventListener('click', () => { 
+        if (count < currentMaxCapacity) { 
+            count++; 
+            countSpan.innerText = count;
+            guestInput.value = count;
+            
+            checkPlusButtonState(count);
+        } 
+    });
 });
 </script>
 </body>

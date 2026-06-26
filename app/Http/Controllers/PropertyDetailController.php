@@ -43,4 +43,41 @@ class PropertyDetailController extends Controller
 
         return view('property_detail', compact('hotel', 'similarProperties'));
     }
+
+    public function showPropertyDetailDirect(Request $request, $id)
+    {
+        // 1. Tarik semua data mentah dari API
+        $properties = collect(Http::get(env('API_BASE_URL').'/properties')->json());
+        $units = collect(Http::get(env('API_BASE_URL').'/units')->json());
+        $images = collect(Http::get(env('API_BASE_URL').'/images')->json());
+
+        // 2. Cari properti yang diklik
+        $property = $properties->firstWhere('id', $id);
+        if (!$property) {
+            abort(404);
+        }
+
+        // 3. Pasangkan gambar utama properti
+        $property['image'] = $images->where('property_id', $id)->first();
+
+        // 4. Ambil semua unit kamar milik properti ini & pasangkan gambarnya masing-masing
+        $propertyUnits = $units->where('property_id', $id)->map(function ($unit) use ($images) {
+            $unit['image'] = $images->where('unit_id', $unit['id'])->first();
+            return $unit;
+        });
+
+        // 5. Cek status favorit di database lokal
+        $isFavorite = \App\Models\Favorite::where('user_id', auth()->id())
+            ->where('property_id', $property['id'])->exists(); // Sesuaikan nama kolom jika 'unit_id'
+
+        // 6. Oper data 'units' ke view property_detail!
+        return view('property_detail', [
+            'hotel' => $property,
+            'units' => $propertyUnits, // <-- Kunci utama agar Blade bisa membaca list kamar
+            'checkin' => $request->query('checkin', date('Y-m-d')),
+            'checkout' => $request->query('checkout', date('Y-m-d', strtotime('+1 day'))),
+            'guests' => $request->query('guests', 1),
+            'isFavorite' => $isFavorite
+        ]);
+    }
 }

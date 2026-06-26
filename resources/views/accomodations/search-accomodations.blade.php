@@ -74,7 +74,7 @@ input[type="date"] {
 
         <div class="glass-panel rounded-3xl p-4 sm:p-6 md:p-8">
 
-            <form action="{{ route('accomodations.search') }}" method="GET">
+            <form id="searchForm" action="{{ route('accomodations.search') }}" method="GET">
 
                 <div class="grid grid-cols-1 lg:grid-cols-11 gap-4 items-end">
 
@@ -172,6 +172,7 @@ input[type="date"] {
                 {{-- SEARCH BUTTON --}}
                 <div class="mt-6 md:mt-8 lg:mt-10 flex justify-center">
                     <button
+                     id="searchBtn"
                         type="submit"
                         class="gradient-button w-full sm:w-auto sm:min-w-[200px] rounded-xl px-8 py-3.5 flex items-center justify-center gap-2 font-semibold text-base shadow-md">
                         <span class="material-symbols-outlined text-xl">
@@ -188,6 +189,9 @@ input[type="date"] {
     </div>
 
 </header>
+
+@include('partials.footer')
+
 
 @endsection
 
@@ -260,5 +264,48 @@ checkin.addEventListener('change', function(){
         checkout.value = "";
     }
 });
+
+const searchForm = document.getElementById('searchForm');
+const searchBtn = document.getElementById('searchBtn');
+
+let submitting = false;
+
+searchForm.addEventListener('submit', function(e){
+
+    if(submitting){
+        e.preventDefault();
+        return;
+    }
+
+    submitting = true;
+
+    searchBtn.disabled = true;
+    searchBtn.classList.add('opacity-70','cursor-not-allowed');
+
+    searchBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg"
+             fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25"
+                cx="12" cy="12" r="10"
+                stroke="currentColor"
+                stroke-width="4">
+            </circle>
+            <path class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2
+                5.291A7.962 7.962 0 014 12H0c0 3.042
+                1.135 5.824 3 7.938l3-2.647z">
+            </path>
+        </svg>
+
+        <span>Searching...</span>
+    `;
+});
+
 </script>
+
+
+
+
 @endsection 
+

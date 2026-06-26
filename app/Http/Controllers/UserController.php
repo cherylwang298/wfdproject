@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\CancelRequest;
+use App\Models\Favorite;
 use App\Models\Promo;
+use App\Models\Reservation;
+use App\Models\Review;
+use App\Models\ReviewImages;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use App\Models\Favorite;
 
 class UserController extends Controller
 {
@@ -63,11 +67,12 @@ class UserController extends Controller
             'username' => $validated['username'],
             'email' => $validated['email'],
             'phone_number' => $validated['phone'],
+            'status' => 'active',
             'password' => Hash::make($validated['password']),
         ]);
 
         return redirect()
-            ->route('login.form')
+            ->route('login')
             ->with('success', 'Registrasi berhasil, silakan login.');
     }
 
@@ -97,7 +102,6 @@ public function myBookings()
     if (Auth::check()) {
         $user = Auth::user();
 
-        // 1. DATA AKOMODASI ASLI (Jangan di-transform gabungan)
         $bookings = $user->reservations()->latest()->get();
         $bookingIds = $bookings->pluck('id');
         $cancelRequests = CancelRequest::whereIn('reservation_id', $bookingIds)->get();
@@ -109,44 +113,50 @@ public function myBookings()
             $units = collect();
         }
 
-        $bookings->transform(function ($booking) use ($units, $cancelRequests) {
-            if ($units->isNotEmpty()) {
-                $booking->unit_details = $units->firstWhere('id', $booking->unit_id); 
-            } else {
-                $booking->unit_details = null;
-            }
-            $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id); 
-            return $booking;
-        });
-
-        // 2. DATA PENERBANGAN (Dikirim terpisah)
-        $flightBookings = $user->flightBookings()->with(['tickets.passenger', 'payment'])->latest()->get();
+        $reviewedReservations = Review::whereIn('reservation_id', $bookingIds)
+        ->pluck('reservation_id')
+        ->toArray();
         
-        // Ambil master rute penerbangan dari API
+
+        $bookings->transform(function ($booking) use ($units, $cancelRequests) {
+
+    $booking->unit_details = $units->firstWhere('id', $booking->unit_id);
+
+    $booking->cancel_request = $cancelRequests->firstWhere('reservation_id', $booking->id);
+
+    $booking->isReviewed = Review::where(
+        'reservation_id',
+        $booking->id
+    )->exists();
+
+    return $booking;
+});
+
+
+        $flightBookings = $user->flightBookings()
+            ->with(['tickets.passenger', 'payment', 'cancel_request']) // <-- Tambahkan 'cancel_request' di sini
+            ->latest()
+            ->get();
+        
         try {
             $responseFlights = Http::get(env('API_BASE_URL') . '/flights');
             $apiFlights = $responseFlights->successful() ? collect(Http::get(env('API_BASE_URL') . '/flights')->json()) : collect();
             
-            // --- AMBIL MASTER DATA AIRLINES DARI API ---
             $responseAirlines = Http::get(env('API_BASE_URL') . '/airlines');
             $airlinesMaster = $responseAirlines->successful() ? $responseAirlines->json() : [];
             $airlineMap = collect($airlinesMaster)->pluck('name', 'id')->toArray();
-            // ───────────────────────────────────────────
         } catch (\Exception $e) {
             $apiFlights = collect();
             $airlineMap = [];
         }
 
-        // Transformasikan data penerbangan agar menyertakan string nama 'airline' asli
         $flightBookings->transform(function ($fb) use ($apiFlights, $airlineMap) {
             $firstTicket = $fb->tickets->first();
             
             if ($firstTicket && $apiFlights->isNotEmpty()) {
-                // Cari detail rute dari API Flights
                 $matchedFlight = $apiFlights->firstWhere('id', $firstTicket->flight_id);
                 
                 if ($matchedFlight) {
-                    // KUNCI PERBAIKAN: Suntikkan nama asli maskapai berdasarkan airline_id ke dalam flight_details
                     $matchedFlight['airline'] = $airlineMap[$matchedFlight['airline_id']] ?? 'Unknown Airline';
                     $fb->flight_details = $matchedFlight;
                 } else {
@@ -158,21 +168,11 @@ public function myBookings()
             return $fb;
         });
 
-        // dd([
-        //     'Jumlah Flight Bookings' => $flightBookings->count(),
-        //     'Sample Booking Code'    => $flightBookings->first()?->booking_code,
-        //     'Apakah Punya Tiket?'    => $flightBookings->first()?->tickets->isNotEmpty(),
-        //     'ID Flight dari Tiket'   => $flightBookings->first()?->tickets->first()?->flight_id,
-        //     'Semua ID dari API'      => $apiFlights->pluck('id')->toArray(),
-        //     'Isi Detail Penerbangan' => $flightBookings->first()?->flight_details,
-        // ]);
-
     } else {
         $bookings = collect();
         $flightBookings = collect();
     }
 
-    // Kirim kedua variabel ke satu halaman view Blade
     return view('users.my-bookings', compact('bookings', 'flightBookings'));
 }
 
@@ -388,5 +388,76 @@ public function addToFav(Request $request)
             ]);
         }
     }
+
+    public function addReview($propertyId, Request $request)
+{
+    $request->validate([
+        'reservation_id' => 'required|exists:reservations,id',
+        'rating' => 'required|integer|min:1|max:5',
+        'comment' => 'required|string|max:1000',
+        'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+    ]);
+
+    $reservation = Reservation::where('id', $request->reservation_id)
+    ->where('user_id', Auth::id())
+    ->firstOrFail();
+
+$unitId = $reservation->unit_id;
+
+$response = Http::get(env('API_BASE_URL') . '/units/' . $unitId);
+
+if (!$response->successful()) {
+    return back()->with('error', 'Unable to retrieve unit information.');
+}
+
+$unit = $response->json();
+
+$propertyIdFromApi = $unit['property_id'];
+
+if ($propertyIdFromApi != $propertyId) {
+    return back()->with('error', 'Invalid reservation.');
+}
+
+    // Sudah pernah review?
+    if (Review::where('reservation_id', $reservation->id)->exists()) {
+        return back()->with('error', 'You have already reviewed this booking.');
+    }
+
+    DB::beginTransaction();
+
+    try {
+
+        $review = Review::create([
+            'reservation_id' => $reservation->id,
+            'user_id' => Auth::id(),
+            'property_id' => $propertyId,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        if ($request->hasFile('images')) {
+
+            foreach ($request->file('images') as $image) {
+
+                $path = $image->store('review-images', 'public');
+
+                ReviewImages::create([
+                    'review_id' => $review->id,
+                    'path' => $path
+                ]);
+            }
+        }
+
+        DB::commit();
+
+        return back()->with('success', 'Review submitted successfully.');
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->with('error', $e->getMessage());
+    }
+}
 
 }

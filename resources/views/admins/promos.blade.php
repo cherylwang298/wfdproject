@@ -115,7 +115,6 @@
                     </td>
                     <td class="px-6 py-5">
                         <div class="flex justify-end gap-2 items-center">
-                            {{-- TOMBOL EDIT (Melempar data ke JS) --}}
                             <button type="button"
                                     onclick="openEditPromoModal(this)"
                                     data-id="{{ $promo->id }}"

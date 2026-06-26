@@ -29,7 +29,7 @@ Route::prefix('prototype')->group(function(){
 });
 
 // home
-Route::get('/', [UserController::class, 'home'])->name('home');
+// Route::get('/', [UserController::class, 'home'])->name('home');
 Route::get('/testhome', [UserController::class, 'home2'])->name('homepage');
 
 // accommodations
@@ -62,7 +62,7 @@ Route::get('/booking/receipt/{code}', function($code) {
 
 
 // ROOT
-// Route::get('/', [UserController::class, 'home2'])->name('home');
+Route::get('/', [UserController::class, 'home2'])->name('home');
 
 
 

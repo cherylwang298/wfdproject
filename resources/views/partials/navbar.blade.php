@@ -6,7 +6,7 @@
         ['label' => 'Accommodations', 'route' => 'accomodations.open', 'icon' => 'hotel',        'page' => 'hotel'],
         ['label' => 'Flights',       'route' => 'flights',        'icon' => 'flight',       'page' => 'flights'],
         ['label' => 'Deals',         'route' => 'deals',          'icon' => 'local_offer',  'page' => 'promo'],
-        ['label' => 'My Bookings',   'route' => 'bookings',       'icon' => 'luggage',      'page' => 'bookings'],
+        ['label' => 'My Bookings',   'route' => 'bookings.success',       'icon' => 'luggage',      'page' => 'bookings'],
     ];
 
     $currentPage = $currentPage ?? '';

@@ -2,7 +2,11 @@
 
 @section('content')
 
-@include('dummy_pages.partials.navbar')
+@php
+$currentPage = 'hotel';
+@endphp
+
+@include('partials.navbar')
 
 <div class="max-w-7xl mx-auto px-6 pt-28 pb-20">
     <h1 class="text-4xl font-bold mb-10">Review & Book Your Accommodation</h1>

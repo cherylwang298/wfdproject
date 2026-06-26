@@ -78,7 +78,7 @@ public function searchAccomodations(Request $request)
         $propertyUnits = $units
             ->where('property_id', $property['id'])
             ->where('capacity', '>=', $request->guests);
-        dd($propertyUnits->values()->all());
+        // dd($propertyUnits->values()->all());
 
         foreach($propertyUnits as $unit){
 

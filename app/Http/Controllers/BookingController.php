@@ -171,7 +171,7 @@ class BookingController extends Controller
         DB::commit();
 
         return redirect()
-            ->route('booking.success')
+            ->route('bookings.success')
             ->with('success', 'Booking berhasil dibuat.');
 
     } catch (\Exception $e) {

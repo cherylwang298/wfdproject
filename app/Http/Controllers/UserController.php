@@ -257,11 +257,27 @@ public function myBookings()
 
         // 4. Proses data Properites jika API berhasil
         if ($responseProperties->successful()) {
-            $properties = collect($responseProperties->json());
-            $featuredProperties = $properties->shuffle()->take(8)->values();
-        } else {
-            $featuredProperties = collect();
-        }
+    $properties = collect($responseProperties->json());
+
+    // Tambahkan rata-rata rating ke setiap property
+    $properties = $properties->map(function ($property) {
+
+        $avgRating = Review::where('property_id', $property['id'])
+            ->avg('rating');
+
+        $reviewCount = Review::where('property_id', $property['id'])
+            ->count();
+
+        $property['avg_rating'] = $avgRating ? round($avgRating, 1) : 0;
+        $property['review_count'] = $reviewCount;
+
+        return $property;
+    });
+
+    $featuredProperties = $properties->shuffle()->take(8)->values();
+} else {
+    $featuredProperties = collect();
+}
 
         // 5. Ambil 4 flights secara random dari API jika data flights tersedia
         $featuredRoutes = collect();

@@ -143,7 +143,7 @@
 
                 <a href="{{ route('properties.detail', $h['id']) }}" 
                     class="property-card group cursor-pointer relative overflow-hidden rounded-3xl block hover:shadow-2xl transition-shadow duration-300"
-                    data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['rating'] }}">
+                    data-type="{{ $h['type'] }}" data-price="{{ $h['cheapest_price'] }}" data-rating="{{ $h['avg_rating'] }}">
                     
                     <div class="relative h-64 overflow-hidden">
                         <img alt="{{ $h['name'] }}" 
@@ -168,9 +168,13 @@
                             {{-- PENYESUAIAN CLASS CUSTOM: text-lg font-bold text-gray-800 --}}
                             <h3 class="text-lg font-bold text-gray-800 leading-tight group-hover:text-blue-600 transition-colors">{{ $h['name'] }}</h3>
                             {{-- PENYESUAIAN CLASS CUSTOM: text-xs font-bold --}}
-                            <span class="flex items-center gap-0.5 text-gray-700 text-xs font-bold shrink-0 ml-2">
-                                <span class="material-symbols-outlined text-[14px] text-yellow-500 icon-fill">star</span>{{ number_format($h['rating'], 1) }}
-                            </span>
+                           <span class="flex items-center gap-0.5 text-gray-700 text-xs font-bold shrink-0 ml-2">
+    <span class="material-symbols-outlined text-[14px] text-yellow-500 icon-fill">star</span>
+    {{ number_format($h['avg_rating'], 1) }}
+    <span class="text-gray-400 font-normal">
+        ({{ $h['review_count'] }})
+    </span>
+</span>
                         </div>
                         
                         {{-- PENYESUAIAN CLASS CUSTOM: text-xs text-gray-400 --}}
@@ -338,11 +342,12 @@ function renderCards() {
 
     let visible = allCards.filter(card => currentFilter === 'all' || card.dataset.type === currentFilter);
 
-    if (currentSort === 'price-asc') {
         visible.sort((a,b) => +a.dataset.price - +b.dataset.price);
-    } else if (currentSort === 'price-desc') {
-        visible.sort((a,b) => +b.dataset.price - +a.dataset.price);
-    }
+} else if (currentSort === 'price-desc') {
+    visible.sort((a,b) => +b.dataset.price - +a.dataset.price);
+} else if (currentSort === 'rating') {
+    visible.sort((a,b) => +b.dataset.rating - +a.dataset.rating);
+}
 
     allCards.forEach(c => { c.style.display = 'none'; });
     visible.forEach(c => { c.style.display = ''; grid.appendChild(c); });

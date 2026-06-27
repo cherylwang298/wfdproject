@@ -334,25 +334,33 @@ function sortProperties(value) {
     currentSort = value;
     renderCards();
 }
-
 function renderCards() {
     const grid = document.getElementById('properties-grid');
     const noResults = document.getElementById('no-results');
     const label = document.getElementById('filter-label');
 
-    let visible = allCards.filter(card => currentFilter === 'all' || card.dataset.type === currentFilter);
+    let visible = allCards.filter(card =>
+        currentFilter === 'all' || card.dataset.type === currentFilter
+    );
 
+    if (currentSort === 'price-asc') {
         visible.sort((a,b) => +a.dataset.price - +b.dataset.price);
-} else if (currentSort === 'price-desc') {
-    visible.sort((a,b) => +b.dataset.price - +a.dataset.price);
-} else if (currentSort === 'rating') {
-    visible.sort((a,b) => +b.dataset.rating - +a.dataset.rating);
-}
+    } else if (currentSort === 'price-desc') {
+        visible.sort((a,b) => +b.dataset.price - +a.dataset.price);
+    } else if (currentSort === 'rating') {
+        visible.sort((a,b) => +b.dataset.rating - +a.dataset.rating);
+    }
 
-    allCards.forEach(c => { c.style.display = 'none'; });
-    visible.forEach(c => { c.style.display = ''; grid.appendChild(c); });
+    allCards.forEach(c => c.style.display = 'none');
+    visible.forEach(c => {
+        c.style.display = '';
+        grid.appendChild(c);
+    });
 
-    noResults.classList.toggle('hidden', visible.length > 0);
+    if(noResults){
+        noResults.classList.toggle('hidden', visible.length > 0);
+    }
+
     label.textContent = `Showing ${visible.length} properties`;
 }
 

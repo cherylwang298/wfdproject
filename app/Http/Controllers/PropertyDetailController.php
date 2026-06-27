@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+// use App\Models\Property;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -57,6 +59,19 @@ class PropertyDetailController extends Controller
             abort(404);
         }
 
+        // Average rating
+$avgRating = Review::where('property_id', $id)->avg('rating');
+
+$reviewCount = Review::where('property_id', $id)->count();
+
+$reviews = Review::with(['user', 'images'])
+    ->where('property_id', $id)
+    ->latest()
+    ->get();
+
+$property['avg_rating'] = $avgRating ? round($avgRating, 1) : 0;
+$property['review_count'] = $reviewCount;
+
         // 3. Pasangkan gambar utama properti
         $property['image'] = $images->where('property_id', $id)->first();
 
@@ -71,13 +86,16 @@ class PropertyDetailController extends Controller
             ->where('property_id', $property['id'])->exists(); // Sesuaikan nama kolom jika 'unit_id'
 
         // 6. Oper data 'units' ke view property_detail!
-        return view('property_detail', [
-            'hotel' => $property,
-            'units' => $propertyUnits, // <-- Kunci utama agar Blade bisa membaca list kamar
-            'checkin' => $request->query('checkin', date('Y-m-d')),
-            'checkout' => $request->query('checkout', date('Y-m-d', strtotime('+1 day'))),
-            'guests' => $request->query('guests', 1),
-            'isFavorite' => $isFavorite
-        ]);
+       return view('property_detail', [
+    'hotel' => $property,
+    'units' => $propertyUnits,
+    'reviews' => $reviews,
+
+    'checkin' => $request->query('checkin', date('Y-m-d')),
+    'checkout' => $request->query('checkout', date('Y-m-d', strtotime('+1 day'))),
+    'guests' => $request->query('guests', 1),
+
+    'isFavorite' => $isFavorite
+]);
     }
 }

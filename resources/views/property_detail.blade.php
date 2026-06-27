@@ -51,7 +51,7 @@
                 <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight drop-shadow-md mb-2">{{ $hotel['name'] }}</h1>
                 <p class="text-sm md:text-base text-gray-200 flex items-center gap-2 drop-shadow-sm">
                     <span class="material-symbols-outlined text-[18px]">location_on</span>{{ $hotel['city'] }}
-                    <span class="flex items-center gap-1 ml-4"><span class="material-symbols-outlined text-[16px] text-yellow-400 icon-fill">star</span>{{ number_format($hotel['rating'] ?? 4.5, 1) }} Rating</span>
+                    <span class="flex items-center gap-1 ml-4"><span class="material-symbols-outlined text-[16px] text-yellow-400 icon-fill">star</span>{{ number_format($hotel['avg_rating'] ?? 0, 1) }} Rating</span>
                 </p>
             </div>
         </div>
@@ -96,6 +96,88 @@
                     {{ $hotel['description'] }} Experience unparalleled luxury at {{ $hotel['name'] }} in {{ $hotel['city'] }}. This stunning property seamlessly blends contemporary design with the natural beauty of its surroundings. Floor-to-ceiling windows flood every room with natural light.
                 </p>
             </div>
+
+            <div class="mt-10">
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold">
+                Guest Reviews
+            </h2>
+
+            <div class="flex items-center gap-2 mt-2">
+
+                <span class="material-symbols-outlined text-yellow-500 icon-fill">
+                    star
+                </span>
+
+                <span class="font-bold text-lg">
+    {{ number_format($hotel['avg_rating'] ?? 0, 1) }}
+</span>
+
+<span class="text-gray-500">
+    ({{ $hotel['review_count'] ?? 0 }} Reviews)
+</span>
+
+            </div>
+
+        </div>
+    </div>
+
+    @forelse($reviews as $review)
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
+
+            <div class="flex justify-between">
+
+                <div>
+
+                    <h4 class="font-bold">
+                        {{ $review->user->name }}
+                    </h4>
+
+                    <p class="text-gray-400 text-sm">
+                        {{ $review->created_at->format('d M Y') }}
+                    </p>
+
+                </div>
+
+                <div class="flex items-center">
+
+                    @for($i=1;$i<=5;$i++)
+                        <span class="material-symbols-outlined text-yellow-500 {{ $i <= $review->rating ? 'icon-fill' : '' }}">
+                            star
+                        </span>
+                    @endfor
+
+                </div>
+
+            </div>
+
+            <p class="text-gray-600 mt-4">
+                {{ $review->comment }}
+            </p>
+
+        </div>
+
+    @empty
+
+        <div class="bg-gray-50 rounded-2xl p-10 text-center border border-dashed">
+
+            <span class="material-symbols-outlined text-5xl text-gray-300">
+                reviews
+            </span>
+
+            <p class="mt-4 text-gray-500">
+                No reviews yet.
+            </p>
+
+        </div>
+
+    @endforelse
+
+</div>
+
 
             <div>
                 <h2 class="text-2xl font-bold text-on-surface mb-6">Amenities</h2>
@@ -205,7 +287,7 @@
                     </div>
                     <div class="flex items-center gap-1 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-lg">
                         <span class="material-symbols-outlined text-yellow-500 text-[18px] icon-fill">star</span>
-                        <span class="text-sm font-bold text-gray-800">{{ number_format($hotel['rating'] ?? 4.5, 1) }}</span>
+                        <span class="text-sm font-bold text-gray-800">{{ number_format($hotel['avg_rating'] ?? 0, 1) }}</span>
                     </div>
                 </div>
 

@@ -170,7 +170,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const editModalBox = document.getElementById('editModalBox');
     const editForm = document.getElementById('editPromoForm');
 
+    function getCurrentLocalDateTime() {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        return now.toISOString().slice(0, 16);
+    }
+
     window.openPromoModal = function () {
+        const createExpiredInput = document.querySelector('#createPromoModal input[name="expired_at"]');
+        if(createExpiredInput) createExpiredInput.min = getCurrentLocalDateTime();
+
         createModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
@@ -198,7 +207,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('edit_discount_value').value = value;
         document.getElementById('edit_min_purchase').value = min;
         document.getElementById('edit_quota').value = quota;
-        document.getElementById('edit_expired_at').value = expired;
+
+        const editExpiredInput = document.getElementById('edit_expired_at');
+        editExpiredInput.value = expired;
+
+        editExpiredInput.min = getCurrentLocalDateTime();
 
         // Atur action form route secara dinamis menuju rute update Laravel
         editForm.action = `/admin/promos/update/${id}`;
@@ -256,7 +269,7 @@ document.querySelectorAll('.deletePromoForm').forEach(form => {
 Swal.fire({
     icon: 'success',
     title: 'Success',
-    text: '{{ session('success') }}',
+    text: "{{ session('success') }}",
     timer: 1800,
     showConfirmButton: false
 });

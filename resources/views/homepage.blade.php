@@ -278,7 +278,12 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($featuredRoutes as $r)
-                <a href="#" class="bg-surface-container p-6 hover:bg-surface-container-high transition-all cursor-pointer group rounded-3xl hover:shadow-md hover:-translate-y-1 duration-300 block">
+                {{-- ==========================================================================
+                    PERBAIKAN: Arahkan href ke halaman search flights beserta filter lokasinya
+                    ========================================================================== --}}
+                <a href="{{ route('flights') }}?origin={{ urlencode($r['origin']) }}&destination={{ urlencode($r['destination']) }}" 
+                class="bg-surface-container p-6 hover:bg-surface-container-high transition-all cursor-pointer group rounded-3xl hover:shadow-md hover:-translate-y-1 duration-300 block">
+                    
                     <div class="flex items-center justify-between mb-4">
                         {{-- Menampilkan Kode Bandara Asal dan Tujuan dari API --}}
                         <span class="font-headline-md text-headline-md text-on-surface text-xl font-bold">{{ $r['origin'] }}</span>

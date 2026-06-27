@@ -523,6 +523,24 @@ document.getElementById('flightSearchForm').addEventListener('submit', function(
     e.preventDefault();
     doSearch();
 });
+
+// Pemicu Pencarian Otomatis Berdasarkan Parameter Kiriman URL dari Homepage
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlOrigin = urlParams.get('origin');
+    const urlDest = urlParams.get('destination');
+
+    if (urlOrigin && urlDest) {
+        // 1. Set nilai elemen select bandara asal & tujuan sesuai parameter
+        if (document.getElementById('originSelect') && document.getElementById('destSelect')) {
+            document.getElementById('originSelect').value = urlOrigin;
+            document.getElementById('destSelect').value = urlDest;
+            
+            // 2. Jalankan fungsi pencarian otomatis secara instan
+            typeof doSearch === "function" && doSearch();
+        }
+    }
+});
 </script>
 </body>
 </html>

@@ -215,14 +215,23 @@
         </section>
 
         {{-- promos --}}
+        {{-- promos --}}
         <section class="max-w-7xl mx-auto mb-24">
             <div class="mb-8">
                 <h2 class="text-3xl font-bold text-on-surface mb-2">Hot Deals for You 🔥</h2>
                 <p class="text-sm text-on-surface-variant">Save more on selected stays and exclusive promotions.</p>
             </div>
+            @php
+                $activePromos = collect($promos)->filter(function($p) {
+                    $expiredAt = is_array($p) ? ($p['expired_at'] ?? null) : ($p->expired_at ?? null);
+                    if (!$expiredAt) return true; 
+                    return \Carbon\Carbon::parse($expiredAt) >= now();
+                });
+            @endphp
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($promos as $promo)
+                {{-- UBAH LOOPING JADI PAKAI $activePromos --}}
+                @forelse($activePromos as $promo)
                 @php
                 $isPercent = ($promo['discount_type'] ?? 'percentage') === 'percentage';
                 $value = $promo['discount_value'] ?? 0;

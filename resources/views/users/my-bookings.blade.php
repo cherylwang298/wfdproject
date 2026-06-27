@@ -36,11 +36,13 @@ $currentPage = 'bookings';
     </div>
     @else
     <div class="flex gap-4 border-b border-gray-200 mb-6">
-        <button onclick="switchBookingTab('tab-accommodation')" id="btn-tab-accommodation" class="pb-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition-all">
-            🏨 Accommodations
+        <button onclick="switchBookingTab('tab-accommodation')" id="btn-tab-accommodation" class="flex items-center gap-2 pb-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition-all">
+            <span class="material-symbols-outlined text-[20px]">hotel</span>
+            Accommodations
         </button>
-        <button onclick="switchBookingTab('tab-flights')" id="btn-tab-flights" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition-all">
-            ✈️ Flights
+        <button onclick="switchBookingTab('tab-flights')" id="btn-tab-flights" class="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition-all">
+            <span class="material-symbols-outlined text-[20px]">flight</span>
+            Flights
         </button>
     </div>
 

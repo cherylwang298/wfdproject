@@ -295,14 +295,14 @@ function buildReturnFlights(origin, dest) {
 }
 
 function renderFlightCard(f, type, isSelected) {
-    const badgeHtml = f.badge ? `<span class="bg-green-100 text-green-800 border border-green-200 px-2 py-0.5 rounded-full text-xs font-semibold ml-2">${escapeHtml(f.badge)}</span>` : '';
+    // const badgeHtml = f.badge ? `<span class="bg-green-100 text-green-800 border border-green-200 px-2 py-0.5 rounded-full text-xs font-semibold ml-2">${escapeHtml(f.badge)}</span>` : '';
     const selectedClass = isSelected ? 'selected' : '';
     return `
         <div class="flight-card bg-white border border-gray-200 p-5 rounded-2xl hover:shadow-md transition cursor-pointer flex items-center justify-between gap-6 ${selectedClass}" data-id="${f.id}" data-type="${type}">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center"><span class="material-symbols-outlined text-blue-600">flight</span></div>
                 <div>
-                    <div class="font-bold text-sm text-gray-800">${escapeHtml(f.airline)} ${badgeHtml}</div>
+                    <div class="font-bold text-sm text-gray-800">${escapeHtml(f.airline)}</div>
                     <div class="text-xs text-gray-500 font-medium mt-0.5">${escapeHtml(f.code)} · <span class="capitalize">${escapeHtml(f.class)}</span></div>
                 </div>
             </div>

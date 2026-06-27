@@ -91,6 +91,7 @@ class FlightCheckoutController extends Controller
                 'user_id' => Auth::id() ?? null,
                 'booking_code' => 'STAYGO-' . strtoupper(Str::random(8)),
                 'payment_status' => 'Paid',
+                'status' => 'confirmed',
                 'promo_id' => $request->promo_id // <-- PASTIKAN KOLOM INI ADA DI MIGRASI/MODEL FLIGHT BOOKINGS
             ]);
 

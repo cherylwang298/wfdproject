@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('flight_bookings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['confirmed', 'cancelled'])->default('confirmed');
             $table->string('booking_code')->unique();
             $table->string('payment_status')->default('unpaid'); // Untuk melacak status pembayaran internal booking
             $table->timestamps();

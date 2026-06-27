@@ -312,21 +312,25 @@ public function myBookings()
     
 public function requestCancellation(Request $request, $id)
 {
-    // 1. Validasi input alasan
+    // validasi input alasan
     $request->validate([
         'reason' => 'required|string|max:500',
     ]);
 
-    // 2. Ambil data booking milik user yang sedang login untuk memastikan keamanan
+    //ambil data booking milik user yang sedang login untuk memastikan keamanan
     $booking = Auth::user()->reservations()->findOrFail($id);
 
-    // 3. Cek apakah user sudah pernah mengajukan pembatalan untuk booking ini sebelumnya
+     if (today()->gte($booking->check_in)) {
+        return back()->with('error', 'Cancellation requests are no longer allowed after the check-in date.');
+    }
+
+    // cek pernah mengajukan pembatalan untuk booking ini sebelumnya
     $existingRequest = CancelRequest::where('reservation_id', $booking->id)->first();
     if ($existingRequest) {
         return redirect()->back()->with('error', 'Kamu sudah mengajukan pembatalan untuk reservasi ini.');
     }
 
-    // 4. Simpan pengajuan ke table cancel_requests
+   
     CancelRequest::create([
         'reservation_id'    => $booking->id,
         'flight_booking_id' => $booking->flight_booking_id ?? null, // Sesuaikan jika ada flight_booking_id
@@ -334,7 +338,6 @@ public function requestCancellation(Request $request, $id)
         'status'            => 'Pending', // Status default saat pertama diajukan
     ]);
 
-    // 5. (Opsional) Mengubah status booking lokal menjadi 'Cancellation Requested' 
     // $booking->update(['status' => 'Pending Cancellation']);
 
     return redirect()->back()->with('success', 'Permintaan pembatalan berhasil dikirim. Menunggu konfirmasi admin.');

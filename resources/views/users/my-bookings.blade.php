@@ -151,10 +151,13 @@ $currentPage = 'bookings';
 
                                             @endif
                                     @else
-                                        {{-- Belum pernah request cancel sama sekali --}}
-                                        <button type="button" onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()" class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto">
-                                            Cancel
-                                        </button>
+                                        @if($booking->check_in->isFuture())
+    <button type="button"
+        onclick="document.getElementById('modal-cancel-{{ $booking->id }}').showModal()"
+        class="bg-red-500 text-white text-sm px-4 py-2 rounded hover:bg-red-600 transition w-full md:w-auto">
+        Cancel
+    </button>
+@endif
                                         
                                         @if($booking->payment && $booking->payment->status !== 'Paid')
                                             <a href="/payment/{{ $booking->id }}" class="inline-block bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 transition w-full md:w-auto text-center">

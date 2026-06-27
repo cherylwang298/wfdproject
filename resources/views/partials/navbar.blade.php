@@ -39,7 +39,8 @@
                 <span class="hidden lg:inline">Favourites</span>
             </a>
 
-            <div class="flex items-center gap-3 pl-3 border-l border-gray-200">
+            {{-- <div class="flex items-center gap-3 pl-3 border-l border-gray-200"> --}}
+                <div class="hidden md:flex items-center gap-3 pl-3 border-l border-gray-200">
                 {{-- Tampilan Kondisional jika User sudah login --}}
                 @auth
                     @php
@@ -102,6 +103,38 @@
             <span class="material-symbols-outlined text-[20px] text-blue-600">favorite</span>Favourites
         </a>
         @auth
+
+            @auth
+    @php
+        $firstName = Auth::user()->first_name ?? '';
+        $lastName = Auth::user()->last_name ?? '';
+        $initials = strtoupper(substr($firstName,0,1).substr($lastName,0,1));
+    @endphp
+
+    <a href="{{ route('profile.index') }}"
+       class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 transition">
+
+        @if(Auth::user()->profile_picture)
+            <img src="{{ asset('storage/'.Auth::user()->profile_picture) }}"
+                 class="w-10 h-10 rounded-full object-cover">
+        @else
+            <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                {{ $initials ?: 'U' }}
+            </div>
+        @endif
+
+        <div>
+            <p class="font-semibold text-gray-900">
+                {{ $firstName }} {{ $lastName }}
+            </p>
+            <p class="text-xs text-gray-500">
+                View Profile
+            </p>
+        </div>
+
+    </a>
+@endauth
+
             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
                 <span class="material-symbols-outlined text-[20px] text-red-600">logout</span>Sign Out
             </a>

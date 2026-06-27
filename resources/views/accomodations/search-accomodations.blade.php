@@ -68,7 +68,7 @@ input[type="date"] {
 
     <div class="max-w-6xl mx-auto">
 
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 md:mb-10 tracking-tight">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-6 md:mb-10 tracking-tight">
             Find your perfect stay
         </h1>
 

@@ -35,7 +35,7 @@ class AdminController extends Controller
         return $booking;
     });
 
-$flightBookings = FlightBooking::with('user')
+$flightBookings = FlightBooking::with(['user', 'payment'])
     ->latest()
     ->get()
     ->map(function ($booking) {

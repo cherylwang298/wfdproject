@@ -132,9 +132,12 @@
         @endif
 
         <p class="font-bold text-gray-800">
-            Rp {{ number_format($booking->total_price, 0, ',', '.') }}
-        </p>
-
+    @if($booking->booking_type == 'hotel')
+        Rp {{ number_format($booking->total_price, 0, ',', '.') }}
+    @else
+        Rp {{ number_format($booking->payment->amount ?? 0, 0, ',', '.') }}
+    @endif
+</p>
     </div>
 </div>
 

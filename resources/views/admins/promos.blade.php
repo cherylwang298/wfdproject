@@ -129,16 +129,23 @@
                             </button>
 
                 
-                            <form action="{{ route('admin.promos.destroy', $promo->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button
-                                    type="submit"
-                                    onclick="return confirm('Delete promo {{ $promo->code }}?')"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">
-                                    Delete
-                                </button>
-                            </form>
+                            <form action="{{ route('admin.promos.destroy', $promo->id) }}"
+      method="POST"
+      class="inline deletePromoForm">
+
+    @csrf
+    @method('DELETE')
+
+    <button
+        type="submit"
+        data-code="{{ $promo->code }}"
+        class="deletePromoBtn bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">
+
+        Delete
+
+    </button>
+
+</form>
                         </div>
                     </td>
                 </tr>
@@ -210,7 +217,51 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!editModalBox.contains(e.target)) closeEditPromoModal();
     });
 });
+
+// DELETE PROMO CONFIRMATION
+document.querySelectorAll('.deletePromoForm').forEach(form => {
+
+    form.addEventListener('submit', function(e) {
+
+        e.preventDefault();
+
+        const code = form.querySelector('.deletePromoBtn').dataset.code;
+
+        Swal.fire({
+            title: 'Delete Promo?',
+            html: `Are you sure you want to delete <b>${code}</b>?<br><br>This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            focusCancel: true
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                form.submit();
+            }
+
+        });
+
+    });
+
+});
 </script>
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: '{{ session('success') }}',
+    timer: 1800,
+    showConfirmButton: false
+});
+</script>
+@endif
 @endsection
 
 @push('modals')

@@ -77,7 +77,7 @@ for ($i = 6; $i >= 0; $i--) {
     $request->session()->regenerateToken();
 
     // 4. Lempar kembali ke halaman login admin
-    return redirect()->route('admin.login')->with('success', 'Anda berhasil logout.');
+    return redirect()->route('admin.login')->with('success', 'Logout successful.');
 }
 
 public function openCancelRequests(){
@@ -95,7 +95,7 @@ public function approveCancelRequest($id)
 
         // Pastikan hanya request berstatus 'pending' yang bisa diproses
         if ($cancelRequest->status !== 'pending') {
-            return redirect()->back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
+            return redirect()->back()->with('error', 'This request has already been processed.');
         }
 
         // Jalankan Database Transaction agar kedua perubahan sukses bersamaan
@@ -119,7 +119,7 @@ public function approveCancelRequest($id)
             }
         });
 
-        return redirect()->back()->with('success', 'Permintaan pembatalan berhasil disetujui.');
+        return redirect()->back()->with('success', 'Cancel request approved.');
     }
 
     public function rejectCancelRequest($id)
@@ -127,14 +127,14 @@ public function approveCancelRequest($id)
         $cancelRequest = CancelRequest::findOrFail($id);
 
         if ($cancelRequest->status !== 'pending') {
-            return redirect()->back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
+            return redirect()->back()->with('error', 'This request has already been processed.');
         }
 
         // Jika ditolak, kita hanya perlu mengubah status cancel_requests menjadi 'rejected'
         // Data reservation / flight_bookings tidak berubah (tetap aktif/aman)
         $cancelRequest->update(['status' => 'rejected']);
 
-        return redirect()->back()->with('success', 'Permintaan pembatalan telah ditolak.');
+        return redirect()->back()->with('success', 'Cancel request rejected.');
     }
 
     public function openPromos(){
@@ -191,7 +191,7 @@ public function editBooking(Request $request, $id)
             'status' => $request->status,
         ]);
 
-        return redirect()->back()->with('success', 'Status reservasi berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Reservation status updated.');
 }
 
 public function deleteBooking($id)
@@ -199,7 +199,7 @@ public function deleteBooking($id)
     $booking = FlightBooking::findOrFail($id);
     $booking->delete();
 
-    return redirect()->back()->with('success', 'Data reservasi berhasil dihapus.');
+    return redirect()->back()->with('success', 'Reservation deleted.');
 }
 
 public function viewReserv($id){
@@ -220,7 +220,7 @@ public function editReserv(Request $request, $id)
             'status' => $request->status,
         ]);
 
-        return redirect()->back()->with('success', 'Status reservasi berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Reservation status updated.');
     }
 
     public function deleteReserv($id)
@@ -228,7 +228,7 @@ public function editReserv(Request $request, $id)
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
 
-        return redirect()->back()->with('success', 'Data reservasi berhasil dihapus.');
+        return redirect()->back()->with('success', 'Reservation deleted.');
     }
 
     public function createPromo(Request $request){
@@ -250,7 +250,7 @@ public function editReserv(Request $request, $id)
         'expired_at' => $request->expired_at,
     ]);
 
-    return redirect()->back()->with('success', 'Promo berhasil ditambahkan.');
+    return redirect()->back()->with('success', 'Promo created.');
 
     }
 
@@ -275,14 +275,14 @@ public function editReserv(Request $request, $id)
             'quota' => $request->quota,
             'expired_at' => $request->expired_at,
         ]);
-        return redirect()->back()->with('success', 'Promo berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Promo updated.');
     }
 
     public function deletePromo($id)
     {
         $promo = Promo::findOrFail($id);
         $promo->delete();
-        return redirect()->back()->with('success', 'Promo berhasil dihapus.');
+        return redirect()->back()->with('success', 'Promo deleted.');
     }
 
     public function viewUser($id){
@@ -317,11 +317,11 @@ public function editReserv(Request $request, $id)
             'status' => $validated['status'],
         ]);
 
-        return redirect()->back()->with('success', 'Status user berhasil diperbarui.');
+        return redirect()->back()->with('success', 'User status updated.');
     } catch (\Illuminate\Validation\ValidationException $e) {
         return redirect()->back()->withErrors($e->validator)->withInput();
     } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Gagal memperbarui status user.');
+        return redirect()->back()->with('error', 'Failed to update user status.');
     }
 }
 
@@ -329,7 +329,7 @@ public function deleteUser($id)
 {
     $user = User::findOrFail($id);
     $user->delete();
-    return redirect()->back()->with('success', 'User berhasil dihapus.');
+    return redirect()->back()->with('success', 'User deleted.');
 
 
 }

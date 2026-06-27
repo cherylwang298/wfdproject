@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -374,8 +375,11 @@
             location.reload();
         }
 
-        // 1. Fungsi eksklusif untuk memilih salah satu unit saja
+        // 1. Fungsi eksklusif untuk memilih atau membatalkan pilihan unit kamar
         function selectUnit(unitId, capacity) {
+            const hiddenInput = document.getElementById('selected_unit_id');
+            const isAlreadySelected = hiddenInput.value === unitId.toString();
+
             document.querySelectorAll('.select-unit-btn').forEach(btn => {
                 btn.className = "select-unit-btn bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm";
                 btn.innerText = "Select";
@@ -384,6 +388,13 @@
                 card.classList.remove('border-blue-600', 'ring-2', 'ring-blue-600/20', 'bg-blue-50/20');
             });
 
+            if (isAlreadySelected) {
+                hiddenInput.value = ""; 
+                currentMaxCapacity = 10;
+                checkPlusButtonState(count);
+                return;
+            }
+
             const activeBtn = document.getElementById(`select-btn-${unitId}`);
             activeBtn.className = "select-unit-btn bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-colors shadow-sm";
             activeBtn.innerText = "Selected ✓";
@@ -391,10 +402,9 @@
             const activeCard = document.getElementById(`unit-card-${unitId}`);
             activeCard.classList.add('border-blue-600', 'ring-2', 'ring-blue-600/20', 'bg-blue-50/20');
 
-            document.getElementById('selected_unit_id').value = unitId;
+            hiddenInput.value = unitId;
 
             currentMaxCapacity = parseInt(capacity) || 10;
-
             const countSpan = document.getElementById('guestCount');
             const guestInput = document.getElementById('guestInput');
 
@@ -405,17 +415,6 @@
             }
 
             checkPlusButtonState(count);
-        }
-
-        function checkPlusButtonState(currentCount) {
-            const plusBtn = document.getElementById('guestPlus');
-            if (currentCount >= currentMaxCapacity) {
-                plusBtn.disabled = true;
-                plusBtn.classList.add('opacity-40', 'cursor-not-allowed', 'bg-gray-100');
-            } else {
-                plusBtn.disabled = false;
-                plusBtn.classList.remove('opacity-40', 'cursor-not-allowed', 'bg-gray-100');
-            }
         }
 
         // 2. Fungsi validasi saat menekan tombol "Reserve Now"

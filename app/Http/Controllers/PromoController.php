@@ -9,10 +9,12 @@ class PromoController extends Controller
 {
     public function index()
     {
-        // 1. Ambil semua data promo dari database lokal main repo
-        $promos = Promo::all();
+        // 1. Ambil data promo yang tanggal expired-nya belum lewat DAN kuotanya masih ada
+        $promos = Promo::where('expired_at', '>=', now())
+            ->where('quota', '>', 0)
+            ->get();
 
-        // 2. Jika database kosong (belum di-seed), sediakan data fallback agar halaman tidak kosong melompong
+        // 2. Jika database kosong (belum di-seed) atau tidak ada promo yang aktif, sediakan data fallback
         if ($promos->isEmpty()) {
             $promos = collect([
                 [
@@ -50,48 +52,47 @@ class PromoController extends Controller
 
         return view('deals', compact('promos'));
     }
-
     public function apply(Request $request)
-{
-    $promo = Promo::where('code',$request->promo_code)->first();
-  
-    if(!$promo){
+    {
+        $promo = Promo::where('code', $request->promo_code)->first();
+
+        if (!$promo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Promo code not found.'
+            ]);
+        }
+
+        $quotaNow = $promo->quota;
+
+        if ($promo->expired_at < now()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Promo has expired.'
+            ]);
+        }
+
+        $total = $request->total;
+
+        if ($promo->discount_type == "percentage") {
+            $discount = $total * ($promo->discount_value / 100);
+        } else {
+            $discount = $promo->discount_value;
+        }
+
+        $discount = min($discount, $total);
+        $newQuota = $quotaNow - 1;
+
+        $promo->update([
+            'quota' => $newQuota
+        ]);
+
         return response()->json([
-            'success'=>false,
-            'message'=>'Promo code not found.'
+            'success' => true,
+            'promo_id' => $promo->id,
+            'discount' => $discount,
+            'new_total' => $total - $discount,
+            'message' => 'Promo applied!'
         ]);
     }
-
-      $quotaNow =$promo->quota;
-
-    if($promo->expired_at < now()){
-        return response()->json([
-            'success'=>false,
-            'message'=>'Promo has expired.'
-        ]);
-    }
-
-    $total = $request->total;
-
-    if($promo->discount_type == "percentage"){
-        $discount = $total * ($promo->discount_value/100);
-    }else{
-        $discount = $promo->discount_value;
-    }
-
-    $discount = min($discount,$total);
-    $newQuota = $quotaNow - 1;
-
-    $promo->update([
-        'quota'=>$newQuota
-    ]);
-
-    return response()->json([
-        'success'=>true,
-        'promo_id'=>$promo->id,
-        'discount'=>$discount,
-        'new_total'=>$total-$discount,
-        'message'=>'Promo applied!'
-    ]);
-}
 }

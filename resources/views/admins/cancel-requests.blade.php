@@ -103,18 +103,18 @@
                             <td class="py-4 px-6 text-right">
                                 @if($cancel->status == 'pending')
                                     <div class="inline-flex items-center gap-2">
-                                        <form action="{{ route('admin.cancel.approve', $cancel->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to approve this request?');">
+                                        <form action="{{ route('admin.cancel.approve', $cancel->id) }}" method="POST" class="action-form">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm shadow-emerald-100">
+                                            <button type="submit" data-action="approve" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm shadow-emerald-100">
                                                 Approve
                                             </button>
                                         </form>
 
-                                        <form action="{{ route('admin.cancel.reject', $cancel->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to reject this request?');">
+                                        <form action="{{ route('admin.cancel.reject', $cancel->id) }}" method="POST" class="action-form">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition border border-rose-100">
+                                            <button type="submit" data-action="reject" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition border border-rose-100">
                                                 Reject
                                             </button>
                                         </form>
@@ -135,4 +135,35 @@
 
     </div>
 </div>
+
+{{-- Script SweetAlert --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.action-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+                
+                const button = form.querySelector('button[type="submit"]');
+                const action = button.getAttribute('data-action'); 
+                const confirmColor = action === 'approve' ? '#16a34a' : '#ef4444'; 
+    
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Are you sure you want to ${action} this request?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: confirmColor,
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: `Yes, ${action} it!`,
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); 
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection

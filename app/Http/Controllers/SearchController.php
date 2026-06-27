@@ -19,7 +19,7 @@ class SearchController extends Controller
     // dd($response->json());
 
     if (!$response->successful()) {
-        return view('dummy_pages.accomodations', [
+        return view('accomodations.search-accomodations', [
             'cities' => []
         ]);
     }

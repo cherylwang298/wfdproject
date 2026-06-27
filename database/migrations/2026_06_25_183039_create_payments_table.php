@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('reservation_id')->nullable();
             $table->uuid('flight_booking_id')->nullable();
-            $table->string('method'); // e.g., 'gopay', 'bank_transfer'
+            $table->string('method'); 
             $table->unsignedInteger('amount');
             $table->string('status')->default('pending');
             $table->timestamps();

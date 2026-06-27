@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sessions', function (Blueprint $table) {
-            // Mengubah tipe data user_id dari integer menjadi string/uuid nullable
             $table->string('user_id', 36)->nullable()->change();
         });
     }

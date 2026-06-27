@@ -14,36 +14,36 @@ class BookingController extends Controller
 {
     public function openBookingPage(Request $request, $id)
     {
-        // 1. Ambil data dari API
+      
         $units = collect(Http::get(env('API_BASE_URL').'/units')->json());
         $properties = collect(Http::get(env('API_BASE_URL').'/properties')->json());
         $images = collect(Http::get(env('API_BASE_URL').'/images')->json());
 
-        // 2. Cari unit dan property terkait
+      
         $unit = $units->firstWhere('id', $id);
         if (!$unit) {
             abort(404, 'Unit tidak ditemukan');
         }
         $property = $properties->firstWhere('id', $unit['property_id']);
 
-        // 3. Ambil tanggal dari request (fallback ke hari ini & besok jika kosong)
+      
         $checkin = $request->query('checkin', now()->toDateString());
         $checkout = $request->query('checkout', now()->addDay()->toDateString());
 
-        // 4. Hitung selisih malam (Nights)
+     
         $dateIn = Carbon::parse($checkin);
         $dateOut = Carbon::parse($checkout);
         $nights = $dateIn->diffInDays($dateOut);
-        $nights = $nights > 0 ? $nights : 1; // Minimal 1 malam jika input keliru
+        $nights = $nights > 0 ? $nights : 1; 
 
-        // 5. Hitung total harga
+    
         $accomPrice = $unit['price'] * $nights;
         $totalPrice = $accomPrice + ($accomPrice * 0.11);
 
-        // 6. Ambil data user login
+       
         $user = auth()->user();
 
-        // $fullname = $user->firstname . ' ' . $user->lastname;
+        
         if (empty($user->last_name)) {
             $fullname = $user->first_name;
         } elseif (empty($user->first_name)) {
@@ -52,7 +52,7 @@ class BookingController extends Controller
             $fullname = $user->first_name . ' ' . $user->last_name;
         }
 
-        // 7. Ambil gambar unit jika ada
+
         $unit['image'] = $images->where('unit_id', $id)->first();
 
         return view('users.bookings', compact(
@@ -144,9 +144,7 @@ class BookingController extends Controller
     }
 }
 
-    /**
-     * Menangani permohonan pembatalan tiket pesawat dari user (Akomodasi / Flights)
-     */
+ 
     public function requestFlightCancel(Request $request, $id)
     {
         $request->validate([

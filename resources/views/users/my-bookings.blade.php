@@ -253,11 +253,11 @@ $currentPage = 'bookings';
                         <textarea name="comment" rows="4" maxlength="1000" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-gray-400 text-sm" placeholder="Ceritakan pengalaman menginap Anda..."></textarea>
                     </div>
 
-                    <div>
+                    {{-- <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Foto (Opsional)</label>
                         <input type="file" name="images[]" multiple accept="image/png, image/jpeg, image/jpg" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         <p class="text-[11px] text-gray-400 mt-1">Maksimal file 2MB berformat JPG/PNG.</p>
-                    </div>
+                    </div> --}}
 
                     <div class="flex justify-end gap-2 pt-3 border-t">
                         <button type="button" onclick="document.getElementById('modal-review-{{ $booking->id }}').close()" class="bg-gray-100 text-gray-700 font-bold px-4 py-2 rounded-lg text-xs hover:bg-gray-200 transition">Batal</button>

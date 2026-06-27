@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['confirmed', 'cancelled'])->default('confirmed');
             $table->string('booking_code')->unique();
-            $table->string('payment_status')->default('unpaid'); // Untuk melacak status pembayaran internal booking
+            $table->string('payment_status')->default('unpaid'); 
             $table->timestamps();
         });
     }

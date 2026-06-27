@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('flight_id'); // Relasi ke API Flights
+            $table->uuid('flight_id'); 
             $table->uuid('flight_booking_id');
             $table->uuid('passenger_id');
             $table->string('seat_number');

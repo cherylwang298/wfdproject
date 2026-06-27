@@ -229,38 +229,24 @@ public function myBookings()
 
     public function home2(Request $request)
     {
-        // dd([
-        //     'Apakah Auth mengenali User?' => Auth::check(),
-        //     'Data User saat ini'          => Auth::user(),
-        //     'Session ID'                  => session()->getId(),
-        //     'Semua Isi Session'           => session()->all(),
-        //     'Isi Cookie Session Browser'  => $request->cookie(config('session.cookie')),
-        // ]);
-
-        // 1. Ambil data properti dari API
+    
         $responseProperties = Http::get(env('API_BASE_URL') . '/properties');
-
-        // 2. Ambil data penerbangan dari API Flights
         $flights = collect();
         try {
-            $responseFlights = Http::get(env('API_BASE_URL') . '/flights'); // Hubungkan ke endpoint /units atau /flights Anda di API
+            $responseFlights = Http::get(env('API_BASE_URL') . '/flights'); 
             if ($responseFlights->successful()) {
                 $flights = collect($responseFlights->json());
             }
         } catch (\Exception $e) {
-            // Tetap biarkan kosong atau isi fallback jika API Flights mati
-        }
+            }
 
-        // 3. Ambil 3 promo random dari DB lokal
         $availPromos = Promo::all();
         $promos = $availPromos->shuffle()->take(3)->values();
 
-        // 4. Proses data Properites jika API berhasil
         if ($responseProperties->successful()) {
     $properties = collect($responseProperties->json());
 
-    // Tambahkan rata-rata rating ke setiap property
-    $properties = $properties->map(function ($property) {
+        $properties = $properties->map(function ($property) {
 
         $avgRating = Review::where('property_id', $property['id'])
             ->avg('rating');
@@ -278,15 +264,11 @@ public function myBookings()
 } else {
     $featuredProperties = collect();
 }
-
-        // 5. Ambil 4 flights secara random dari API jika data flights tersedia
         $featuredRoutes = collect();
         if ($flights->isNotEmpty()) {
-            // Jika data di database kurang dari 4, ambil semua yang ada agar tidak error
             $takeCount = $flights->count() >= 4 ? 4 : $flights->count();
             $featuredRoutes = $flights->random($takeCount)->values();
         } else {
-            // Fallback dummy jika database penerbangan di API bener-bener kosong
             $featuredRoutes = collect([
                 ['origin' => 'CGK', 'destination' => 'DPS', 'class' => 'economy', 'price' => 750000],
                 ['origin' => 'SUB', 'destination' => 'SIN', 'class' => 'economy', 'price' => 1200000],
@@ -295,7 +277,6 @@ public function myBookings()
             ]);
         }
 
-        // Data static traveler stories
         $testimonials = collect([
             ['initials'=>'SJ','name'=>'Sarah Jenkins','sub'=>'Traveled to Santorini','rating'=>5,'quote'=>"Booking our honeymoon through StayGo was an absolute dream.",'color'=>'bg-primary-container text-on-primary-container'],
             ['initials'=>'MR','name'=>'Michael Ross','sub'=>'Frequent Flyer','rating'=>5,'quote'=>"I travel for business constantly. StayGo helps me manage flights and hotels.",'color'=>'bg-tertiary-container text-on-tertiary-container'],
@@ -317,14 +298,12 @@ public function requestCancellation(Request $request, $id)
         'reason' => 'required|string|max:500',
     ]);
 
-    //ambil data booking milik user yang sedang login untuk memastikan keamanan
     $booking = Auth::user()->reservations()->findOrFail($id);
 
      if (today()->gte($booking->check_in)) {
         return back()->with('error', 'Cancellation requests are no longer allowed after the check-in date.');
     }
 
-    // cek pernah mengajukan pembatalan untuk booking ini sebelumnya
     $existingRequest = CancelRequest::where('reservation_id', $booking->id)->first();
     if ($existingRequest) {
         return redirect()->back()->with('error', 'Kamu sudah mengajukan pembatalan untuk reservasi ini.');
@@ -338,47 +317,20 @@ public function requestCancellation(Request $request, $id)
         'status'            => 'Pending', // Status default saat pertama diajukan
     ]);
 
-    // $booking->update(['status' => 'Pending Cancellation']);
-
     return redirect()->back()->with('success', 'Permintaan pembatalan berhasil dikirim. Menunggu konfirmasi admin.');
 }
 
-// public function renderFavorites()
-// {
-//     // Semua property_id favorit user
-//     $favoriteIds = Favorite::where('user_id', Auth::id())
-//         ->pluck('property_id')
-//         ->toArray();
-
-//     // Ambil semua property dari API
-//     $response = Http::get(env('API_BASE_URL') . '/properties');
-
-//     $properties = [];
-
-//     if ($response->successful()) {
-
-//         $allProperties = $response->json();
-
-//         // Ambil hanya yang ada di favorites
-//         $properties = collect($allProperties)
-//             ->whereIn('id', $favoriteIds)
-//             ->values();
-//     }
-
-//     return view('users.favorites', compact('properties'));
-// }
 
 
 public function renderFavorites()
 {
-    // 1. Ambil semua property_id favorit user saat ini
+   
     $favoriteIds = Favorite::where('user_id', Auth::id())
         ->pluck('property_id')
         ->toArray();
 
     $properties = collect();
 
-    // 2. Ambil data properties dan data units dari API
     try {
         $responseProperties = Http::get(env('API_BASE_URL') . '/properties');
         $responseUnits = Http::get(env('API_BASE_URL') . '/units');
@@ -391,20 +343,14 @@ public function renderFavorites()
     }
 
     if ($apiProperties->isNotEmpty()) {
-        // Filter properti yang hanya di-favoritkan oleh user
         $properties = $apiProperties->whereIn('id', $favoriteIds)->values();
-
-        // 3. Inject starting_price (harga unit termurah) ke setiap properti
         $properties->transform(function ($property) use ($apiUnits) {
-            // Filter unit yang memiliki property_id yang sama dengan properti ini
             $propertyUnits = $apiUnits->filter(function ($unit) use ($property) {
                 return $unit['property_id'] == $property['id'];
             });
 
-            // Ambil harga paling minimum, jika tidak ada unit set default ke 0
             $minPrice = $propertyUnits->isNotEmpty() ? $propertyUnits->min('price') : 0;
 
-            // Masukkan attribute baru 'starting_price' ke dalam array properti
             $property['starting_price'] = $minPrice;
             
             return $property;
@@ -462,8 +408,7 @@ public function addToFav(Request $request)
     $request->validate([
         'reservation_id' => 'required|exists:reservations,id',
         'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'required|string|max:1000',
-        'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        'comment' => 'required|string|max:1000'
     ]);
 
     $reservation = Reservation::where('id', $request->reservation_id)
@@ -486,7 +431,6 @@ if ($propertyIdFromApi != $propertyId) {
     return back()->with('error', 'Invalid reservation.');
 }
 
-    // Sudah pernah review?
     if (Review::where('reservation_id', $reservation->id)->exists()) {
         return back()->with('error', 'You have already reviewed this booking.');
     }
@@ -502,19 +446,6 @@ if ($propertyIdFromApi != $propertyId) {
             'rating' => $request->rating,
             'comment' => $request->comment,
         ]);
-
-        if ($request->hasFile('images')) {
-
-            foreach ($request->file('images') as $image) {
-
-                $path = $image->store('review-images', 'public');
-
-                ReviewImages::create([
-                    'review_id' => $review->id,
-                    'path' => $path
-                ]);
-            }
-        }
 
         DB::commit();
 

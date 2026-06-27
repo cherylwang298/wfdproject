@@ -50,25 +50,15 @@ public function searchAccomodations(Request $request)
     $properties = collect(Http::get(env('API_BASE_URL').'/properties')->json());
   
 
-    // dd($properties->count());
-
-//     $response = Http::get(env('API_BASE_URL').'/units');
-
-// dd(
-//     $response->successful(),
-//     $response->status(),
-//     $response->body()
-// );
-
     $units = collect(Http::get(env('API_BASE_URL').'/units')->json());
 
-    // dd($units->first());
+
 
     $reservations = collect(Http::get(env('API_BASE_URL').'/reservations')->json());
 
-    // property di kota yang dipilih
+
     $properties = $properties->where('city', $request->city);
-    //   dd($properties->values()->all());
+ 
 
     $images = collect(
     Http::get(env('API_BASE_URL').'/images')->json()
@@ -76,7 +66,6 @@ public function searchAccomodations(Request $request)
 
     $typeFilter = $request->query('type_filter', 'all');
     if ($typeFilter !== 'all') {
-        // Filter properti berdasarkan tipe ('hotel' atau 'villa') sesuai string API kamu
         $properties = $properties->where('type', $typeFilter);
     }
 
@@ -87,8 +76,7 @@ public function searchAccomodations(Request $request)
         $propertyUnits = $units
             ->where('property_id', $property['id'])
             ->where('capacity', '>=', $request->guests);
-        // dd($propertyUnits->values()->all());
-
+    
         foreach($propertyUnits as $unit){
 
             $reserved = false;
@@ -110,8 +98,7 @@ public function searchAccomodations(Request $request)
                 }
             }
 
-            // kalau ada SATU unit available,
-            // property langsung ditampilkan
+
             if(!$reserved){
                 return true;
             }
@@ -121,21 +108,7 @@ public function searchAccomodations(Request $request)
 
     });
 
-//     $availableProperties = $availableProperties->map(function ($property) use ($images, $units) {
 
-//     $image = $images
-//         ->where('property_id', $property['id'])
-//         ->first();
-
-//     $property['image'] = $image;
-
-//     // Cari harga unit termurah
-//     $property['min_price'] = $units
-//         ->where('property_id', $property['id'])
-//         ->min('price');
-
-//     return $property;
-// });
 
 $ratings = Review::selectRaw("
         property_id,
@@ -154,12 +127,10 @@ $availableProperties = $availableProperties->map(function ($property) use ($imag
 
     $property['image'] = $image;
 
-    // Harga termurah
     $property['min_price'] = $units
         ->where('property_id', $property['id'])
         ->min('price');
 
-    // Rating
     $rating = $ratings->get($property['id']);
 
     $property['avg_rating'] = $rating
@@ -172,7 +143,7 @@ $availableProperties = $availableProperties->map(function ($property) use ($imag
 
     return $property;
 });
-// });
+
 
 
     $sort = $request->query('sort', 'default');
@@ -184,12 +155,12 @@ $availableProperties = $availableProperties->map(function ($property) use ($imag
     $availableProperties = $availableProperties->sortByDesc('avg_rating');
 }
 
-    // Ambil data list kota untuk menyuplai dropdown pencarian bar yang baru
+   
     $cities = collect(Http::get(env('API_BASE_URL').'/properties')->json())->pluck('city')->unique()->sort()->values();
 
     return view('accomodations.accomodations', [
         'properties' => $availableProperties->values(),
-        'cities' => $cities, // Mengirim data kota kembali ke search bar
+        'cities' => $cities,
         'checkin' => $request->checkin,
         'checkout' => $request->checkout,
         'guests' => $request->guests,

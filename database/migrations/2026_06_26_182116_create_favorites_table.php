@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('favorites', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            // $table->uuid('accomodation_id'); // Mengarah ke properti/villa favorit di API
             $table->string('property_id');
-            // $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('user_id');
-            $table->string('unit_id'); // Relasi ke API Units
-            $table->dateTime('check_in')->nullable(); // Menghindari error default value
+            $table->string('unit_id'); 
+            $table->dateTime('check_in')->nullable(); 
             $table->dateTime('check_out')->nullable();
             $table->unsignedInteger('total_price');
             // $table->string('status')->default('pending');

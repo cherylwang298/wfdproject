@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CancelRequest;
 use App\Models\Payment;
 use App\Models\Reservation;
 use Carbon\Carbon;
@@ -151,18 +152,23 @@ class BookingController extends Controller
             'reason' => 'required|string|max:1000'
         ]);
 
-        // PROTEKSI BACKEND: Cek apakah booking ini sudah punya request cancel yang 'pending' atau 'approved'
-        $existingRequest = \App\Models\CancelRequest::where('flight_booking_id', $id)
+        // KUNCI PERBAIKAN: Cari apakah sudah ada yang berstatus 'approved' atau 'pending'
+        // Dengan mengurutkan status 'approved' di posisi teratas, data 'rejected' tidak akan mengeblok pengajuan baru
+        $existingRequest = CancelRequest::where('flight_booking_id', $id)
             ->whereIn('status', ['pending', 'approved'])
+            ->orderByRaw("FIELD(status, 'approved', 'pending') ASC")
             ->first();
 
         if ($existingRequest) {
-            return back()->with('error', 'Anda sudah mengirimkan permohonan pembatalan untuk penerbangan ini.');
+            if ($existingRequest->status === 'approved') {
+                return back()->with('error', 'Penerbangan ini sudah berhasil dibatalkan sebelumnya.');
+            }
+            return back()->with('error', 'Anda sudah mengirimkan permohonan pembatalan untuk penerbangan ini dan sedang menunggu persetujuan.');
         }
 
         DB::beginTransaction();
         try {
-            \App\Models\CancelRequest::create([
+            CancelRequest::create([
                 'flight_booking_id' => $id,
                 'user_id'           => auth()->id(),
                 'reason'            => $request->reason,
@@ -170,7 +176,7 @@ class BookingController extends Controller
             ]);
 
             DB::commit();
-            return back()->with('success', 'Permohonan pembatalan penerbangan Anda berhasil dikirim dan menunggu persetujuan admin.');
+            return back()->with('success', 'Permohonan pembatalan penerbangan Anda berhasil dikirim.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal mengirim permohonan pembatalan: ' . $e->getMessage());

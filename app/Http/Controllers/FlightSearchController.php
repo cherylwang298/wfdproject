@@ -52,7 +52,6 @@ class FlightSearchController extends Controller
                 'code'           => 'FL-' . rand(100, 999),
                 'class'          => $f['class'],
                 
-                // UBAH BARIS INI: langsung ambil nilai price asli Rupiah dari API
                 'price'          => (int) $f['price'], 
                 
                 'stops'          => 0,

@@ -327,20 +327,18 @@ $currentPage = 'bookings';
                         <span class="text-sm font-mono font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded">{{ $flight->booking_code }}</span>
 
                         {{-- TAMPILKAN UPDATE STATUS PEMBATALAN PESAWAT --}}
-                        @if($flight->cancel_request)
-                        @if(strtolower($flight->cancel_request->status) === 'pending')
-                        <span class="px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-700">Cancel Pending</span>
-                        @elseif(strtolower($flight->cancel_request->status) === 'approved')
-                        <span class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-700">Cancelled</span>
-                        @elseif(strtolower($flight->cancel_request->status) === 'rejected')
-                        <span class="px-2 py-1 text-xs font-bold rounded bg-orange-100 text-orange-700">Cancel Rejected</span>
-                        @endif
+                        @if($flight->cancel_request && strtolower($flight->cancel_request->status) === 'approved')
+                            <span class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-700">Cancelled</span>
+                        @elseif($flight->cancel_request && strtolower($flight->cancel_request->status) === 'pending')
+                            <span class="px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-700">Cancel Pending</span>
+                        @elseif($flight->cancel_request && strtolower($flight->cancel_request->status) === 'rejected')
+                            <span class="px-2 py-1 text-xs font-bold rounded bg-orange-100 text-orange-700">Cancel Rejected</span>
                         @else
-                        @if(($flight->payment->status ?? 'pending') === 'Paid')
-                        <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Issued ✓</span>
-                        @else
-                        <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
-                        @endif
+                            @if(($flight->payment->status ?? 'pending') === 'Paid')
+                                <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">Issued ✓</span>
+                            @else
+                                <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">Pending Payment</span>
+                            @endif
                         @endif
                     </div>
 
@@ -376,24 +374,22 @@ $currentPage = 'bookings';
 
                     <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                         {{-- FITUR CANCEL UNTUK FLIGHT BOOKINGS --}}
-                        @if($flight->cancel_request)
-                        @if(strtolower($flight->cancel_request->status) === 'pending')
-                        <button disabled class="bg-purple-100 text-purple-700 text-xs px-4 py-2 rounded cursor-not-allowed font-semibold w-full md:w-auto">
-                            Cancel Pending Approval
-                        </button>
-                        @elseif(strtolower($flight->cancel_request->status) === 'approved')
-                        <button disabled class="bg-red-100 text-red-700 text-xs px-4 py-2 rounded cursor-not-allowed font-semibold w-full md:w-auto">
-                            Cancelled
-                        </button>
-                        @elseif(strtolower($flight->cancel_request->status) === 'rejected')
-                        <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').showModal()" class="bg-red-500 text-white text-xs px-4 py-2 rounded hover:bg-red-600 transition font-semibold w-full md:w-auto">
-                            Cancel Again
-                        </button>
-                        @endif
+                        @if($flight->cancel_request && strtolower($flight->cancel_request->status) === 'approved')
+                            <button disabled class="bg-red-100 text-red-700 text-xs px-4 py-2 rounded cursor-not-allowed font-semibold w-full md:w-auto">
+                                Cancelled
+                            </button>
+                        @elseif($flight->cancel_request && strtolower($flight->flight_details ? ($flight->cancel_request->status ?? '') : '') === 'pending')
+                            <button disabled class="bg-purple-100 text-purple-700 text-xs px-4 py-2 rounded cursor-not-allowed font-semibold w-full md:w-auto">
+                                Cancel Pending Approval
+                            </button>
+                        @elseif($flight->cancel_request && strtolower($flight->cancel_request->status) === 'rejected')
+                            <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').showModal()" class="bg-red-500 text-white text-xs px-4 py-2 rounded hover:bg-red-600 transition font-semibold w-full md:w-auto">
+                                Cancel Again
+                            </button>
                         @else
-                        <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').showModal()" class="bg-red-500 text-white text-xs px-4 py-2 rounded hover:bg-red-600 transition font-semibold w-full md:w-auto">
-                            Cancel Flight
-                        </button>
+                            <button type="button" onclick="document.getElementById('modal-cancel-flight-{{ $flight->id }}').showModal()" class="bg-red-500 text-white text-xs px-4 py-2 rounded hover:bg-red-600 transition font-semibold w-full md:w-auto">
+                                Cancel Flight
+                            </button>
                         @endif
 
                         <button type="button" onclick="document.getElementById('modal-detail-flight-{{ $flight->id }}').showModal()" class="inline-block bg-blue-600 text-white text-xs px-4 py-2 rounded hover:bg-blue-700 transition w-full md:w-auto text-center font-semibold">

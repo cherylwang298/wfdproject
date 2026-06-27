@@ -115,9 +115,10 @@ class AdminController extends Controller
 
             // 3. Jika pembatalan untuk Tiket Pesawat, ubah status flight booking menjadi 'cancelled'
             if ($cancelRequest->flight_booking_id) {
-                DB::table('flight_bookings')
-                    ->where('id', $cancelRequest->flight_booking_id)
-                    ->update(['status' => 'cancelled']);
+                $flightBooking = \App\Models\FlightBooking::find($cancelRequest->flight_booking_id);
+                if ($flightBooking) {
+                    $flightBooking->update(['status' => 'cancelled']);
+                }
             }
         });
 

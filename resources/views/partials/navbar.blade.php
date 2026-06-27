@@ -2,7 +2,7 @@
     // Inisialisasi rute menu navigasi terpusat
     $navLinks = [
         // SINKRONISASI: Pastikan nama rute sesuai dengan penamaan ->name() di routes/web.php
-        ['label' => 'Home',           'route' => 'homepage',       'icon' => 'home',         'page' => 'home'],
+        ['label' => 'Home',           'route' => 'home',       'icon' => 'home',         'page' => 'home'],
         ['label' => 'Accommodations', 'route' => 'accomodations.open', 'icon' => 'hotel',        'page' => 'hotel'],
         ['label' => 'Flights',       'route' => 'flights',        'icon' => 'flight',       'page' => 'flights'],
         ['label' => 'Deals',         'route' => 'deals',          'icon' => 'local_offer',  'page' => 'promo'],
@@ -14,7 +14,7 @@
 
 <nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-sm transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 md:px-16 flex justify-between items-center h-20">
-        <a class="flex items-center gap-2 hover:opacity-80 transition-opacity" href="{{ route('homepage') }}">
+        <a class="flex items-center gap-2 hover:opacity-80 transition-opacity" href="{{ route('home') }}">
             <span class="material-symbols-outlined text-blue-600 text-[32px] icon-fill">flight_takeoff</span>
             <span class="font-display text-2xl text-on-surface tracking-tight font-bold">Stay<span class="text-blue-600">Go</span></span>
         </a>

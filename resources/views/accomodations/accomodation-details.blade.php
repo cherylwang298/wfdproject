@@ -51,7 +51,19 @@ $currentPage = 'hotel';
                 <h1 class="text-2xl md:text-5xl font-extrabold tracking-tight drop-shadow-md mb-2">{{ $property['name'] }}</h1>
                 <p class="text-xs md:text-sm text-gray-200 flex items-center gap-2 drop-shadow-sm">
                     <span class="material-symbols-outlined text-[18px]">location_on</span>{{ $property['city'] }}
-                    <span class="flex items-center gap-1 ml-4"><span class="material-symbols-outlined text-[16px] text-yellow-400 icon-fill">star</span> 4.8 Rating</span>
+                    {{-- <span class="flex items-center gap-1 ml-4"><span class="material-symbols-outlined text-[16px] text-yellow-400 icon-fill">star</span> 4.8 Rating</span> --}}
+                    <span class="flex items-center gap-1 ml-4">
+    <span class="material-symbols-outlined text-[16px] text-yellow-400 icon-fill">
+        star
+    </span>
+
+    @if($property['review_count'])
+        {{ number_format($property['avg_rating'],1) }}
+        ({{ $property['review_count'] }} reviews)
+    @else
+        No reviews yet
+    @endif
+</span>
                 </p>
             </div>
         </div>
@@ -114,6 +126,100 @@ $currentPage = 'hotel';
                         </div>
                     </div>
                 </div>
+
+                <div>
+
+    <div class="flex items-center justify-between mb-5">
+        <h2 class="text-2xl font-bold text-gray-900">
+            Guest Reviews
+        </h2>
+
+        @if($property['review_count'])
+            <div class="flex items-center gap-2">
+
+                <span class="material-symbols-outlined text-yellow-500 icon-fill">
+                    star
+                </span>
+
+                <span class="font-bold">
+                    {{ number_format($property['avg_rating'],1) }}
+                </span>
+
+                <span class="text-gray-400">
+                    ({{ $property['review_count'] }} reviews)
+                </span>
+
+            </div>
+        @endif
+    </div>
+
+    @forelse($reviews as $review)
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
+
+            <div class="flex justify-between items-start">
+
+                <div>
+
+                    <div class="font-bold text-gray-900">
+                        {{ $review->user->username }}
+                    </div>
+
+                    <div class="text-xs text-gray-400">
+                        {{ $review->created_at->format('d M Y') }}
+                    </div>
+
+                </div>
+
+                <div class="flex items-center gap-1 text-yellow-500">
+
+                    @for($i=1;$i<=5;$i++)
+                        @if($i <= round($review->rating))
+                            <span class="material-symbols-outlined icon-fill">
+                                star
+                            </span>
+                        @else
+                            <span class="material-symbols-outlined">
+                                star
+                            </span>
+                        @endif
+                    @endfor
+
+                </div>
+
+            </div>
+
+            @if($review->comment)
+
+                <p class="mt-4 text-gray-600 leading-relaxed">
+                    {{ $review->comment }}
+                </p>
+
+            @endif
+
+        </div>
+
+    @empty
+
+        <div class="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
+
+            <span class="material-symbols-outlined text-6xl text-gray-300 mb-3">
+                reviews
+            </span>
+
+            <h3 class="text-lg font-bold text-gray-800">
+                No reviews yet
+            </h3>
+
+            <p class="text-sm text-gray-400 mt-2">
+                Be the first guest to leave a review for this property.
+            </p>
+
+        </div>
+
+    @endforelse
+
+</div>
 
                 {{-- AVAILABLE UNITS --}}
                 <div>
@@ -200,7 +306,16 @@ $currentPage = 'hotel';
                         </div>
                         <div class="flex items-center gap-1 bg-yellow-50 border border-yellow-100 px-2.5 py-1 rounded-xl shadow-sm">
                             <span class="material-symbols-outlined text-yellow-500 text-[18px] icon-fill">star</span>
-                            <span class="text-sm font-bold text-gray-800">4.8</span>
+                            {{-- <span class="text-sm font-bold text-gray-800">4.8</span> --}}
+                            @if($property['review_count'])
+    <span class="text-sm font-bold text-gray-800">
+        {{ number_format($property['avg_rating'],1) }}
+    </span>
+@else
+    <span class="text-xs text-gray-500">
+        No reviews
+    </span>
+@endif
                         </div>
                     </div>
 

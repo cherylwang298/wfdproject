@@ -6,6 +6,7 @@ use App\Models\Favorite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use App\Models\Review;
 
 class SearchController extends Controller
 {
@@ -120,7 +121,32 @@ public function searchAccomodations(Request $request)
 
     });
 
-    $availableProperties = $availableProperties->map(function ($property) use ($images, $units) {
+//     $availableProperties = $availableProperties->map(function ($property) use ($images, $units) {
+
+//     $image = $images
+//         ->where('property_id', $property['id'])
+//         ->first();
+
+//     $property['image'] = $image;
+
+//     // Cari harga unit termurah
+//     $property['min_price'] = $units
+//         ->where('property_id', $property['id'])
+//         ->min('price');
+
+//     return $property;
+// });
+
+$ratings = Review::selectRaw("
+        property_id,
+        AVG(rating) as avg_rating,
+        COUNT(*) as review_count
+    ")
+    ->groupBy('property_id')
+    ->get()
+    ->keyBy('property_id');
+
+$availableProperties = $availableProperties->map(function ($property) use ($images, $units, $ratings) {
 
     $image = $images
         ->where('property_id', $property['id'])
@@ -128,10 +154,21 @@ public function searchAccomodations(Request $request)
 
     $property['image'] = $image;
 
-    // Cari harga unit termurah
+    // Harga termurah
     $property['min_price'] = $units
         ->where('property_id', $property['id'])
         ->min('price');
+
+    // Rating
+    $rating = $ratings->get($property['id']);
+
+    $property['avg_rating'] = $rating
+        ? round($rating->avg_rating, 1)
+        : 0;
+
+    $property['review_count'] = $rating
+        ? $rating->review_count
+        : 0;
 
     return $property;
 });
@@ -143,9 +180,9 @@ public function searchAccomodations(Request $request)
         $availableProperties = $availableProperties->sortBy('min_price');
     } elseif ($sort === 'price_desc') {
         $availableProperties = $availableProperties->sortByDesc('min_price');
-    } elseif ($sort === 'rating_desc') {
-        $availableProperties = $availableProperties->sortByDesc('rating');
-    }
+   }elseif ($sort === 'rating_desc') {
+    $availableProperties = $availableProperties->sortByDesc('avg_rating');
+}
 
     // Ambil data list kota untuk menyuplai dropdown pencarian bar yang baru
     $cities = collect(Http::get(env('API_BASE_URL').'/properties')->json())->pluck('city')->unique()->sort()->values();
@@ -158,7 +195,6 @@ public function searchAccomodations(Request $request)
         'guests' => $request->guests,
     ]);
 }
-
 
 
 public function openPropertyDetail(Request $request, $id)
@@ -201,6 +237,14 @@ public function openPropertyDetail(Request $request, $id)
 
         $isFavorite = Favorite::where('user_id', Auth::id())
         ->where('property_id', $property['id'])->exists();
+    
+        $reviews = Review::with('user')
+        ->where('property_id', $id)
+        ->latest()
+        ->get();
+
+    $property['avg_rating'] = round($reviews->avg('rating') ?? 0, 1);
+    $property['review_count'] = $reviews->count();
 
     return view('accomodations.accomodation-details', [
         'property' => $property,
@@ -208,7 +252,8 @@ public function openPropertyDetail(Request $request, $id)
         'checkin' => $request->query('checkin'),
         'checkout' => $request->query('checkout'),
         'guests' => $request->query('guests'),
-        'isFavorite' => $isFavorite
+        'isFavorite' => $isFavorite,
+        'reviews' => $reviews
     ]); 
 }
 

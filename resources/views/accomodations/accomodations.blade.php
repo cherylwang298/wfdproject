@@ -245,7 +245,20 @@ $currentPage = 'hotel';
                             <div class="flex justify-between items-start gap-2">
                                 <h2 class="font-bold text-lg leading-tight line-clamp-1">{{ $property['name'] }}</h2>
                                 <span class="text-yellow-500 font-bold shrink-0 flex items-center text-sm gap-0.5">
-                                    <span class="material-symbols-outlined text-sm icon-fill">star</span>{{ number_format($property['rating'] ?? 4.8, 1) }}
+                                    {{-- <span class="material-symbols-outlined text-sm icon-fill">star</span>{{ number_format($property['rating'] ?? 4.8, 1) }} --}}
+                                    @if($property['review_count'] > 0)
+                                <span class="text-yellow-500 font-bold shrink-0 flex items-center text-sm gap-0.5">
+                                    <span class="material-symbols-outlined text-sm icon-fill">star</span>
+                                    {{ number_format($property['avg_rating'], 1) }}
+                                    <span class="text-xs text-gray-400">
+                                        ({{ $property['review_count'] }})
+                                    </span>
+                                </span>
+                            @else
+                                <span class="text-xs text-gray-400 font-medium">
+                                    No reviews
+                                </span>
+                            @endif
                                 </span>
                             </div>
                             <p class="text-gray-400 text-xs font-semibold flex items-center gap-0.5 mt-1">

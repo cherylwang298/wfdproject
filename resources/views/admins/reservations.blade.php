@@ -103,11 +103,23 @@
                         <div class="flex justify-end gap-2 items-center">
                             <button type="button" onclick="openDetailModal('{{ $reservation->id }}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl text-sm font-medium transition">Detail</button>
                             <button type="button" onclick="openEditModal(this)" data-id="{{ $reservation->id }}" data-code="{{ $reservation->booking_code }}" data-status="{{ $reservation->status }}" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-2 rounded-xl text-sm font-medium transition">Edit</button>
-                            <form action="{{ route('admin.reservations.destroy', $reservation->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Apakah Anda yakin menghapus reservasi ini?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">Delete</button>
-                            </form>
+                           <form action="{{ route('admin.reservations.destroy', $reservation->id) }}"
+      method="POST"
+      class="inline deleteReservationForm">
+
+    @csrf
+    @method('DELETE')
+
+    <button
+        type="submit"
+        class="deleteReservationBtn bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition"
+        data-id="{{ $reservation->id }}">
+
+        Delete
+
+    </button>
+
+</form>
                         </div>
                     </td>
                 </tr>
@@ -282,8 +294,62 @@ document.addEventListener('DOMContentLoaded', function() {
         flightDetailModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+
+    // DELETE RESERVATION CONFIRMATION
+document.querySelectorAll('.deleteReservationForm').forEach(form => {
+
+    form.addEventListener('submit', function(e) {
+
+        e.preventDefault();
+
+        const id = form.querySelector('.deleteReservationBtn').dataset.id;
+
+        Swal.fire({
+            title: 'Delete Reservation?',
+            html: `Are you sure you want to delete reservation <b>#${id}</b>?<br><br>This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+
+            if(result.isConfirmed){
+                form.submit();
+            }
+
+        });
+
+    });
+
+});
 });
 </script>
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: '{{ session('success') }}',
+    timer: 1800,
+    showConfirmButton: false
+});
+</script>
+@endif
+
+@if(session('error'))
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Unable to Delete',
+    text: '{{ session('error') }}',
+    confirmButtonColor: '#2563eb'
+});
+</script>
+@endif
 @endsection
 
 @push('modals')

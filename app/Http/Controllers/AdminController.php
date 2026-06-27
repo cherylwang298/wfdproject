@@ -226,8 +226,15 @@ public function editReserv(Request $request, $id)
     public function deleteReserv($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->delete();
+        $status = $reservation->status;
 
+        if($status == 'pending' || $status == 'confirmed'){
+            return redirect()->back()->with('error', 'Reservation cannot be deleted.');
+        }
+        else{
+        $reservation->delete();
+        }
+        
         return redirect()->back()->with('success', 'Reservation deleted.');
     }
 

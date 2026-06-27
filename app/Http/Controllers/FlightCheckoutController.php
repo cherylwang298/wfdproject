@@ -37,8 +37,8 @@ class FlightCheckoutController extends Controller
         // 3. Transformasikan data penerbangan agar menyertakan string nama 'airline'
         $flights = collect($rawFlights)->map(function ($f) use ($airlineMap) {
             $f['airline'] = $airlineMap[$f['airline_id']] ?? 'Unknown Airline'; // Tambahkan key airline secara dinamis
-            $f['from']        = $f['origin'];      // <-- TAMBAHKAN ALIAS INI
-            $f['to']          = $f['destination']; // <-- TAMBAHKAN ALIAS INI
+            $f['from']        = $f['origin'];
+            $f['to']          = $f['destination'];
             return $f;
         });
 

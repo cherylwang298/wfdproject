@@ -241,16 +241,27 @@ $currentPage = 'hotel';
                     @if($units->count())
                     <div class="space-y-4">
                         @foreach($units as $unit)
+                        @php
+                            // Menyediakan 3 pilihan gambar dummy interior kamar unit yang bervariasi
+                            $unitDummies = [
+                                'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80', // Deluxe Bedroom
+                                'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&q=80', // Executive Suite
+                                'https://images.unsplash.com/photo-1568495248636-6432b97bd949?w=600&q=80'  // Luxury King Room
+                            ];
+
+                            // Alokasikan gambar dummy secara dinamis berdasarkan indeks perulangan saat ini
+                            $assignedUnitDummy = $unitDummies[$loop->index % 3];
+                        @endphp
+
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row overflow-hidden transition-all hover:shadow-md">
 
                             {{-- UNIT IMAGE --}}
                             <div class="w-full md:w-60 h-44 md:h-auto bg-gray-100 shrink-0 relative">
                                 @if($unit['image'])
-                                <img src="{{ asset('storage/'.$unit['image']['path']) }}" class="w-full h-full object-cover md:absolute md:inset-0">
+                                    <img src="{{ asset('storage/'.$unit['image']['path']) }}" class="w-full h-full object-cover md:absolute md:inset-0" alt="{{ $unit['name'] }}">
                                 @else
-                                <div class="w-full h-full md:absolute md:inset-0 flex items-center justify-center text-gray-400 text-xs bg-gray-100">
-                                    No Image Available
-                                </div>
+                                    {{-- FALLBACK KUNCI: Menampilkan salah satu dari 3 gambar dummy unik jika foto kosong --}}
+                                    <img src="{{ $assignedUnitDummy }}" class="w-full h-full object-cover md:absolute md:inset-0" alt="{{ $unit['name'] }}">
                                 @endif
                             </div>
 

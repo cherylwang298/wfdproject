@@ -153,9 +153,11 @@ $currentPage = 'hotel';
                 <div class="flex gap-4 pb-6 border-b border-gray-100">
                     <div class="w-24 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
                         @if($unit['image'])
-                            <img src="{{ asset('storage/'.$unit['image']['path']) }}" class="w-full h-full object-cover">
+                            {{-- Jika ada gambar asli dari database storage --}}
+                            <img src="{{ asset('storage/'.$unit['image']['path']) }}" class="w-full h-full object-cover" alt="{{ $unit['name'] }}">
                         @else
-                            <div class="w-full h-full flex items-center justify-center text-xs text-gray-400">No Image</div>
+                            {{-- FALLBACK: Gambar dummy interior kamar hotel/resort mewah --}}
+                            <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=300&q=80" class="w-full h-full object-cover" alt="{{ $unit['name'] }}">
                         @endif
                     </div>
                     <div>

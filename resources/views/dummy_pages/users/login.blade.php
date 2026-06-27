@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css'])
+
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
@@ -20,6 +22,8 @@
             {{ session('success') }}
         </div>
     @endif
+
+    
 
     @if($errors->any())
         <div class="mb-4 bg-red-100 text-red-700 px-4 py-3 rounded-lg">
@@ -73,6 +77,18 @@
     </div>
 
 </div>
+
+
+@if(session('error'))
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Login Failed',
+    text: '{{ session('error') }}',
+    confirmButtonColor: '#2563eb'
+});
+</script>
+@endif
 
 </body>
 </html>

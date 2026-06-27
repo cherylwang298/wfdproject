@@ -151,5 +151,3 @@ Route::get('/properties/{id}', [SearchController::class, 'openPropertyDetail'])
     ->name('property.detail');
 
 
-// butuh user middleware:
-

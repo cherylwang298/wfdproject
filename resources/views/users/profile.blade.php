@@ -7,12 +7,41 @@
 <div class="max-w-4xl mx-auto pt-24 pb-20 px-4 sm:px-6">
 
     {{-- HEADER SECTION --}}
-    <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-            Profile Management
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">Update your personal information and account security settings.</p>
+<div class="flex items-start justify-between mb-8">
+
+    <div class="flex items-center gap-4">
+
+        <a href="{{ route('home') }}"
+           class="flex items-center justify-center w-11 h-11 rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition shadow-sm">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="w-5 h-5"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.75 19.5L8.25 12l7.5-7.5"/>
+
+            </svg>
+
+        </a>
+
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                Profile Management
+            </h1>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Update your personal information and account security settings.
+            </p>
+        </div>
+
     </div>
+
+</div>
 
     {{-- ALERT NOTIFICATION --}}
     @if(session('success'))

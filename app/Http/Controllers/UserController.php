@@ -22,23 +22,37 @@ class UserController extends Controller
         return view('auth.login');
     }
  
-    public function login(Request $request)
+   public function login(Request $request)
 {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
     ]);
 
+    // Cari user berdasarkan email
+    $user = User::where('email', $request->email)->first();
+
+    // User tidak ditemukan
+    if (!$user) {
+        return back()
+            ->withInput()
+            ->withErrors([
+                'email' => 'Email atau password salah.',
+            ]);
+    }
+
+    // Cek status akun
+    if ($user->status === 'suspended') {
+        return back()
+            ->withInput()
+            ->withErrors([
+                'email' => 'Your account is suspended.',
+            ]);
+    }
+
+    // Cek password
     if (Auth::attempt($credentials)) {
-        //    dd('LOGIN BERHASIL');
-
         $request->session()->regenerate();
-
-        // dd(
-        //     Auth::check(),
-        //     Auth::id(),
-        //     session()->all()
-        // );
 
         return redirect()->route('home');
     }

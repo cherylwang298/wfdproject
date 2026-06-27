@@ -74,9 +74,9 @@
             <img src="{{ $img }}" alt="Gallery view" class="w-full h-full object-cover">
         </div>
         @endforeach
-        <div class="w-32 h-24 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200/50">
+        {{-- <div class="w-32 h-24 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200/50">
             <span class="text-xs font-semibold text-gray-600 text-center px-2">+12 More Photos</span>
-        </div>
+        </div> --}}
     </div>
 </div>
 

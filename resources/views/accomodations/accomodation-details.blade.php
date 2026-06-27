@@ -85,9 +85,9 @@ $currentPage = 'hotel';
                 <img src="{{ $img }}" alt="Gallery view" class="w-full h-full object-cover">
             </div>
             @endforeach
-            <div class="w-24 h-16 md:w-32 md:h-22 rounded-xl overflow-hidden shrink-0 bg-white flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors border border-gray-200/60 shadow-sm">
+            {{-- <div class="w-24 h-16 md:w-32 md:h-22 rounded-xl overflow-hidden shrink-0 bg-white flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors border border-gray-200/60 shadow-sm">
                 <span class="text-xs font-bold text-gray-600 text-center px-2">+6 Photos</span>
-            </div>
+            </div> --}}
         </div>
     </div>
 

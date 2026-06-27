@@ -87,8 +87,9 @@
 
             @if($booking->booking_type == 'hotel')
 
+                
                 <p class="font-bold text-gray-800">
-                    {{ $booking->user->name ?? $booking->guest_name }}
+                    {{  $booking->guest_name ?? $booking->user->username }}
                 </p>
 
                 <p class="text-xs text-gray-400">
@@ -97,8 +98,11 @@
 
             @else
 
+                @php
+                $fullname = $booking->user->first_name . ' ' . $booking->user->last_name;
+                @endphp
                 <p class="font-bold text-gray-800">
-                    {{ $booking->user->name ?? $booking->passenger_name }}
+                    {{ $booking->user->username ?? $fullname }}
                 </p>
 
                 <p class="text-xs text-gray-400">

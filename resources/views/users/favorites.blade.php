@@ -6,6 +6,8 @@
 $currentPage = 'favorites';
 @endphp
 
+
+
 @include('partials.navbar')
 
 <div class="max-w-7xl mx-auto px-6 pt-28 pb-20">
@@ -73,25 +75,45 @@ $currentPage = 'favorites';
 
         @else
 
+            @php
+$dummyImages = [
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1568495248636-6432b97bd949?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1529290130-4ca3753253ae?w=600&auto=format&fit=crop&q=80'
+];
+@endphp
+
+
             {{-- Favorite List --}}
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
 
                 @foreach($properties as $property)
+
+                @php
+                $assignedDummy = $dummyImages[$loop->index % 10];
+                @endphp
 
                     <div class="group rounded-3xl overflow-hidden bg-white shadow hover:shadow-xl transition duration-300">
 
                         {{-- Image --}}
                         <div class="relative h-72 overflow-hidden">
 
-                            @if(isset($property['image']))
-                                <img
-                                    src="{{ asset('storage/'.$property['image']['path']) }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            @else
-                                <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                    No Image
-                                </div>
-                            @endif
+                           @if(!empty($property['image']))
+    <img
+        src="{{ asset('storage/'.$property['image']['path']) }}"
+        class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+@else
+    <img
+        src="{{ $assignedDummy }}"
+        class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+@endif
 
                             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
 

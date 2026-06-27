@@ -181,11 +181,22 @@
                     <td class="px-6 py-5">
                         <div class="flex justify-end gap-2 items-center">
                             <button type="button" onclick="openFlightDetailModal('{{ $booking->id }}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl text-sm font-medium transition">Detail</button>
-                            <form action="{{ route('admin.flight-bookings.destroy', $booking->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Hapus booking penerbangan ini?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition">Delete</button>
-                            </form>
+                            <form action="{{ route('admin.flight-bookings.destroy', $booking->id) }}"
+      method="POST"
+      class="inline deleteFlightForm">
+
+    @csrf
+    @method('DELETE')
+
+    <button
+        type="submit"
+        class="deleteFlightBtn bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-sm font-medium transition"
+        data-code="{{ $booking->booking_code }}">
+
+        Delete
+
+    </button>
+</form>
                         </div>
                     </td>
                 </tr>
@@ -317,6 +328,37 @@ document.querySelectorAll('.deleteReservationForm').forEach(form => {
         }).then((result) => {
 
             if(result.isConfirmed){
+                form.submit();
+            }
+
+        });
+
+    });
+
+});
+
+// DELETE FLIGHT BOOKING CONFIRMATION
+document.querySelectorAll('.deleteFlightForm').forEach(form => {
+
+    form.addEventListener('submit', function(e) {
+
+        e.preventDefault();
+
+        const bookingCode = form.querySelector('.deleteFlightBtn').dataset.code;
+
+        Swal.fire({
+            title: 'Delete Flight Booking?',
+            html: `Are you sure you want to delete booking <b>${bookingCode}</b>?<br><br>This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+
+            if (result.isConfirmed) {
                 form.submit();
             }
 

@@ -17,7 +17,7 @@ $currentPage = 'hotel';
     </div>
 @endif
 
-{{-- TAMBAHKAN BLOCK INI UNTUK MELIHAT ERROR --}}
+
 @if(session('error'))
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6">
         <strong>Error:</strong> {{ session('error') }}
@@ -46,7 +46,7 @@ $currentPage = 'hotel';
                
                 <input id="promoId" type="hidden" name="promo_id" value="{{ $promoId ?? '' }}">
 
-                {{-- DETAIL PEMESAN (EDITABLE) --}}
+              
                 <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
                     <h2 class="text-2xl font-bold mb-6 text-gray-800">Contact Details</h2>
                     
@@ -75,7 +75,7 @@ $currentPage = 'hotel';
                     </div>
                 </div>
 
-                {{-- METODE PEMBAYARAN --}}
+               
                 <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
                     <h2 class="text-2xl font-bold mb-6 text-gray-800">Payment Method</h2>
                     
@@ -137,14 +137,14 @@ $currentPage = 'hotel';
 @endphp --}}
  {{-- <input type="hidden" name="total_price" value="{{ $totalPrice }}"> --}}
 
-                {{-- TOMBOL BOOK NOW --}}
+              
                 <button id="bookNowBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-blue-200 transition duration-200">
                     Book Now
                 </button>
             </form>
         </div>
 
-        {{-- RIGHT COLUMN: RINGKASAN BOOKING & HARGA TOTAL --}}
+        {{-- RINGKASAN BOOKING & HARGA TOTAL --}}
         <div class="space-y-6">
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-28">
                 <h2 class="text-xl font-bold mb-4 text-gray-800">Price Details</h2>

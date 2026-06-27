@@ -10,7 +10,6 @@ $currentPage = 'bookings';
 <div class="container mx-auto px-4 py-8 max-w-7xl pt-28">
     <h1 class="text-2xl font-bold mb-6 text-gray-800">My Bookings</h1>
 
-    {{-- ALERT COMPONENT --}}
     @if(session('success'))
     <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
         {{ session('success') }}

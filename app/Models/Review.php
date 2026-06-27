@@ -16,7 +16,7 @@ class Review extends Model
    
     protected $fillable = [
         'user_id',
-        'property_id', // Disimpan sebagai referensi UUID ke API Properties
+        'property_id',
         'rating',
         'comment',
         'reservation_id'

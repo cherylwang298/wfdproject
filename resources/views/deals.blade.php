@@ -14,7 +14,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        /* Modifikasi border putus-putus CSS Native lama ke Tailwind-friendly inline SVG */
+       
         .dashed-coupon-border {
             background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%232563eb' stroke-width='2' stroke-dasharray='6%2c6' stroke-dashoffset='0' stroke-opacity='0.3'/%3e%3c/svg%3e");
             border-radius: 16px;
@@ -102,9 +102,7 @@
 @include('partials.footer')
 
 <script>
-    /**
-     * Menyalin kode voucher kupon secara otomatis ke clipboard sistem operasi pengguna
-     */
+   
     function copyCode(btn, code) {
         navigator.clipboard.writeText(code).then(() => {
             const icon = btn.querySelector('span');

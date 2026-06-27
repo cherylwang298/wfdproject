@@ -152,8 +152,6 @@ class BookingController extends Controller
             'reason' => 'required|string|max:1000'
         ]);
 
-        // KUNCI PERBAIKAN: Cari apakah sudah ada yang berstatus 'approved' atau 'pending'
-        // Dengan mengurutkan status 'approved' di posisi teratas, data 'rejected' tidak akan mengeblok pengajuan baru
         $existingRequest = CancelRequest::where('flight_booking_id', $id)
             ->whereIn('status', ['pending', 'approved'])
             ->orderByRaw("FIELD(status, 'approved', 'pending') ASC")

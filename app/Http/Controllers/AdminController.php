@@ -68,16 +68,11 @@ class AdminController extends Controller
 
     public function AdminLogout(Request $request)
     {
-        // 1. Proses logout khusus untuk guard admin
+
         Auth::guard('admin')->logout();
-
-        // 2. Hancurkan session admin saat ini agar aman
         $request->session()->invalidate();
-
-        // 3. Buat ulang token session baru untuk mencegah session fixation
         $request->session()->regenerateToken();
 
-        // 4. Lempar kembali ke halaman login admin
         return redirect()->route('admin.login')->with('success', 'Logout successful.');
     }
 
@@ -92,28 +87,24 @@ class AdminController extends Controller
 
     public function approveCancelRequest($id)
     {
-        // Cari data cancel request berdasarkan ID, jika tidak ada lepar error 404
+      
         $cancelRequest = CancelRequest::findOrFail($id);
 
-        // Pastikan hanya request berstatus 'pending' yang bisa diproses
+      
         if ($cancelRequest->status !== 'pending') {
             return redirect()->back()->with('error', 'This request has already been processed.');
         }
 
-        // Jalankan Database Transaction agar kedua perubahan sukses bersamaan
+   
         DB::transaction(function () use ($cancelRequest) {
-            // 1. Ubah status cancel request menjadi approved
             $cancelRequest->update(['status' => 'approved']);
 
-            // 2. Jika pembatalan untuk Hotel/Reservation, ubah status reservasi menjadi 'cancelled'
             if ($cancelRequest->reservation_id) {
-                // Catatan: Pastikan kolom 'status' ada di table reservations Anda (misal: 'pending', 'success', 'cancelled')
                 DB::table('reservations')
                     ->where('id', $cancelRequest->reservation_id)
                     ->update(['status' => 'cancelled']);
             }
 
-            // 3. Jika pembatalan untuk Tiket Pesawat, ubah status flight booking menjadi 'cancelled'
             if ($cancelRequest->flight_booking_id) {
                 $flightBooking = \App\Models\FlightBooking::find($cancelRequest->flight_booking_id);
                 if ($flightBooking) {
@@ -133,8 +124,7 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'This request has already been processed.');
         }
 
-        // Jika ditolak, kita hanya perlu mengubah status cancel_requests menjadi 'rejected'
-        // Data reservation / flight_bookings tidak berubah (tetap aktif/aman)
+      
         $cancelRequest->update(['status' => 'rejected']);
 
         return redirect()->back()->with('success', 'Cancel request rejected.');

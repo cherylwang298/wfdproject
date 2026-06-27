@@ -192,7 +192,7 @@
   </div>
 </main>
 
-{{-- INTERACTIVE JAVASCRIPT --}}
+
 <script>
   function togglePwd(inputId, eyeId) {
     const inp = document.getElementById(inputId);

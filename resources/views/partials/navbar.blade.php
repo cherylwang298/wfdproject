@@ -1,7 +1,5 @@
 @php
-    // Inisialisasi rute menu navigasi terpusat
-    $navLinks = [
-        // SINKRONISASI: Pastikan nama rute sesuai dengan penamaan ->name() di routes/web.php
+    $navLinks = [   
         ['label' => 'Home',           'route' => 'home',       'icon' => 'home',         'page' => 'home'],
         ['label' => 'Accommodations', 'route' => 'accomodations.open', 'icon' => 'hotel',        'page' => 'hotel'],
         ['label' => 'Flights',       'route' => 'flights',        'icon' => 'flight',       'page' => 'flights'],
@@ -41,7 +39,7 @@
 
             {{-- <div class="flex items-center gap-3 pl-3 border-l border-gray-200"> --}}
                 <div class="hidden md:flex items-center gap-3 pl-3 border-l border-gray-200">
-                {{-- Tampilan Kondisional jika User sudah login --}}
+                {{-- tmpilan Kondisional jika User sudah login --}}
                 @auth
                     @php
                         $firstName = Auth::user()->first_name ?? '';

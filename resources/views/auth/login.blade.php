@@ -133,7 +133,7 @@
   </div>
 </main>
 
-{{-- INTERACTIVE JAVASCRIPT --}}
+
 <script>
   function togglePwd() {
     const inp = document.getElementById('password');

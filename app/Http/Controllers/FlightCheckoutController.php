@@ -78,8 +78,8 @@ class FlightCheckoutController extends Controller
             'passengers' => 'required|array',
             'passengers.*.name' => 'required|string',
             'passengers.*.phone' => 'required|string',
-            'payment_method' => 'required', // Menerima: Bank Transfer, E-Wallet, atau Credit Card
-            'promo_id' => 'nullable'         // Menerima input id promo jika kupon sukses di-apply
+            'payment_method' => 'required', 
+            'promo_id' => 'nullable'        
         ]);
 
         // Mulai database transaction lokal
@@ -103,9 +103,9 @@ class FlightCheckoutController extends Controller
             }
 
             $totalAmount = 0;
-            $ticketPayloads = []; // Menampung data untuk dikirim ke API nanti
+            $ticketPayloads = []; 
 
-            // 2. Loop entri form input dinamis penumpang
+            // input dinamis penumpang
             foreach ($request->passengers as $pData) {
                 // Simpan ke tabel passengers lokal
                 $passenger = Passenger::create([
@@ -115,10 +115,10 @@ class FlightCheckoutController extends Controller
                     'passport_number' => $pData['passport'] ?? null
                 ]);
 
-                // Generasi kursi acak
+                //  kursi acak
                 $outboundSeat = 'ECO-' . rand(10, 99) . chr(rand(65, 70));
 
-                // Simpan data Tiket Keberangkatan (Outbound Ticket) lokal
+            
                 Ticket::create([
                     'flight_id' => $request->outbound_id,
                     'flight_booking_id' => $booking->id,
@@ -129,14 +129,13 @@ class FlightCheckoutController extends Controller
                 ]);
                 $totalAmount += $request->outbound_price;
 
-                // Catat payload untuk API (Outbound)
+              
                 $ticketPayloads[] = [
                     'flight_id' => $request->outbound_id,
                     'seat_number' => $outboundSeat,
                     'seat_type' => 'economy'
                 ];
 
-                // Jika ada tiket kepulangan (Inbound Ticket)
                 if ($request->has('inbound_id') && $request->inbound_id) {
                     $inboundSeat = 'ECO-' . rand(10, 99) . chr(rand(65, 70));
 
@@ -161,13 +160,12 @@ class FlightCheckoutController extends Controller
 
             $grandTotalFinal = (int) $request->input('total_price');
 
-            // 3. Tambahkan biaya pajak & fees 12%
+           
             if (!$grandTotalFinal || $grandTotalFinal <= 0) {
                 $finalTax = round($totalAmount * 0.12);
                 $grandTotalFinal = $totalAmount + $finalTax;
             }
 
-            // 4. Catat riwayat log ke tabel payments lokal
             Payment::create([
                 'flight_booking_id' => $booking->id,
                 'reservation_id' => null,
@@ -176,11 +174,7 @@ class FlightCheckoutController extends Controller
                 'status' => 'Paid'
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | KIRIM DATA KE REPO API (Untuk Mengurangi Seats Left)
-            |--------------------------------------------------------------------------
-            */
+         
             // Sesuaikan endpoint '/tickets' dengan endpoint di Controller API Anda yang memproses pengurangan seat
             $response = Http::post(env('API_BASE_URL') . '/tickets', [
                 'application_booking_id' => $booking->id,
@@ -188,7 +182,7 @@ class FlightCheckoutController extends Controller
                 'tickets'                => $ticketPayloads // Mengirim array berisikan flight_id yang dibeli
             ]);
 
-            // Cek jika API mengembalikan status gagal (misal: seats berstatus penuh/validasi error)
+          
             if (!$response->successful()) {
                 $apiError = $response->body();
                 throw new \Exception('Gagal sinkronisasi data ke API Penerbangan. Detail: ' . $apiError);
